@@ -1,6 +1,6 @@
 #include "../include/ColourDial.h"
 
-ColourDial::ColourDial() //int TotalBands, int InnerRadius, int OuterRadius, int OriginX, int OriginY, float Thickness
+ColourDial::ColourDial() 
 {
     BandsAmount = 1530;  //More or less forced, 3 values in RGB, 2 states each (rising, falling), between 0-255 totals (6 *255) 1530 possible bands
 
@@ -10,12 +10,13 @@ ColourDial::ColourDial() //int TotalBands, int InnerRadius, int OuterRadius, int
     DialInnerRadius = 244;
     DialOuterRadius = DialInnerRadius + 45;
 
-    DialBoundingBox = {
-                        DialOriginX - DialOuterRadius,
-                        DialOriginX + DialOuterRadius,
-                        DialOriginY - DialOuterRadius,
-                        DialOriginY + DialOuterRadius};//The left mouse button is currently being pressed somewhere in the bounding box around the RGBdial
-
+    DialBoundingBox =   {
+                            DialOriginX - DialOuterRadius,
+                            DialOriginX + DialOuterRadius,
+                            DialOriginY - DialOuterRadius,
+                            DialOriginY + DialOuterRadius
+                        };
+                        
     MapOfRGBSaturates = GenerateRGBTuples();
     MapOFDialPositions = CalculateDialPositions();
     

@@ -21,7 +21,7 @@ OBJECTNAMES := $(patsubst $(SOURCE_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SOURCENAMES))
 
 #object file linking
 $(OUTPUT): $(OBJECTNAMES)
-	$(CXX) -o $@ $^ $(CXXFLAGS) $(LIBS) 
+	$(CXX) -o $@ $^  $(LIBS) 
 
 #object file generation
 $(OBJ_DIR)/%.o: $(SOURCE_DIR)/%.cpp
@@ -29,12 +29,14 @@ $(OBJ_DIR)/%.o: $(SOURCE_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 run: $(OUTPUT)
-	$<
+	./$<
 
 check: $(OUTPUT)
-	valgrind --leak-check=full $<
+	valgrind --leak-check=full ./$<
 
 clean:
 ifneq ($(wildcard $(BUILD_DIR)),)
 	@rm -rf $(BUILD_DIR)
 endif
+
+.PHONY: run check clean
