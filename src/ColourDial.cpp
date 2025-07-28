@@ -18,6 +18,8 @@ void ColourDial::Initialise(int SetOriginX, int SetOriginY, int SetOuterRadius)
     DialOuterRadius = SetOuterRadius;
     DialBandThickness = (DialOuterRadius - DialInnerRadius) * 0.1; //10% of the Dial's thickness is a wild guess, might update later
 
+    RGBSquare.Initialise(DialOriginX, DialOriginY, DialInnerRadius);
+
     MapOFDialPositions = CalculateDialPositions();  
 }
 
@@ -92,6 +94,8 @@ void ColourDial::DrawRGBDial()
             DialBandThickness, BaseColour
         );
     }
+
+    DrawRectangle(RGBSquare.XAnchorPoint, RGBSquare.YAnchorPoint, RGBSquare.SquareEdgeLength, RGBSquare.SquareEdgeLength, RGBSquare.SquareBaseColour);
 }
 
 

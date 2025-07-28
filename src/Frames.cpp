@@ -6,7 +6,7 @@ Frames::Frames()
     AnchorY = 0;
     LenX = 0;
     LenY = 0;
-    EdgeButtonSize = 10;
+    EdgeButtonSize = 40;
 }
 
 
@@ -27,4 +27,12 @@ void Frames::DrawFrameBox()
     DrawRectangleLines(AnchorX, AnchorY, LenX, LenY, RAYWHITE);
     DrawRectangle(MoveButtonRoot[0], MoveButtonRoot[1], EdgeButtonSize, EdgeButtonSize, RAYWHITE);
     DrawRectangle(ScaleButtonRoot[0], ScaleButtonRoot[1], EdgeButtonSize, EdgeButtonSize, RAYWHITE);
+}
+
+
+void Frames::SetFrameRatio(double RatioXY)
+{
+    //This is a stupid, but for the time easy way to force a ratio on frames
+    LenY = LenX * RatioXY;
+    ScaleButtonRoot = {LenX + AnchorX - EdgeButtonSize, LenY + AnchorY - EdgeButtonSize};
 }

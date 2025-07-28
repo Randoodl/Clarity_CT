@@ -1,6 +1,7 @@
 #pragma once
 
-#include "./ColourDial.h"
+#include <raylib.h>
+#include <cmath>
 
 class GradientSquare
 {
@@ -14,5 +15,4 @@ class GradientSquare
 
         Color SquareBaseColour;
         void Initialise(int OffsetX, int OffsetY, int DialInnerRadius);
-        void DrawGradientSquare();
 };

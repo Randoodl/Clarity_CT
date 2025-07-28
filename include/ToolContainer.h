@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./GradientSquare.h"
+#include "./ColourDial.h"
 #include "./Frames.h"
 
 class ToolContainer
@@ -11,14 +11,17 @@ class ToolContainer
     public:
         ToolContainer();
 
+        bool FrameIsMutable;  //This toggles whether or not you can move/scale frames
+
         void DrawElements();
         void LeftMouseClickHandler();
         void RightMouseClickHandler();  //Not in use yet
 
-        //Frame, Dial and Square for the Colour Picker
+        //Colour picker
         Frames ColourPicker;
         ColourDial RGBDial;
-        GradientSquare RGBSquare;
+
+    private:    
         void InteractWithRGBDial(Vector2 MouseXY);
         int GetRGBColour(Vector2 MousePositionXY, double DistanceToClick);
 

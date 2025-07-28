@@ -5,8 +5,8 @@
 int main()
 {
     Color BackGroundColour {51, 66, 89, 255};
-    InitWindow(1530, 750, "RGB Colour Tool");
-    SetTargetFPS(30); //Perhaps not super relevant
+    InitWindow(1530, 750, "Clarity CT");
+    //SetTargetFPS(30); //Perhaps not super relevant
 
     ToolContainer ToolInstance; //Create all widgets (Colour Picker)
     
@@ -21,6 +21,13 @@ int main()
         if(IsMouseButtonDown(0))
         {
             ToolInstance.LeftMouseClickHandler();
+        }
+
+        if(IsMouseButtonPressed(2))
+        {
+            //DEBUGDEBUGDEBUG
+            if(ToolInstance.FrameIsMutable){ToolInstance.FrameIsMutable = false;}else{ToolInstance.FrameIsMutable = true;}
+            //DEBUGDEBUGDEBUG
         }
     }
 

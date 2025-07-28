@@ -1,10 +1,11 @@
 #pragma once
 
-#include <raylib.h>
 #include <map>
 #include <vector>
 #include <iostream>
 #include <cmath>
+
+#include "./GradientSquare.h"
 
 class ColourDial
 {
@@ -25,6 +26,8 @@ class ColourDial
         void Initialise(int SetOriginX, int SetOriginY, int SetOuterRadius);
         void PrintValues();
         void DrawRGBDial();
+
+        GradientSquare RGBSquare;
         
     private:
         std::map<int, std::vector<int>> GenerateRGBTuples();

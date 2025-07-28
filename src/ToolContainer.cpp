@@ -6,16 +6,19 @@ ToolContainer::ToolContainer()
     //Initialise Frame, Dial and Square for the Colour picker
     ColourPicker.Initialise(20, 20, 250, 250);
     RGBDial.Initialise(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, ColourPicker.LenX/2);
-    RGBSquare.Initialise(RGBDial.DialOriginX, RGBDial.DialOriginY, RGBDial.DialInnerRadius);
+    FrameIsMutable = false;
 }
 
 
 void ToolContainer::DrawElements()
 {
     //Simply combining all drawing calls
-    ColourPicker.DrawFrameBox();
     RGBDial.DrawRGBDial();
-    RGBSquare.DrawGradientSquare();
+
+    if(FrameIsMutable)
+    {
+        ColourPicker.DrawFrameBox();
+    }
 }
 
 
@@ -37,33 +40,49 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
 {
     //Using good ol' pythagoras we can calculate the distance from the centre of the dial to the mouseclick
     double DistanceToClick = std::sqrt(std::pow(MouseXY.x - RGBDial.DialOriginX, 2) + std::pow(MouseXY.y - RGBDial.DialOriginY, 2));
-        
-    if(DistanceToClick > RGBDial.DialInnerRadius && DistanceToClick < RGBDial.DialOuterRadius)
-    {
-        //The click occurs within the bounds of the dial
-        int i_RGBSatures = GetRGBColour(MouseXY, DistanceToClick);
-        RGBSquare.SquareBaseColour.r = RGBDial.MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][2]; //Using remainder of i_RGBSatures because the Map is created left-to-right
-        RGBSquare.SquareBaseColour.g = RGBDial.MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][1]; //but the dial is created as a unit circle (counter clockwise or right-to left)
-        RGBSquare.SquareBaseColour.b = RGBDial.MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][0]; //If we use i_Saturates directly the colours are flipped along the Y axis
-    }
-    else if (MouseXY.x > RGBSquare.XAnchorPoint && MouseXY.x < (RGBSquare.XAnchorPoint + RGBSquare.SquareEdgeLength) &&
-             MouseXY.y > RGBSquare.YAnchorPoint && MouseXY.y < (RGBSquare.YAnchorPoint + RGBSquare.SquareEdgeLength))
-    {
-        //The click occurs within the bounds of the square
-        std::cout << "Square time!" << std::endl;
-    }
-    else if ((MouseXY.x > ColourPicker.MoveButtonRoot[0] && MouseXY.x < (ColourPicker.MoveButtonRoot[0] + ColourPicker.EdgeButtonSize)) &&
-             (MouseXY.y > ColourPicker.MoveButtonRoot[1] && MouseXY.y < (ColourPicker.MoveButtonRoot[1] + ColourPicker.EdgeButtonSize)))
-    {   
-        //The click occurs on the move button
-        std::cout << "Move" << std::endl;
 
+    if(!FrameIsMutable)
+    {    
+        //Mouse clicks are meant to interact with Picker
+        if(DistanceToClick > RGBDial.DialInnerRadius && DistanceToClick < RGBDial.DialOuterRadius)
+        {
+            //The click occurs within the bounds of the dial
+            int i_RGBSatures = GetRGBColour(MouseXY, DistanceToClick);
+            RGBDial.RGBSquare.SquareBaseColour.r = RGBDial.MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][2]; //Using remainder of i_RGBSatures because the Map is created left-to-right
+            RGBDial.RGBSquare.SquareBaseColour.g = RGBDial.MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][1]; //but the dial is created as a unit circle (counter clockwise or right-to left)
+            RGBDial.RGBSquare.SquareBaseColour.b = RGBDial.MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][0]; //If we use i_Saturates directly the colours are flipped along the Y axis
+        }
+        else if (MouseXY.x > RGBDial.RGBSquare.XAnchorPoint && MouseXY.x < (RGBDial.RGBSquare.XAnchorPoint + RGBDial.RGBSquare.SquareEdgeLength) &&
+                 MouseXY.y > RGBDial.RGBSquare.YAnchorPoint && MouseXY.y < (RGBDial.RGBSquare.YAnchorPoint + RGBDial.RGBSquare.SquareEdgeLength))
+        {
+            //The click occurs within the bounds of the square
+            std::cout << "Square time!" << std::endl;
+        }
     }
-    else if ((MouseXY.x > ColourPicker.ScaleButtonRoot[0] && MouseXY.x < ColourPicker.ScaleButtonRoot[0] + ColourPicker.EdgeButtonSize) &&
-             (MouseXY.y > ColourPicker.ScaleButtonRoot[1] && MouseXY.y < ColourPicker.ScaleButtonRoot[1] + ColourPicker.EdgeButtonSize))
+    else
     {
-        //The click occurs on the scale button
-        std::cout << "Scale" << std::endl;
+        //Mouse clicks are meant to move and scale the Frame
+        if ((MouseXY.x > ColourPicker.MoveButtonRoot[0] && MouseXY.x < (ColourPicker.MoveButtonRoot[0] + ColourPicker.EdgeButtonSize)) &&
+            (MouseXY.y > ColourPicker.MoveButtonRoot[1] && MouseXY.y < (ColourPicker.MoveButtonRoot[1] + ColourPicker.EdgeButtonSize)))
+        {   
+            //The click occurs on the move button
+            //This updates the Frame's origin to MouseXY and snaps the center of the button to the mouse so it doesn't get locked in the corner
+            ColourPicker.Initialise(MouseXY.x - ColourPicker.EdgeButtonSize/2 , MouseXY.y - ColourPicker.EdgeButtonSize/2, 
+                                    ColourPicker.LenX, ColourPicker.LenY);
+            
+        }
+        else if ((MouseXY.x > ColourPicker.ScaleButtonRoot[0] && MouseXY.x < ColourPicker.ScaleButtonRoot[0] + ColourPicker.EdgeButtonSize) &&
+                 (MouseXY.y > ColourPicker.ScaleButtonRoot[1] && MouseXY.y < ColourPicker.ScaleButtonRoot[1] + ColourPicker.EdgeButtonSize))
+        {
+            //The click occurs on the scale button
+            //Some cursed relative math fuckery going on here, will probably need to revisit this later
+            ColourPicker.Initialise(ColourPicker.AnchorX, ColourPicker.AnchorY, 
+                                    (ColourPicker.LenX + MouseXY.x - ColourPicker.LenX - ColourPicker.AnchorX + ColourPicker.EdgeButtonSize/2) , 
+                                    (ColourPicker.LenY + MouseXY.y - ColourPicker.LenY - ColourPicker.AnchorY + ColourPicker.EdgeButtonSize/2));
+            
+            ColourPicker.SetFrameRatio(1.0); //Rework this, it is a silly way to force a ratio
+        }
+        RGBDial.Initialise(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, ColourPicker.LenX/2);
     }
 }
 

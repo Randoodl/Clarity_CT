@@ -23,11 +23,3 @@ void GradientSquare::Initialise(int OffsetX, int OffsetY, int DialInnerRadius)
     YAnchorPoint = OffsetY - AnchorPointOffset;
     SquareEdgeLength = 2 * AnchorPointOffset;  
 }
-
-
-void GradientSquare::DrawGradientSquare()
-{
-    //Draw a square in the centre of the RGB dial that gradients the currently selected colour
-
-    DrawRectangle(XAnchorPoint, YAnchorPoint, SquareEdgeLength, SquareEdgeLength, SquareBaseColour);
-}
