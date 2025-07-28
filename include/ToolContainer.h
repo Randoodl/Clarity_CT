@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./GradientSquare.h"
+#include "./Frames.h"
 
 class ToolContainer
 {
@@ -9,13 +10,16 @@ class ToolContainer
     
     public:
         ToolContainer();
+
+        void DrawElements();
+        void LeftMouseClickHandler();
+        void RightMouseClickHandler();  //Not in use yet
+
+        //Frame, Dial and Square for the Colour Picker
+        Frames ColourPicker;
         ColourDial RGBDial;
         GradientSquare RGBSquare;
-
-        //Handling user input
-        void LeftMouseClickHandler();
-        void UpdateGradientSquare(Vector2 MouseXY);
-
-        //Retrieving colour information
+        void InteractWithRGBDial(Vector2 MouseXY);
         int GetRGBColour(Vector2 MousePositionXY, double DistanceToClick);
+
 };

@@ -8,23 +8,19 @@ int main()
     InitWindow(1530, 750, "RGB Colour Tool");
     SetTargetFPS(30); //Perhaps not super relevant
 
+    ToolContainer ToolInstance; //Create all widgets (Colour Picker)
     
-    ToolContainer ToolInstance;
-
-
     while(!WindowShouldClose())
     {
         BeginDrawing();
             ClearBackground(BackGroundColour);
-            ToolInstance.RGBDial.DrawRGBDial(); 
-            ToolInstance.RGBSquare.DrawGradientSquare();
-
+            ToolInstance.DrawElements();
       
         EndDrawing();
 
         if(IsMouseButtonDown(0))
         {
-            ToolInstance.LeftMouseClickHandler();            
+            ToolInstance.LeftMouseClickHandler();
         }
     }
 

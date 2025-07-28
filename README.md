@@ -29,5 +29,5 @@ Clone the repository and compile using Make
 ```sh
 git clone https://github.com/Randoodl/Clarity_CT.git
 cd Clarity_CT
-Make
+make
 ```

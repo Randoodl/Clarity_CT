@@ -8,14 +8,11 @@ class GradientSquare
 
     public:
         GradientSquare();
-        Color SquareBaseColour;
-        void Initialise(int OffsetX, int OffsetY, int DialInnerRadius);
-        void DrawGradientSquare();
-    
-    private:
         int XAnchorPoint;
         int YAnchorPoint;
         int SquareEdgeLength;
 
-
+        Color SquareBaseColour;
+        void Initialise(int OffsetX, int OffsetY, int DialInnerRadius);
+        void DrawGradientSquare();
 };

@@ -3,23 +3,22 @@
 ColourDial::ColourDial() 
 {
     BandsAmount = 1530;  //More or less forced, 3 values in RGB, 2 states each (rising, falling), between 0-255 totals (6 *255) 1530 possible bands
+    MapOfRGBSaturates = GenerateRGBTuples();  
+}
 
-    DialBandThickness = 1.2;
-    DialOriginX = 400;
-    DialOriginY = 400;
-    DialInnerRadius = 244;
-    DialOuterRadius = DialInnerRadius + 45;
 
-    DialBoundingBox =   {
-                            DialOriginX - DialOuterRadius,
-                            DialOriginX + DialOuterRadius,
-                            DialOriginY - DialOuterRadius,
-                            DialOriginY + DialOuterRadius
-                        };
-                        
-    MapOfRGBSaturates = GenerateRGBTuples();
-    MapOFDialPositions = CalculateDialPositions();
-    
+void ColourDial::Initialise(int SetOriginX, int SetOriginY, int SetOuterRadius)
+{
+    //When the program is started, load initial conditions and apply them
+    //Perhaps UI save function in the future?
+
+    DialOriginX = SetOriginX;
+    DialOriginY = SetOriginY;
+    DialInnerRadius = SetOuterRadius - (SetOuterRadius/5); //Approach the Dial's max size from the Frame holding it
+    DialOuterRadius = SetOuterRadius;
+    DialBandThickness = (DialOuterRadius - DialInnerRadius) * 0.1; //10% of the Dial's thickness is a wild guess, might update later
+
+    MapOFDialPositions = CalculateDialPositions();  
 }
 
 
