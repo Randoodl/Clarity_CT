@@ -23,6 +23,4 @@ class ToolContainer
 
     private:    
         void InteractWithRGBDial(Vector2 MouseXY);
-        int GetRGBColour(Vector2 MousePositionXY, double DistanceToClick);
-
 };

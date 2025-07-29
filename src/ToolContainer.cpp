@@ -4,8 +4,8 @@
 ToolContainer::ToolContainer()
 {
     //Initialise Frame, Dial and Square for the Colour picker
-    ColourPicker.Initialise(20, 20, 250, 250);
-    RGBDial.Initialise(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, ColourPicker.LenX/2);
+    ColourPicker.Update(20, 20, 250, 250);
+    RGBDial.Update(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, ColourPicker.LenX/2);
     FrameIsMutable = false;
 }
 
@@ -38,36 +38,23 @@ void ToolContainer::LeftMouseClickHandler()
 
 void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
 {
-    //Using good ol' pythagoras we can calculate the distance from the centre of the dial to the mouseclick
-    double DistanceToClick = std::sqrt(std::pow(MouseXY.x - RGBDial.DialOriginX, 2) + std::pow(MouseXY.y - RGBDial.DialOriginY, 2));
-
     if(!FrameIsMutable)
-    {    
-        //Mouse clicks are meant to interact with Picker
-        if(DistanceToClick > RGBDial.DialInnerRadius && DistanceToClick < RGBDial.DialOuterRadius)
-        {
-            //The click occurs within the bounds of the dial
-            int i_RGBSatures = GetRGBColour(MouseXY, DistanceToClick);
-            RGBDial.RGBSquare.SquareBaseColour.r = RGBDial.MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][2]; //Using remainder of i_RGBSatures because the Map is created left-to-right
-            RGBDial.RGBSquare.SquareBaseColour.g = RGBDial.MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][1]; //but the dial is created as a unit circle (counter clockwise or right-to left)
-            RGBDial.RGBSquare.SquareBaseColour.b = RGBDial.MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][0]; //If we use i_Saturates directly the colours are flipped along the Y axis
-        }
-        else if (MouseXY.x > RGBDial.RGBSquare.XAnchorPoint && MouseXY.x < (RGBDial.RGBSquare.XAnchorPoint + RGBDial.RGBSquare.SquareEdgeLength) &&
-                 MouseXY.y > RGBDial.RGBSquare.YAnchorPoint && MouseXY.y < (RGBDial.RGBSquare.YAnchorPoint + RGBDial.RGBSquare.SquareEdgeLength))
-        {
-            //The click occurs within the bounds of the square
-            std::cout << "Square time!" << std::endl;
-        }
+    {   
+        //Mouse clicks are meant to deal with the RGBDial itself 
+        RGBDial.UpdateRGBSquareColour(MouseXY);
     }
     else
     {
         //Mouse clicks are meant to move and scale the Frame
+        /*
+        NOTE: There's GOT to be a better way to check if mouse clicks fall into an area like this
+        */
         if ((MouseXY.x > ColourPicker.MoveButtonRoot[0] && MouseXY.x < (ColourPicker.MoveButtonRoot[0] + ColourPicker.EdgeButtonSize)) &&
             (MouseXY.y > ColourPicker.MoveButtonRoot[1] && MouseXY.y < (ColourPicker.MoveButtonRoot[1] + ColourPicker.EdgeButtonSize)))
         {   
             //The click occurs on the move button
             //This updates the Frame's origin to MouseXY and snaps the center of the button to the mouse so it doesn't get locked in the corner
-            ColourPicker.Initialise(MouseXY.x - ColourPicker.EdgeButtonSize/2 , MouseXY.y - ColourPicker.EdgeButtonSize/2, 
+            ColourPicker.Update(MouseXY.x - ColourPicker.EdgeButtonSize/2 , MouseXY.y - ColourPicker.EdgeButtonSize/2, 
                                     ColourPicker.LenX, ColourPicker.LenY);
             
         }
@@ -76,35 +63,13 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
         {
             //The click occurs on the scale button
             //Some cursed relative math fuckery going on here, will probably need to revisit this later
-            ColourPicker.Initialise(ColourPicker.AnchorX, ColourPicker.AnchorY, 
+            ColourPicker.Update(ColourPicker.AnchorX, ColourPicker.AnchorY, 
                                     (ColourPicker.LenX + MouseXY.x - ColourPicker.LenX - ColourPicker.AnchorX + ColourPicker.EdgeButtonSize/2) , 
                                     (ColourPicker.LenY + MouseXY.y - ColourPicker.LenY - ColourPicker.AnchorY + ColourPicker.EdgeButtonSize/2));
             
             ColourPicker.SetFrameRatio(1.0); //Rework this, it is a silly way to force a ratio
         }
-        RGBDial.Initialise(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, ColourPicker.LenX/2);
+        
+        RGBDial.Update(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, ColourPicker.LenX/2);
     }
-}
-
-
-int ToolContainer::GetRGBColour(Vector2 MousePositionXY, double DistanceToClick)
-{
-    //Get the precise RGB colour value when the colour dial is clicked
-
-    int i_RGBSaturatesMap {0}; //MapOfRGBSaturates lookup value
-    
-    //Now this looks really obtuse, but all it does it convert the x-coordinate back to a point on a standard unit circle
-    //and then scale it back from 0-2PI to 0-BandsAmount, e.g. 0-1530
-    //This value then acts as the lookup key for the RGB colour tuples in the MapOfRGBSaturates
-    //Since x is 1-dimensional, we can check for the "top" or "bottom" of the circle by seeing if the y is negative, if so we need to act as if counting pi-2pi
-    if(MousePositionXY.y - RGBDial.DialOriginY < 0)
-    {
-        i_RGBSaturatesMap = int(((acos((MousePositionXY.x - RGBDial.DialOriginX) / DistanceToClick)) / (2 * PI)) * RGBDial.BandsAmount);
-    }
-    else
-    {
-        i_RGBSaturatesMap = int((((PI - acos((MousePositionXY.x - RGBDial.DialOriginX) / DistanceToClick)) + PI) / (2 * PI)) * RGBDial.BandsAmount);
-    }
-
-    return i_RGBSaturatesMap;
 }

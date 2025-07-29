@@ -14,5 +14,5 @@ class GradientSquare
         int SquareEdgeLength;
 
         Color SquareBaseColour;
-        void Initialise(int OffsetX, int OffsetY, int DialInnerRadius);
+        void Update(int OffsetX, int OffsetY, int DialInnerRadius);
 };

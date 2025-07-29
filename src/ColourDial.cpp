@@ -7,7 +7,7 @@ ColourDial::ColourDial()
 }
 
 
-void ColourDial::Initialise(int SetOriginX, int SetOriginY, int SetOuterRadius)
+void ColourDial::Update(int SetOriginX, int SetOriginY, int SetOuterRadius)
 {
     //When the program is started, load initial conditions and apply them
     //Perhaps UI save function in the future?
@@ -18,7 +18,7 @@ void ColourDial::Initialise(int SetOriginX, int SetOriginY, int SetOuterRadius)
     DialOuterRadius = SetOuterRadius;
     DialBandThickness = (DialOuterRadius - DialInnerRadius) * 0.1; //10% of the Dial's thickness is a wild guess, might update later
 
-    RGBSquare.Initialise(DialOriginX, DialOriginY, DialInnerRadius);
+    RGBSquare.Update(DialOriginX, DialOriginY, DialInnerRadius);
 
     MapOFDialPositions = CalculateDialPositions();  
 }
@@ -96,6 +96,51 @@ void ColourDial::DrawRGBDial()
     }
 
     DrawRectangle(RGBSquare.XAnchorPoint, RGBSquare.YAnchorPoint, RGBSquare.SquareEdgeLength, RGBSquare.SquareEdgeLength, RGBSquare.SquareBaseColour);
+}
+
+
+void ColourDial::UpdateRGBSquareColour(Vector2 MouseXY)
+{
+    //Using good ol' pythagoras we can calculate the distance from the centre of the dial to the mouseclick
+    float DistanceToClick = std::sqrt(std::pow(MouseXY.x - DialOriginX, 2) + std::pow(MouseXY.y - DialOriginY, 2));
+
+    if(DistanceToClick > DialInnerRadius && DistanceToClick < DialOuterRadius)
+        {
+            //The click occurs within the bounds of the dial
+            int i_RGBSatures = GetRGBColour(MouseXY, DistanceToClick);
+
+            RGBSquare.SquareBaseColour.r = MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][2]; //Using remainder of i_RGBSatures because the Map is created left-to-right
+            RGBSquare.SquareBaseColour.g = MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][1]; //but the dial is created as a unit circle (counter clockwise or right-to left)
+            RGBSquare.SquareBaseColour.b = MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][0]; //If we use i_Saturates directly the colours are flipped along the Y axis
+        }
+        else if (MouseXY.x > RGBSquare.XAnchorPoint && MouseXY.x < (RGBSquare.XAnchorPoint + RGBSquare.SquareEdgeLength) &&
+                 MouseXY.y > RGBSquare.YAnchorPoint && MouseXY.y < (RGBSquare.YAnchorPoint + RGBSquare.SquareEdgeLength))
+        {
+            //The click occurs within the bounds of the square
+            std::cout << "Square time!" << std::endl;
+        }
+}
+
+
+int ColourDial::GetRGBColour(Vector2 MouseXY, float DistanceToClick)
+{
+    //Get the precise RGB colour value when the colour dial is clicked
+
+    int i_RGBSaturatesMap {0}; //MapOfRGBSaturates lookup value
+    
+    //Now this looks really obtuse, but all it does it convert the x-coordinate back to a point on a standard unit circle
+    //and then scale it back from 0-2PI to 0-BandsAmount, e.g. 0-1530
+    //This value then acts as the lookup key for the RGB colour tuples in the MapOfRGBSaturates
+    //Since x is 1-dimensional, we can check for the "top" or "bottom" of the circle by seeing if the y is negative, if so we need to act as if counting pi-2pi
+    if(MouseXY.y - DialOriginY < 0)
+    {
+        i_RGBSaturatesMap = int(((acos((MouseXY.x - DialOriginX) / DistanceToClick)) / (2 * PI)) * BandsAmount);
+    }
+    else
+    {
+        i_RGBSaturatesMap = int((((PI - acos((MouseXY.x - DialOriginX) / DistanceToClick)) + PI) / (2 * PI)) * BandsAmount);
+    }
+    return i_RGBSaturatesMap;
 }
 
 

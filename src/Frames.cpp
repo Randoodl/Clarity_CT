@@ -10,7 +10,7 @@ Frames::Frames()
 }
 
 
-void Frames::Initialise(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
+void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
 {
     AnchorX = SetAnchorX;
     AnchorY = SetAnchorY;

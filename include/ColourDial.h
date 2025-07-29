@@ -23,14 +23,19 @@ class ColourDial
         std::map<int, std::vector<float>> MapOFDialPositions;  //Vectors of X and Y coordinates to draw lines between, creating a dial
         std::map<int, std::vector<int>> MapOfRGBSaturates;     //All 1530 possible saturated RGB colours for each R,G or B value from 0-255
 
-        void Initialise(int SetOriginX, int SetOriginY, int SetOuterRadius);
+        void Update(int SetOriginX, int SetOriginY, int SetOuterRadius);
         void PrintValues();
         void DrawRGBDial();
+        void UpdateRGBSquareColour(Vector2 MouseXY);
 
         GradientSquare RGBSquare;
         
     private:
+        float DialBandThickness;
+
+        int GetRGBColour(Vector2 MouseXY, float DistanceToClick);
+
         std::map<int, std::vector<int>> GenerateRGBTuples();
         std::map<int, std::vector<float>> CalculateDialPositions();
-        float DialBandThickness;
+        
 };

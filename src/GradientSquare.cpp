@@ -9,7 +9,7 @@ GradientSquare::GradientSquare()
 }
 
 
-void GradientSquare::Initialise(int OffsetX, int OffsetY, int DialInnerRadius)
+void GradientSquare::Update(int OffsetX, int OffsetY, int DialInnerRadius)
 {
     /*
     Essentially, from the centre off the RGB Dial, how much do I offset XY
