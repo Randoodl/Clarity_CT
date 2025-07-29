@@ -18,7 +18,7 @@ void GradientSquare::Update(int OffsetX, int OffsetY, int DialInnerRadius)
     the straight sides are then the length of half the square
     */
 
-    double AnchorPointOffset = std::sqrt(0.5 * pow(DialInnerRadius, 2));
+    double AnchorPointOffset = sqrt(0.5 * pow(DialInnerRadius, 2));
     XAnchorPoint = OffsetX - AnchorPointOffset;
     YAnchorPoint = OffsetY - AnchorPointOffset;
     SquareEdgeLength = 2 * AnchorPointOffset;  

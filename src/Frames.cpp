@@ -17,22 +17,28 @@ void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
     LenX = SetLenX;
     LenY = SetLenY;
 
-    MoveButtonRoot = {AnchorX, AnchorY};
-    ScaleButtonRoot = {LenX + AnchorX - EdgeButtonSize, LenY + AnchorY - EdgeButtonSize};
+    MoveButton.height = MoveButton.width = EdgeButtonSize;
+    MoveButton.x = AnchorX;
+    MoveButton.y = AnchorY;
+
+    ScaleButton.height = ScaleButton.width = EdgeButtonSize;
+    ScaleButton.x = LenX + AnchorX - EdgeButtonSize;
+    ScaleButton.y = LenY + AnchorY - EdgeButtonSize;
 }
 
 
 void Frames::DrawFrameBox()
 {
     DrawRectangleLines(AnchorX, AnchorY, LenX, LenY, RAYWHITE);
-    DrawRectangle(MoveButtonRoot[0], MoveButtonRoot[1], EdgeButtonSize, EdgeButtonSize, RAYWHITE);
-    DrawRectangle(ScaleButtonRoot[0], ScaleButtonRoot[1], EdgeButtonSize, EdgeButtonSize, RAYWHITE);
-}
+    DrawRectangle(MoveButton.x, MoveButton.y, EdgeButtonSize, EdgeButtonSize, RAYWHITE);
+    DrawRectangle(ScaleButton.x, ScaleButton.y, EdgeButtonSize, EdgeButtonSize, RAYWHITE);
+} 
 
 
 void Frames::SetFrameRatio(double RatioXY)
 {
     //This is a stupid, but for the time easy way to force a ratio on frames
     LenY = LenX * RatioXY;
-    ScaleButtonRoot = {LenX + AnchorX - EdgeButtonSize, LenY + AnchorY - EdgeButtonSize};
+    ScaleButton.x = LenX + AnchorX - EdgeButtonSize;
+    ScaleButton.y = LenY + AnchorY - EdgeButtonSize;
 }

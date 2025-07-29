@@ -15,12 +15,10 @@ class Frames
         int LenY;
 
         int EdgeButtonSize;
-        std::vector<int> MoveButtonRoot;  //XY Position of the Move "Button" in the Frame
-        std::vector<int> ScaleButtonRoot; //Ditto for the Scale "Button"
+        Rectangle MoveButton;
+        Rectangle ScaleButton;
 
         void Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
         void DrawFrameBox();
         void SetFrameRatio(double RatioXY);
-
-        //Add Move and Scale
 };      

@@ -30,6 +30,7 @@ int main()
             //DEBUGDEBUGDEBUG
         }
     }
+    CloseWindow();
 
     return 0;
 }

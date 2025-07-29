@@ -3,7 +3,6 @@
 #include <map>
 #include <vector>
 #include <iostream>
-#include <cmath>
 
 #include "./GradientSquare.h"
 

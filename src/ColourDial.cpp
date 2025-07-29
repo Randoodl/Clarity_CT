@@ -102,7 +102,7 @@ void ColourDial::DrawRGBDial()
 void ColourDial::UpdateRGBSquareColour(Vector2 MouseXY)
 {
     //Using good ol' pythagoras we can calculate the distance from the centre of the dial to the mouseclick
-    float DistanceToClick = std::sqrt(std::pow(MouseXY.x - DialOriginX, 2) + std::pow(MouseXY.y - DialOriginY, 2));
+    float DistanceToClick = sqrt(pow(MouseXY.x - DialOriginX, 2) + pow(MouseXY.y - DialOriginY, 2));
 
     if(DistanceToClick > DialInnerRadius && DistanceToClick < DialOuterRadius)
         {
