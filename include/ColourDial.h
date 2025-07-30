@@ -14,8 +14,7 @@ class ColourDial
         ColourDial();
 
         int BandsAmount;
-        int DialOriginX;
-        int DialOriginY;
+        Vector2 DialOriginXY;
         int DialInnerRadius;
         int DialOuterRadius;
 
@@ -26,15 +25,22 @@ class ColourDial
         void PrintValues();
         void DrawRGBDial();
         void UpdateRGBSquareColour(Vector2 MouseXY);
+        void UpdateBubblePosition();
 
         GradientSquare RGBSquare;
         
     private:
         float DialBandThickness;
+        int Current_iRGB;   //The current index in the RGBSaturares map that updates when a colour is selected
+
+        Vector2 BubbleOriginXY;
+        float BubbleRadius;
 
         int GetRGBColour(Vector2 MouseXY, float DistanceToClick);
 
         std::map<int, std::vector<int>> GenerateRGBTuples();
         std::map<int, std::vector<float>> CalculateDialPositions();
+
+        Color ElementOutLines;
         
 };

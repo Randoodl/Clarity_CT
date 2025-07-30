@@ -2,9 +2,6 @@
 
 GradientSquare::GradientSquare()
 {
-    XAnchorPoint = 0;
-    YAnchorPoint = 0;
-    SquareEdgeLength = 0;
     SquareBaseColour = {255, 0, 0, 255};
 }
 

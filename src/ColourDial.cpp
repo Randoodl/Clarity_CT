@@ -3,7 +3,9 @@
 ColourDial::ColourDial() 
 {
     BandsAmount = 1530;  //More or less forced, 3 values in RGB, 2 states each (rising, falling), between 0-255 totals (6 *255) 1530 possible bands
-    MapOfRGBSaturates = GenerateRGBTuples();  
+    MapOfRGBSaturates = GenerateRGBTuples(); 
+    Current_iRGB = 0;
+    ElementOutLines =  {80, 80, 80, 255};
 }
 
 
@@ -12,13 +14,14 @@ void ColourDial::Update(int SetOriginX, int SetOriginY, int SetOuterRadius)
     //When the program is started, load initial conditions and apply them
     //Perhaps UI save function in the future?
 
-    DialOriginX = SetOriginX;
-    DialOriginY = SetOriginY;
-    DialInnerRadius = SetOuterRadius - (SetOuterRadius/5); //Approach the Dial's max size from the Frame holding it
+    DialOriginXY.x = SetOriginX;
+    DialOriginXY.y = SetOriginY;
+    DialInnerRadius = SetOuterRadius - (SetOuterRadius/3); //Approach the Dial's max size from the Frame holding it
     DialOuterRadius = SetOuterRadius;
     DialBandThickness = (DialOuterRadius - DialInnerRadius) * 0.1; //10% of the Dial's thickness is a wild guess, might update later
 
-    RGBSquare.Update(DialOriginX, DialOriginY, DialInnerRadius);
+    RGBSquare.Update(DialOriginXY.x, DialOriginXY.y, DialInnerRadius);
+    UpdateBubblePosition();
 
     MapOFDialPositions = CalculateDialPositions();  
 }
@@ -65,10 +68,10 @@ std::map<int, std::vector<float>> ColourDial::CalculateDialPositions()
         The offsets can then be used to move this dial around the screen
         */
         DialXYPositions[CircleStep] = {
-                                        (std::cos(UnitCircleSegment) * DialInnerRadius) + DialOriginX, //XStart
-                                        (std::cos(UnitCircleSegment) * DialOuterRadius) + DialOriginX, //XEnd
-                                        (std::sin(UnitCircleSegment) * DialInnerRadius) + DialOriginY, //YStart
-                                        (std::sin(UnitCircleSegment) * DialOuterRadius) + DialOriginY  //YEnd
+                                        (std::cos(UnitCircleSegment) * DialInnerRadius) + DialOriginXY.x, //XStart
+                                        (std::cos(UnitCircleSegment) * DialOuterRadius) + DialOriginXY.x, //XEnd
+                                        (std::sin(UnitCircleSegment) * DialInnerRadius) + DialOriginXY.y, //YStart
+                                        (std::sin(UnitCircleSegment) * DialOuterRadius) + DialOriginXY.y  //YEnd
                                       };
     }
     return DialXYPositions;
@@ -79,8 +82,9 @@ void ColourDial::DrawRGBDial()
 {
     //Draw a colour dial based on the data calculated in the MapOfDialPositions
 
-    Color BaseColour {0 ,0 ,0 ,255}; //Placeholder colour to update and draw to screen
+    Color BaseColour {0, 0, 0, 255}; //Placeholder colour to update and draw to screen
 
+    //Draw the circular spectrum
     for(int LineSegment {0}; LineSegment < BandsAmount; ++LineSegment)
     {
         BaseColour.r = MapOfRGBSaturates[LineSegment][2];
@@ -95,23 +99,35 @@ void ColourDial::DrawRGBDial()
         );
     }
 
+    //Draw the Gradient Square
     DrawRectangle(RGBSquare.XAnchorPoint, RGBSquare.YAnchorPoint, RGBSquare.SquareEdgeLength, RGBSquare.SquareEdgeLength, RGBSquare.SquareBaseColour);
+
+    //Draw the colour preview bubble
+    DrawCircle(BubbleOriginXY.x, BubbleOriginXY.y, (DialOuterRadius - DialInnerRadius)/2, ElementOutLines);
+    DrawCircle(BubbleOriginXY.x, BubbleOriginXY.y, BubbleRadius * 0.8 , RGBSquare.SquareBaseColour);
 }
 
 
 void ColourDial::UpdateRGBSquareColour(Vector2 MouseXY)
 {
     //Using good ol' pythagoras we can calculate the distance from the centre of the dial to the mouseclick
-    float DistanceToClick = sqrt(pow(MouseXY.x - DialOriginX, 2) + pow(MouseXY.y - DialOriginY, 2));
+    float DistanceToClick = sqrt(pow(MouseXY.x - DialOriginXY.x, 2) + pow(MouseXY.y - DialOriginXY.y, 2));
 
     if(DistanceToClick > DialInnerRadius && DistanceToClick < DialOuterRadius)
         {
             //The click occurs within the bounds of the dial
-            int i_RGBSatures = GetRGBColour(MouseXY, DistanceToClick);
 
-            RGBSquare.SquareBaseColour.r = MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][2]; //Using remainder of i_RGBSatures because the Map is created left-to-right
-            RGBSquare.SquareBaseColour.g = MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][1]; //but the dial is created as a unit circle (counter clockwise or right-to left)
-            RGBSquare.SquareBaseColour.b = MapOfRGBSaturates[(1530 - i_RGBSatures) % 1530][0]; //If we use i_Saturates directly the colours are flipped along the Y axis
+            Current_iRGB = (1530 - GetRGBColour(MouseXY, DistanceToClick)) % 1530;
+            /* Using the remainder of GetRGBColour because the Map is created left-to-right, but the dial is created as a unit circle
+               which increments to 2 PI in a counter-clockwise (right-to-left) fashion
+               Using GetRGBColour directly would have colours and the bubble flipped along the Y-axis */
+    
+            RGBSquare.SquareBaseColour.r = MapOfRGBSaturates[Current_iRGB][2]; 
+            RGBSquare.SquareBaseColour.g = MapOfRGBSaturates[Current_iRGB][1]; 
+            RGBSquare.SquareBaseColour.b = MapOfRGBSaturates[Current_iRGB][0]; 
+        
+            UpdateBubblePosition();
+        
         }
         else if (MouseXY.x > RGBSquare.XAnchorPoint && MouseXY.x < (RGBSquare.XAnchorPoint + RGBSquare.SquareEdgeLength) &&
                  MouseXY.y > RGBSquare.YAnchorPoint && MouseXY.y < (RGBSquare.YAnchorPoint + RGBSquare.SquareEdgeLength))
@@ -132,15 +148,26 @@ int ColourDial::GetRGBColour(Vector2 MouseXY, float DistanceToClick)
     //and then scale it back from 0-2PI to 0-BandsAmount, e.g. 0-1530
     //This value then acts as the lookup key for the RGB colour tuples in the MapOfRGBSaturates
     //Since x is 1-dimensional, we can check for the "top" or "bottom" of the circle by seeing if the y is negative, if so we need to act as if counting pi-2pi
-    if(MouseXY.y - DialOriginY < 0)
+    if(MouseXY.y - DialOriginXY.y < 0)
     {
-        i_RGBSaturatesMap = int(((acos((MouseXY.x - DialOriginX) / DistanceToClick)) / (2 * PI)) * BandsAmount);
+        i_RGBSaturatesMap = int(((acos((MouseXY.x - DialOriginXY.x) / DistanceToClick)) / (2 * PI)) * BandsAmount);
+        
     }
     else
     {
-        i_RGBSaturatesMap = int((((PI - acos((MouseXY.x - DialOriginX) / DistanceToClick)) + PI) / (2 * PI)) * BandsAmount);
+        i_RGBSaturatesMap = int((((PI - acos((MouseXY.x - DialOriginXY.x) / DistanceToClick)) + PI) / (2 * PI)) * BandsAmount);
     }
     return i_RGBSaturatesMap;
+}
+
+
+void ColourDial::UpdateBubblePosition()
+{
+    BubbleRadius = (DialOuterRadius - DialInnerRadius)/2;
+    BubbleOriginXY =    {
+                            (std::cos(((2 * PI) / BandsAmount) * Current_iRGB)) * (DialInnerRadius + BubbleRadius) + DialOriginXY.x,
+                            (std::sin(((2 * PI) / BandsAmount) * Current_iRGB)) * (DialInnerRadius + BubbleRadius) + DialOriginXY.y
+                        };
 }
 
 
