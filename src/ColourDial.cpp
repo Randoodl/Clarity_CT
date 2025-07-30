@@ -100,7 +100,7 @@ void ColourDial::DrawRGBDial()
     }
 
     //Draw the Gradient Square
-    DrawRectangle(RGBSquare.XAnchorPoint, RGBSquare.YAnchorPoint, RGBSquare.SquareEdgeLength, RGBSquare.SquareEdgeLength, RGBSquare.SquareBaseColour);
+    RGBSquare.DrawSquareGradient();
 
     //Draw the colour preview bubble
     DrawCircle(BubbleOriginXY.x, BubbleOriginXY.y, (DialOuterRadius - DialInnerRadius)/2, ElementOutLines);
@@ -133,7 +133,12 @@ void ColourDial::UpdateRGBSquareColour(Vector2 MouseXY)
                  MouseXY.y > RGBSquare.YAnchorPoint && MouseXY.y < (RGBSquare.YAnchorPoint + RGBSquare.SquareEdgeLength))
         {
             //The click occurs within the bounds of the square
-            std::cout << "Square time!" << std::endl;
+            //I hate everything about the way I do this, gotta rework it
+            Color Help = RGBSquare.GetSquareRGB(MouseXY);
+            DrawRectangle(600, 100, 300, 300, Help);
+            
+            std::cout << int(Help.r) << ", " << int(Help.g) << ", " << int(Help.b) << "\n";
+
         }
 }
 

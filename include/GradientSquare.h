@@ -2,6 +2,7 @@
 
 #include <raylib.h>
 #include <cmath>
+#include <vector>
 
 class GradientSquare
 {
@@ -14,5 +15,11 @@ class GradientSquare
         int SquareEdgeLength;
 
         Color SquareBaseColour;
+
         void Update(int OffsetX, int OffsetY, int DialInnerRadius);
+        void DrawSquareGradient();
+        Color GetSquareRGB(Vector2 MouseXY);
+
+    private:
+        Rectangle ColouredSquare;
 };
