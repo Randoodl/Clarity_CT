@@ -2,16 +2,14 @@
 
 Frames::Frames()
 {
-    AnchorX = 0;
-    AnchorY = 0;
-    LenX = 0;
-    LenY = 0;
     EdgeButtonSize = 40;
 }
 
 
 void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
 {
+    //Update all position and size data when frame is moved or scaled
+
     AnchorX = SetAnchorX;
     AnchorY = SetAnchorY;
     LenX = SetLenX;
@@ -29,6 +27,7 @@ void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
 
 void Frames::DrawFrameBox()
 {
+    //Draw the Frame surrounding the element, as well as the two corner button areas
     DrawRectangleLines(AnchorX, AnchorY, LenX, LenY, RAYWHITE);
     DrawRectangle(MoveButton.x, MoveButton.y, EdgeButtonSize, EdgeButtonSize, RAYWHITE);
     DrawRectangle(ScaleButton.x, ScaleButton.y, EdgeButtonSize, EdgeButtonSize, RAYWHITE);

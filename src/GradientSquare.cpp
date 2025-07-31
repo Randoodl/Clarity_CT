@@ -1,5 +1,6 @@
 #include "../include/GradientSquare.h"
 #include <iostream>
+
 GradientSquare::GradientSquare()
 {
     SquareBaseColour = {255, 0, 0, 255};
@@ -27,43 +28,68 @@ void GradientSquare::Update(int OffsetX, int OffsetY, int DialInnerRadius)
 }
 
 
-void GradientSquare::DrawSquareGradient()
+void GradientSquare::DrawGradientSquare()
 {
-    DrawRectangleGradientEx(ColouredSquare, SquareBaseColour, BLACK, {127, 127, 127, 255}, WHITE);
+    //This seems like a very heavy-handed approach to do something as seemingly simple as a gradient square
+    //doing 255^2 calculations each frame seems silly at best
+    //There has to be a better way of doing this, but it is solid for now
+
+    //How much EdgeLength per one of the 255 colours
+    float EdgePerBand = float(SquareEdgeLength / 255.);
+    float BandThickness = EdgePerBand;
+    if(BandThickness < 1){BandThickness = 1;} //Square stops being visible with thicknessess under 1
+
+    //Create a colour to be darkened
+    Color DarkenRGBColour = SquareBaseColour;
+
+    //Create a vector to hold the colour as floats (to avoid narrowing fuckery)
+    std::vector<float> DarkRGBFloats = {float(DarkenRGBColour.r), float(DarkenRGBColour.g), float(DarkenRGBColour.b)};
+
+    //The proportional difference from the R, G or B value to 0, per 1 step in 255 total steps
+    float DarkFactorRed   = DarkRGBFloats[0] / 255.;
+    float DarkFactorGreen = DarkRGBFloats[1] / 255.;
+    float DarkFactorBlue  = DarkRGBFloats[2] / 255.;
+
+    for(int DarkStep {0}; DarkStep < 255; ++DarkStep)
+    {
+        //Update the row to be slightly darker than the last one
+        DarkRGBFloats[0] -= DarkFactorRed;  
+        DarkRGBFloats[1] -= DarkFactorGreen;  
+        DarkRGBFloats[2] -= DarkFactorBlue;   
+        
+        DarkenRGBColour.r = DarkRGBFloats[0];
+        DarkenRGBColour.g = DarkRGBFloats[1];
+        DarkenRGBColour.b = DarkRGBFloats[2];
+
+        //Create a colour to be whitened
+        Color LightenRGBColour = DarkenRGBColour;
+
+        //Create a vector to hold the colour as floats
+        std::vector<float> LightRGBFloats = {float(LightenRGBColour.r), float(LightenRGBColour.g), float(LightenRGBColour.b)};
+
+        //The proportional difference from the R, G or B value to the highest RGB (255 - Darkstep), per 1 step in 255 total steps
+        float LightFactorRed   = ((255 - DarkStep) - LightRGBFloats[0]) / 255;
+        float LightFactorGreen = ((255 - DarkStep) - LightRGBFloats[1]) / 255;
+        float LightFactorBlue  = ((255 - DarkStep) - LightRGBFloats[2]) / 255;
+
+        for(int LightStep {0}; LightStep < 255; ++LightStep)
+        {
+            //Update the Row-Column pair (pixel) to be slightly lighter
+            LightRGBFloats[0] += LightFactorRed;
+            LightRGBFloats[1] += LightFactorGreen;
+            LightRGBFloats[2] += LightFactorBlue;
+
+            LightenRGBColour.r = LightRGBFloats[0];
+            LightenRGBColour.g = LightRGBFloats[1];
+            LightenRGBColour.b = LightRGBFloats[2];
+
+            DrawRectangle(XAnchorPoint + (EdgePerBand * LightStep), YAnchorPoint + (EdgePerBand * DarkStep), std::ceil(BandThickness), std::ceil(BandThickness), LightenRGBColour);
+        }               
+    }
 }
 
 
 Color GradientSquare::GetSquareRGB(Vector2 MouseXY)
 {
-    //Please don't look at this
-    //Very much still a complete concept, but it works!
-
-    //DEFINITELY reworking this, I mean, fuck, LOOK AT IT
-
-    Color GradientColour = SquareBaseColour;
-
-    float WhiteGrade = ((MouseXY.x - XAnchorPoint) / SquareEdgeLength);
-    float BlackGrade = ((MouseXY.y - YAnchorPoint) / SquareEdgeLength);
-    float TotalGrade = WhiteGrade + BlackGrade;
-
-    float WhiteCorrection = (WhiteGrade / TotalGrade) * ((MouseXY.x - XAnchorPoint) / SquareEdgeLength);
-    float BlackCorrection = (BlackGrade / TotalGrade) * ((MouseXY.y - YAnchorPoint) / SquareEdgeLength);
-
-    float RFacW = (255. - SquareBaseColour.r) ; 
-    float GFacW = (255. - SquareBaseColour.g) ; 
-    float BFacW = (255. - SquareBaseColour.b) ; 
-
-    float RFacB = SquareBaseColour.r; 
-    float GFacB = SquareBaseColour.g;
-    float BFacB = SquareBaseColour.b;     
-
-    GradientColour.r = GradientColour.r + (RFacW * WhiteCorrection); 
-    GradientColour.g = GradientColour.g + (GFacW * WhiteCorrection); 
-    GradientColour.b = GradientColour.b + (BFacW * WhiteCorrection); 
-
-    GradientColour.r = GradientColour.r - (RFacB * BlackCorrection); 
-    GradientColour.g = GradientColour.g - (GFacB * BlackCorrection); 
-    GradientColour.b = GradientColour.b - (BFacB * BlackCorrection); 
-
-    return GradientColour;
+    return BLANK;
 }

@@ -4,7 +4,7 @@
 ToolContainer::ToolContainer()
 {
     //Initialise Frame, Dial and Square for the Colour picker
-    ColourPicker.Update(20, 20, 250, 250);
+    ColourPicker.Update(20, 20, 400, 400);
     RGBDial.Update(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, ColourPicker.LenX/2);
     FrameIsMutable = false;
 }
@@ -45,8 +45,9 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
     }
     else
     {
-        Vector2 MouseXYDelta = GetMouseDelta();
         //Mouse clicks are meant to move and scale the Frame
+        Vector2 MouseXYDelta = GetMouseDelta();
+
         if (CheckCollisionPointRec(MouseXY, ColourPicker.MoveButton))
         {   
             //The click occurs on the move button

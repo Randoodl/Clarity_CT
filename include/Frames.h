@@ -9,16 +9,18 @@ class Frames
     
     public:
         Frames();
+        
         int AnchorX;
         int AnchorY;
         int LenX;
         int LenY;
-
-        int EdgeButtonSize;
         Rectangle MoveButton;
         Rectangle ScaleButton;
 
         void Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
         void DrawFrameBox();
         void SetFrameRatio(double RatioXY);
+    
+    private:
+        int EdgeButtonSize;
 };      

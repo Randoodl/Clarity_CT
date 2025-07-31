@@ -17,7 +17,7 @@ class GradientSquare
         Color SquareBaseColour;
 
         void Update(int OffsetX, int OffsetY, int DialInnerRadius);
-        void DrawSquareGradient();
+        void DrawGradientSquare();
         Color GetSquareRGB(Vector2 MouseXY);
 
     private:
