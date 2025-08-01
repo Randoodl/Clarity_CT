@@ -21,7 +21,11 @@ class Frames
 
         void Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
         void DrawFrameBox();
-        void AdjustFrame(Vector2 MouseXY, float Ratio);
-        void SetFrameRatio(double RatioXY);
+        void AdjustFrame(Vector2 MouseXY);
+        int GetSmallestFrameSide(float SideX, float SideY);
         int EdgeButtonSize;
+
+    private:
+        Rectangle MainWindow; //For bounds checking on the boxes
+        
 };      

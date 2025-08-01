@@ -62,8 +62,9 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
     else
     {
         //Mouse clicks are meant to move and scale the Frame
-        ColourPicker.AdjustFrame(MouseXY, 1.0);
-        RGBDial.Update(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, ColourPicker.LenX/2);
+        ColourPicker.AdjustFrame(MouseXY);
+        int SmallestFrameSide = ColourPicker.GetSmallestFrameSide(ColourPicker.LenX/2, ColourPicker.LenY/2);  //This ensures the dial is sized to the smallest side of the frame
+        RGBDial.Update(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, SmallestFrameSide);
     }
 }
 
@@ -79,7 +80,7 @@ void ToolContainer::InteractWithShadedSquare(Vector2 MouseXY)
     else
     {
         //Mouse clicks are meant to move and scale the Frame
-        SelectedShadeFrame.AdjustFrame(MouseXY, 1.0);
+        SelectedShadeFrame.AdjustFrame(MouseXY);
         //RGBDial.Update(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, ColourPicker.LenX/2);
     }
 }

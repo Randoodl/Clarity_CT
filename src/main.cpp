@@ -5,6 +5,10 @@
 int main()
 {
     Color BackGroundColour {51, 66, 89, 255};
+
+    //SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE);     //Perhaps we need to resize the window only after updating a Frame
+    SetConfigFlags(FLAG_MSAA_4X_HINT); 
+   
     InitWindow(1530, 750, "Clarity CT");
     //SetTargetFPS(30); //Perhaps not super relevant
 
@@ -15,7 +19,6 @@ int main()
         BeginDrawing();
             ClearBackground(BackGroundColour);
             ToolInstance.DrawElements();
-      
         EndDrawing();
 
         if(IsMouseButtonDown(0))

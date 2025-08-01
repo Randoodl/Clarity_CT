@@ -3,6 +3,7 @@
 Frames::Frames()
 {
     EdgeButtonSize = 40;
+    MainWindow = {0, 0, float(GetScreenWidth()), float(GetScreenHeight())};
 }
 
 
@@ -39,7 +40,7 @@ void Frames::DrawFrameBox()
 } 
 
 
-void Frames::AdjustFrame(Vector2 MouseXY, float Ratio)
+void Frames::AdjustFrame(Vector2 MouseXY)
 {
 
     Vector2 MouseXYDelta = GetMouseDelta();
@@ -47,22 +48,27 @@ void Frames::AdjustFrame(Vector2 MouseXY, float Ratio)
     if (CheckCollisionPointRec(MouseXY, MoveButton))
     {   
         //The click occurs on the move button
-        Update(MouseXYDelta.x + AnchorX, MouseXYDelta.y + AnchorY, LenX , LenY);
+        if(CheckCollisionPointRec({AnchorX + MouseXYDelta.x, AnchorY + MouseXYDelta.y}, MainWindow) && 
+           CheckCollisionPointRec({ScaleButton.x + ScaleButton.width + MouseXYDelta.x, ScaleButton.y + ScaleButton.height + MouseXYDelta.y}, MainWindow)) 
+        {
+            //Stops it from being dragged off-screen, but feels kind of clunky?
+            Update(MouseXYDelta.x + AnchorX, MouseXYDelta.y + AnchorY, LenX , LenY);
+        }
+
     }
     else if (CheckCollisionPointRec(MouseXY, ScaleButton))
     {
         //The click occurs on the scale button
-        Update(AnchorX, AnchorY, LenX + MouseXYDelta.x, LenY + MouseXYDelta.y);
-        
-        SetFrameRatio(Ratio); //Rework this, it is a silly way to force a ratio
+        if(CheckCollisionPointRec({ScaleButton.x + ScaleButton.width + MouseXYDelta.x, ScaleButton.y + ScaleButton.height + MouseXYDelta.y}, MainWindow))
+        {   
+            //Not allowing it to scale off-screen
+            Update(AnchorX, AnchorY, LenX + MouseXYDelta.x, LenY + MouseXYDelta.y);
+        }
     }
 }
 
 
-void Frames::SetFrameRatio(double RatioXY)
+int Frames::GetSmallestFrameSide(float SideX, float SideY)
 {
-    //This is a stupid, but for the time easy way to force a ratio on frames
-    LenY = LenX * RatioXY;
-    ScaleButton.x = LenX + AnchorX - EdgeButtonSize;
-    ScaleButton.y = LenY + AnchorY - EdgeButtonSize;
+    return std::min(SideX, SideY);
 }
