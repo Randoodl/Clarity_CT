@@ -6,6 +6,9 @@ ToolContainer::ToolContainer()
     //Initialise Frame, Dial and Square for the Colour picker
     ColourPicker.Update(20, 20, 400, 400);
     RGBDial.Update(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, ColourPicker.LenX/2);
+
+    SelectedShadeFrame.Update(500, 20, 300, 300);
+
     FrameIsMutable = false;
 }
 
@@ -14,10 +17,13 @@ void ToolContainer::DrawElements()
 {
     //Simply combining all drawing calls
     RGBDial.DrawRGBDial();
+    DrawRectangle(600, 20, 200, 200, RGBDial.CurrentShadeColour);
+
 
     if(FrameIsMutable)
     {
         ColourPicker.DrawFrameBox();
+        SelectedShadeFrame.DrawFrameBox();
     }
 }
 
@@ -27,12 +33,17 @@ void ToolContainer::LeftMouseClickHandler()
     //Left Mouse Button
     Vector2 MouseXY = GetMousePosition();
 
-    if((MouseXY.x > ColourPicker.AnchorX && MouseXY.x < (ColourPicker.LenX + ColourPicker.AnchorX)) &&  //This could potentially be a point-in-rec check
-        (MouseXY.y > ColourPicker.AnchorY && MouseXY.y < (ColourPicker.LenY + ColourPicker.AnchorY)))   //Though that would require an extra, perhaps otherwise useless, Rectangle
-        {   
-            //Currently clicking within the RGBDial Frame
-            InteractWithRGBDial(MouseXY);
-        }
+    if(CheckCollisionPointRec(MouseXY, ColourPicker.FrameArea))
+    {   
+        //Currently clicking within the RGBDial Frame
+        InteractWithRGBDial(MouseXY);
+    }
+    else if (CheckCollisionPointRec(MouseXY, SelectedShadeFrame.FrameArea))
+    {
+        //Currently clicking within the Shade preview square
+        InteractWithShadedSquare(MouseXY);
+    }
+    
 }
 
 
@@ -46,21 +57,23 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
     else
     {
         //Mouse clicks are meant to move and scale the Frame
-        Vector2 MouseXYDelta = GetMouseDelta();
-
-        if (CheckCollisionPointRec(MouseXY, ColourPicker.MoveButton))
-        {   
-            //The click occurs on the move button
-            ColourPicker.Update(MouseXYDelta.x + ColourPicker.AnchorX, MouseXYDelta.y + ColourPicker.AnchorY, ColourPicker.LenX , ColourPicker.LenY);
-        }
-        else if (CheckCollisionPointRec(MouseXY, ColourPicker.ScaleButton))
-        {
-            //The click occurs on the scale button
-            ColourPicker.Update(ColourPicker.AnchorX, ColourPicker.AnchorY, ColourPicker.LenX + MouseXYDelta.x, ColourPicker.LenY + MouseXYDelta.y);
-            
-            ColourPicker.SetFrameRatio(1.0); //Rework this, it is a silly way to force a ratio
-        }
-
+        ColourPicker.AdjustFrame(MouseXY, 1.0);
         RGBDial.Update(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, ColourPicker.LenX/2);
+    }
+}
+
+
+void ToolContainer::InteractWithShadedSquare(Vector2 MouseXY)
+{
+    if(!FrameIsMutable)
+    {   
+        //Mouse clicks are meant to deal with the RGBDial itself 
+        //SelectedShadeFrame.UpdateRGBSquareColour(MouseXY);
+    }
+    else
+    {
+        //Mouse clicks are meant to move and scale the Frame
+        SelectedShadeFrame.AdjustFrame(MouseXY, 1.0);
+        //RGBDial.Update(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, ColourPicker.LenX/2);
     }
 }

@@ -3,7 +3,7 @@
 #include <map>
 #include <iostream>
 
-#include "./GradientSquare.h"
+#include "./ShadeSquare.h"
 
 class ColourDial
 {
@@ -13,13 +13,12 @@ class ColourDial
         ColourDial();
 
         void Update(int SetOriginX, int SetOriginY, int SetOuterRadius);
-        void PrintValues();
         void DrawRGBDial();
         void UpdateRGBSquareColour(Vector2 MouseXY);
         void UpdateBubblePosition();
 
-        
-        
+        Color CurrentShadeColour;
+
     private:
         Color ElementOutLines;
         int Current_iRGB;   //The current index in the RGBSaturares map that updates when a colour is selected
@@ -40,5 +39,5 @@ class ColourDial
         Vector2 BubbleOriginXY;
         float BubbleRadius;
 
-        GradientSquare RGBSquare;        
+        ShadeSquare RGBSquare;    
 };

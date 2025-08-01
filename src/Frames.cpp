@@ -15,6 +15,11 @@ void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
     LenX = SetLenX;
     LenY = SetLenY;
 
+    FrameArea.width = SetLenX;
+    FrameArea.height = SetLenY;
+    FrameArea.x = SetAnchorX;
+    FrameArea.y = SetAnchorY;
+
     MoveButton.height = MoveButton.width = EdgeButtonSize;
     MoveButton.x = AnchorX;
     MoveButton.y = AnchorY;
@@ -32,6 +37,26 @@ void Frames::DrawFrameBox()
     DrawRectangle(MoveButton.x, MoveButton.y, EdgeButtonSize, EdgeButtonSize, RAYWHITE);
     DrawRectangle(ScaleButton.x, ScaleButton.y, EdgeButtonSize, EdgeButtonSize, RAYWHITE);
 } 
+
+
+void Frames::AdjustFrame(Vector2 MouseXY, float Ratio)
+{
+
+    Vector2 MouseXYDelta = GetMouseDelta();
+
+    if (CheckCollisionPointRec(MouseXY, MoveButton))
+    {   
+        //The click occurs on the move button
+        Update(MouseXYDelta.x + AnchorX, MouseXYDelta.y + AnchorY, LenX , LenY);
+    }
+    else if (CheckCollisionPointRec(MouseXY, ScaleButton))
+    {
+        //The click occurs on the scale button
+        Update(AnchorX, AnchorY, LenX + MouseXYDelta.x, LenY + MouseXYDelta.y);
+        
+        SetFrameRatio(Ratio); //Rework this, it is a silly way to force a ratio
+    }
+}
 
 
 void Frames::SetFrameRatio(double RatioXY)

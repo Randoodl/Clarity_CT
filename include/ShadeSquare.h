@@ -4,12 +4,12 @@
 #include <cmath>
 #include <vector>
 
-class GradientSquare
+class ShadeSquare
 {
-    //This class is meant to hold all the information for the gradient square in the centre of the colour dial
+    //This class is meant to hold all the information for the shade square in the centre of the colour dial
 
     public:
-        GradientSquare();
+        ShadeSquare();
         int XAnchorPoint;
         int YAnchorPoint;
         int SquareEdgeLength;
@@ -17,7 +17,7 @@ class GradientSquare
         Color SquareBaseColour;
 
         void Update(int OffsetX, int OffsetY, int DialInnerRadius);
-        void DrawGradientSquare();
+        void DrawShadeSquare();
         Color GetSquareRGB(Vector2 MouseXY);
 
     private:

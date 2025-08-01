@@ -21,8 +21,12 @@ class ToolContainer
 
     private:    
         void InteractWithRGBDial(Vector2 MouseXY);
+        void InteractWithShadedSquare(Vector2 MouseXY);
         
         //Colour picker
         Frames ColourPicker;
-        ColourDial RGBDial; //Includes GradientSquare
+        ColourDial RGBDial; //Includes ShadeSquare
+
+        //Preview the selected Shade
+        Frames SelectedShadeFrame;
 };

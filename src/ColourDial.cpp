@@ -5,7 +5,8 @@ ColourDial::ColourDial()
     BandsAmount = 1530;  //More or less forced, 3 values in RGB, 2 states each (rising, falling), between 0-255 totals (6 *255) 1530 possible bands
     MapOfRGBSaturates = GenerateRGBTuples(); 
     Current_iRGB = 0;
-    ElementOutLines =  {80, 80, 80, 255};
+    CurrentShadeColour = {255, 0, 0, 255};
+    ElementOutLines =  {45, 45, 45, 255};
 }
 
 
@@ -16,7 +17,7 @@ void ColourDial::Update(int SetOriginX, int SetOriginY, int SetOuterRadius)
 
     DialOriginXY.x = SetOriginX;
     DialOriginXY.y = SetOriginY;
-    DialInnerRadius = SetOuterRadius - (SetOuterRadius/3); //Approach the Dial's max size from the Frame holding it
+    DialInnerRadius = SetOuterRadius - (SetOuterRadius/4); //Approach the Dial's max size from the Frame holding it
     DialOuterRadius = SetOuterRadius;
     DialBandThickness = (DialOuterRadius - DialInnerRadius) * 0.05; //5% of the Dial's thickness is a wild guess, might update later
 
@@ -99,8 +100,8 @@ void ColourDial::DrawRGBDial()
         );
     }
 
-    //Draw the Gradient Square
-    RGBSquare.DrawGradientSquare();
+    //Draw the Shade Square
+    RGBSquare.DrawShadeSquare();
 
     //Draw the colour preview bubble
     DrawCircle(BubbleOriginXY.x, BubbleOriginXY.y, (DialOuterRadius - DialInnerRadius)/2, ElementOutLines);
@@ -110,7 +111,7 @@ void ColourDial::DrawRGBDial()
 
 void ColourDial::UpdateRGBSquareColour(Vector2 MouseXY)
 {
-    //Set a base saturate colour if the dial is clicked, from which a gradient can be generated
+    //Set a base saturate colour if the dial is clicked, from which a shade and tint can be generated
 
     //Using good ol' pythagoras we can calculate the distance from the centre of the dial to the mouseclick
     float DistanceToClick = sqrt(pow(MouseXY.x - DialOriginXY.x, 2) + pow(MouseXY.y - DialOriginXY.y, 2));
@@ -136,11 +137,7 @@ void ColourDial::UpdateRGBSquareColour(Vector2 MouseXY)
         {
             //The click occurs within the bounds of the square
             //I hate everything about the way I do this, gotta rework it
-            Color Help = RGBSquare.GetSquareRGB(MouseXY);
-            DrawRectangle(600, 100, 300, 300, Help);
-            
-            //std::cout << int(Help.r) << ", " << int(Help.g) << ", " << int(Help.b) << "\n";
-
+            CurrentShadeColour = RGBSquare.GetSquareRGB(MouseXY);
         }
 }
 
@@ -178,19 +175,3 @@ void ColourDial::UpdateBubblePosition()
                             (std::sin(((2 * PI) / BandsAmount) * Current_iRGB)) * (DialInnerRadius + BubbleRadius) + DialOriginXY.y
                         };
 }
-
-
-void ColourDial::PrintValues()
-{
-    //For debugging purposes only
-    for(int i {0}; i < BandsAmount; ++i)
-    {
-        std::cout << i << ": ";
-        for(int iRGB {0}; iRGB < 3; ++ iRGB)
-        {
-            std::cout << MapOfRGBSaturates[i][iRGB] << " ";
-        }
-        std::cout << "\n";
-    }
-}
-

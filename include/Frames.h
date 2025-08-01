@@ -14,11 +14,14 @@ class Frames
         int AnchorY;
         int LenX;
         int LenY;
+
+        Rectangle FrameArea;
         Rectangle MoveButton;
         Rectangle ScaleButton;
 
         void Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
         void DrawFrameBox();
+        void AdjustFrame(Vector2 MouseXY, float Ratio);
         void SetFrameRatio(double RatioXY);
         int EdgeButtonSize;
 };      
