@@ -20,6 +20,8 @@ class ShadeSquare
         void DrawShadeSquare();
         Color GetSquareRGB(Vector2 MouseXY);
 
+        Vector2 CurrentShadeMouseLocation;
+
     private:
         Rectangle ColouredSquare;
 };

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <map>
-#include <iostream>
 
 #include "./ShadeSquare.h"
 
@@ -18,6 +17,7 @@ class ColourDial
         void UpdateBubblePosition();
 
         Color CurrentShadeColour;
+        ShadeSquare RGBSquare;   
 
     private:
         Color ElementOutLines;
@@ -39,5 +39,5 @@ class ColourDial
         Vector2 BubbleOriginXY;
         float BubbleRadius;
 
-        ShadeSquare RGBSquare;    
+         
 };

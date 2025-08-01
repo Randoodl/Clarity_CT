@@ -1,5 +1,5 @@
 #include "../include/ShadeSquare.h"
-#include <iostream>
+
 
 ShadeSquare::ShadeSquare()
 {
@@ -86,6 +86,9 @@ Color ShadeSquare::GetSquareRGB(Vector2 MouseXY)
 {
     //Turn the mouse's XY coordinates back into a colour doing a bunch of math translations
     //Essentially the inverse of DrawShadeSquare()
+
+    //Storing this for Dial feedback use
+    CurrentShadeMouseLocation = MouseXY;
 
     //Color to update and return
     Color CalculatedColour = SquareBaseColour;

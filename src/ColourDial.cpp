@@ -22,6 +22,7 @@ void ColourDial::Update(int SetOriginX, int SetOriginY, int SetOuterRadius)
     DialBandThickness = (DialOuterRadius - DialInnerRadius) * 0.05; //5% of the Dial's thickness is a wild guess, might update later
 
     RGBSquare.Update(DialOriginXY.x, DialOriginXY.y, DialInnerRadius);
+    RGBSquare.GetSquareRGB({float(RGBSquare.XAnchorPoint), float(RGBSquare.XAnchorPoint)}); //Set an initial ShadeSquare position at the saturated top left
     UpdateBubblePosition();
 
     MapOFDialPositions = CalculateDialPositions();  

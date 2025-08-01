@@ -1,5 +1,5 @@
 #include "../include/ToolContainer.h"
-
+#include <iostream>
 
 ToolContainer::ToolContainer()
 {
@@ -17,8 +17,10 @@ void ToolContainer::DrawElements()
 {
     //Simply combining all drawing calls
     RGBDial.DrawRGBDial();
-    DrawRectangle(600, 20, 200, 200, RGBDial.CurrentShadeColour);
 
+    //TEMPORARY FRAME TO SHOW SHADES
+    //MOVE THIS TO OWN CLASS - PERHAPS SOME KIND OF PALETTE PICKER
+    DrawRectangle(SelectedShadeFrame.AnchorX, SelectedShadeFrame.AnchorY, SelectedShadeFrame.LenX, SelectedShadeFrame.LenY, RGBDial.CurrentShadeColour);
 
     if(FrameIsMutable)
     {
@@ -53,6 +55,9 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
     {   
         //Mouse clicks are meant to deal with the RGBDial itself 
         RGBDial.UpdateRGBSquareColour(MouseXY);
+
+        //This now links back to the shade square, updating it to reflect the new Hue selected from the dial
+        RGBDial.CurrentShadeColour = RGBDial.RGBSquare.GetSquareRGB(RGBDial.RGBSquare.CurrentShadeMouseLocation); 
     }
     else
     {
@@ -67,8 +72,9 @@ void ToolContainer::InteractWithShadedSquare(Vector2 MouseXY)
 {
     if(!FrameIsMutable)
     {   
-        //Mouse clicks are meant to deal with the RGBDial itself 
+        //Mouse clicks are meant to deal with the Shade Square itself 
         //SelectedShadeFrame.UpdateRGBSquareColour(MouseXY);
+        std::cout << "(" << int(RGBDial.CurrentShadeColour.r) << ", " << int(RGBDial.CurrentShadeColour.g) << ", " << int(RGBDial.CurrentShadeColour.b) << ")\n";
     }
     else
     {

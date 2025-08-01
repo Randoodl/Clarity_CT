@@ -13,7 +13,7 @@ Clarity CT is a simple, customisable RGB colour picker and pallete tool intended
 
 ### 🛠️ Planned Features <a name = "features"></a>
 - **Interactive Colour Picker:** - Select and narrow down specific colours using the colour dial.
-- **Display related colours:** - Generate palletes of related colours.
+- **Display related colours:** - Generate palettes of related colours.
 - **Copyable HEX and RGB values:** - Easily copy colour values for use in other programs.
 - **Custom UI:** - Scale and move elements to create a comfortable layout.
 - **Colour sampler:** - Sample colours from elsewhere on the desktop.
