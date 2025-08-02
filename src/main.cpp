@@ -21,17 +21,9 @@ int main()
             ToolInstance.DrawElements();
         EndDrawing();
 
-        if(IsMouseButtonDown(0))
-        {
-            ToolInstance.LeftMouseClickHandler();
-        }
 
-        if(IsMouseButtonPressed(2))
-        {
-            //DEBUGDEBUGDEBUG
-            if(ToolInstance.FrameIsMutable){ToolInstance.FrameIsMutable = false;}else{ToolInstance.FrameIsMutable = true;}
-            //DEBUGDEBUGDEBUG
-        }
+        ToolInstance.LeftMouseClickHandler();
+        ToolInstance.RightMouseClickHandler();
     }
     CloseWindow();
 

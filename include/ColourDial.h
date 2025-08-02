@@ -21,7 +21,7 @@ class ColourDial
 
     private:
         Color ElementOutLines;
-        int Current_iRGB;   //The current index in the RGBSaturares map that updates when a colour is selected
+        int Current_iRGB;   //The current index in the RGBSaturates map that updates when a colour is selected
 
         int BandsAmount;
         float DialBandThickness;

@@ -2,8 +2,10 @@
 
 Frames::Frames()
 {
-    EdgeButtonSize = 40;
+    EdgeButtonSize = 20;
     MainWindow = {0, 0, float(GetScreenWidth()), float(GetScreenHeight())};
+    IsDragging = false;
+    IsScaling = false;
 }
 
 
@@ -45,23 +47,22 @@ void Frames::AdjustFrame(Vector2 MouseXY)
 
     Vector2 MouseXYDelta = GetMouseDelta();
 
-    if (CheckCollisionPointRec(MouseXY, MoveButton))
+    if (IsDragging) //The click occurs on the move button
     {   
-        //The click occurs on the move button
+        //Stops it from being dragged off-screen, but feels kind of clunky?
         if(CheckCollisionPointRec({AnchorX + MouseXYDelta.x, AnchorY + MouseXYDelta.y}, MainWindow) && 
            CheckCollisionPointRec({ScaleButton.x + ScaleButton.width + MouseXYDelta.x, ScaleButton.y + ScaleButton.height + MouseXYDelta.y}, MainWindow)) 
         {
-            //Stops it from being dragged off-screen, but feels kind of clunky?
             Update(MouseXYDelta.x + AnchorX, MouseXYDelta.y + AnchorY, LenX , LenY);
         }
 
     }
-    else if (CheckCollisionPointRec(MouseXY, ScaleButton))
+    else if (IsScaling)  //The click occurs on the scale button
     {
-        //The click occurs on the scale button
+        //Not allowing it to scale off-screen
         if(CheckCollisionPointRec({ScaleButton.x + ScaleButton.width + MouseXYDelta.x, ScaleButton.y + ScaleButton.height + MouseXYDelta.y}, MainWindow))
         {   
-            //Not allowing it to scale off-screen
+            
             Update(AnchorX, AnchorY, LenX + MouseXYDelta.x, LenY + MouseXYDelta.y);
         }
     }

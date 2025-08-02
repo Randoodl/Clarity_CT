@@ -4,12 +4,24 @@
 ToolContainer::ToolContainer()
 {
     //Initialise Frame, Dial and Square for the Colour picker
-    ColourPicker.Update(20, 20, 400, 400);
-    RGBDial.Update(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, ColourPicker.LenX/2);
+    RGBDialFrame.Update(20, 20, 400, 400);
+    RGBDial.Update(RGBDialFrame.AnchorX + RGBDialFrame.LenX/2, RGBDialFrame.AnchorY + RGBDialFrame.LenY/2, RGBDialFrame.LenX/2);
 
     SelectedShadeFrame.Update(500, 20, 300, 300);
 
-    FrameIsMutable = false;
+    SetAllInterActionsToFalse(); //This used to set FrameIsMutable to False!
+}
+
+
+void ToolContainer::SetAllInterActionsToFalse()
+{
+    //This feels like such a bandaid solution until I can wrap my head around these event handlers properly
+    CursorOnDial= false;
+    CursorOnShadeSquare = false;
+    RGBDialFrame.IsDragging = false;
+    RGBDialFrame.IsScaling = false;
+    SelectedShadeFrame.IsScaling = false;
+    SelectedShadeFrame.IsDragging = false;
 }
 
 
@@ -24,7 +36,7 @@ void ToolContainer::DrawElements()
 
     if(FrameIsMutable)
     {
-        ColourPicker.DrawFrameBox();
+        RGBDialFrame.DrawFrameBox();
         SelectedShadeFrame.DrawFrameBox();
     }
 }
@@ -32,20 +44,47 @@ void ToolContainer::DrawElements()
 
 void ToolContainer::LeftMouseClickHandler()
 {
-    //Left Mouse Button
+    //Clunky, hopefully temporary, way to handle continuous single press inputs
+    //As more elements get added, this will become way too chonky
+
     Vector2 MouseXY = GetMousePosition();
 
-    if(CheckCollisionPointRec(MouseXY, ColourPicker.FrameArea))
-    {   
-        //Currently clicking within the RGBDial Frame
-        InteractWithRGBDial(MouseXY);
-    }
-    else if (CheckCollisionPointRec(MouseXY, SelectedShadeFrame.FrameArea))
+    //Each frame checks if a mouse button is pressed, on the frame that it does, it might set an interactible bool to true
+    //While the mouse is held down, this IsMousePressed evaluates to false, but the interactible bool remains true until the mouse button is released
+    if(IsMouseButtonPressed(0))
     {
-        //Currently clicking within the Shade preview square
-        InteractWithShadedSquare(MouseXY);
+        if(CheckCollisionPointRec(MouseXY, RGBDialFrame.FrameArea))
+        {   
+            //Currently clicking within the RGBDial Frame
+            CursorOnDial = true;
+        }
+        else if (CheckCollisionPointRec(MouseXY, SelectedShadeFrame.FrameArea))
+        {
+            //Currently clicking within the Shade preview square
+            CursorOnShadeSquare = true;
+        }
     }
     
+    //As soon as a frame passes wherein the mouse button is released, all interactible bools are set to false
+    if(IsMouseButtonReleased(0))
+    {
+        SetAllInterActionsToFalse();
+    }
+    
+    //I believe only one of these can be true at a time, unless elements are stacked on top of each other and multiple point-rec checks evaluate to true
+    if(CursorOnDial){InteractWithRGBDial(MouseXY);}
+    if(CursorOnShadeSquare){InteractWithShadedSquare(MouseXY);}
+}
+
+
+void ToolContainer::RightMouseClickHandler()
+{
+    if(IsMouseButtonPressed(1))
+    {
+        //DEBUGDEBUGDEBUG
+        if(FrameIsMutable){FrameIsMutable = false;}else{FrameIsMutable = true;}
+        //DEBUGDEBUGDEBUG
+    }
 }
 
 
@@ -60,11 +99,19 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
         RGBDial.CurrentShadeColour = RGBDial.RGBSquare.GetSquareRGB(RGBDial.RGBSquare.CurrentShadeMouseLocation); 
     }
     else
-    {
+    {   
         //Mouse clicks are meant to move and scale the Frame
-        ColourPicker.AdjustFrame(MouseXY);
-        int SmallestFrameSide = ColourPicker.GetSmallestFrameSide(ColourPicker.LenX/2, ColourPicker.LenY/2);  //This ensures the dial is sized to the smallest side of the frame
-        RGBDial.Update(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, SmallestFrameSide);
+        if(CheckCollisionPointRec(MouseXY, RGBDialFrame.MoveButton))
+        {
+            RGBDialFrame.IsDragging = true;
+        }
+        else if(CheckCollisionPointRec(MouseXY, RGBDialFrame.ScaleButton))
+        {
+            RGBDialFrame.IsScaling = true;
+        }
+        RGBDialFrame.AdjustFrame(MouseXY);
+        int SmallestFrameSide = RGBDialFrame.GetSmallestFrameSide(RGBDialFrame.LenX/2, RGBDialFrame.LenY/2);  //This ensures the dial is sized to the smallest side of the frame
+        RGBDial.Update(RGBDialFrame.AnchorX + RGBDialFrame.LenX/2, RGBDialFrame.AnchorY + RGBDialFrame.LenY/2, SmallestFrameSide);
     }
 }
 
@@ -74,13 +121,19 @@ void ToolContainer::InteractWithShadedSquare(Vector2 MouseXY)
     if(!FrameIsMutable)
     {   
         //Mouse clicks are meant to deal with the Shade Square itself 
-        //SelectedShadeFrame.UpdateRGBSquareColour(MouseXY);
         std::cout << "(" << int(RGBDial.CurrentShadeColour.r) << ", " << int(RGBDial.CurrentShadeColour.g) << ", " << int(RGBDial.CurrentShadeColour.b) << ")\n";
     }
     else
     {
         //Mouse clicks are meant to move and scale the Frame
+        if(CheckCollisionPointRec(MouseXY, SelectedShadeFrame.MoveButton))
+        {
+            SelectedShadeFrame.IsDragging = true;
+        }
+        else if(CheckCollisionPointRec(MouseXY, SelectedShadeFrame.ScaleButton))
+        {
+            SelectedShadeFrame.IsScaling = true;
+        }
         SelectedShadeFrame.AdjustFrame(MouseXY);
-        //RGBDial.Update(ColourPicker.AnchorX + ColourPicker.LenX/2, ColourPicker.AnchorY + ColourPicker.LenY/2, ColourPicker.LenX/2);
     }
 }

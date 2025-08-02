@@ -17,14 +17,16 @@ class ToolContainer
         void LeftMouseClickHandler();
         void RightMouseClickHandler();  //Not in use yet
 
+    private:  
+        bool CursorOnDial;
+        bool CursorOnShadeSquare;  
 
-
-    private:    
         void InteractWithRGBDial(Vector2 MouseXY);
         void InteractWithShadedSquare(Vector2 MouseXY);
+        void SetAllInterActionsToFalse();
         
         //Colour picker
-        Frames ColourPicker;
+        Frames RGBDialFrame;
         ColourDial RGBDial; //Includes ShadeSquare
 
         //Preview the selected Shade

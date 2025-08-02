@@ -25,6 +25,9 @@ class Frames
         int GetSmallestFrameSide(float SideX, float SideY);
         int EdgeButtonSize;
 
+        bool IsDragging;
+        bool IsScaling;
+
     private:
         Rectangle MainWindow; //For bounds checking on the boxes
         
