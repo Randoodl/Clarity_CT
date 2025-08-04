@@ -9,6 +9,9 @@ ToolContainer::ToolContainer()
 
     SelectedShadeFrame.Update(500, 20, 300, 300);
     FrameIsMutable = false;
+
+    ElementFrames = {&RGBDialFrame, &SelectedShadeFrame};
+
     SetAllInterActionsToFalse(); //This used to set FrameIsMutable to False!
 }
 
@@ -58,44 +61,52 @@ void ToolContainer::MouseClickHandler()
     //DEBUGDEBUGDEBUG
 }
 
-/*
-InteractWithElement, SetElementInteraction and SetFrameInteraction look really damn clunky
-At any point, only one if-statement within the function can be set to true
-this feels like it should be a switch statement, if only I had a better brain
-*/
 
 void ToolContainer::InteractWithElement(Vector2 MouseXY)
 {
-    if(CursorOnDial){InteractWithRGBDial(MouseXY);}
-    if(CursorOnShadeSquare){InteractWithShadedSquare(MouseXY);}
+    //Still a wee bit clunky, but gets the job done for now
+    if(RGBDialFrame.ActiveFrame){InteractWithRGBDial(MouseXY);}
+    if(SelectedShadeFrame.ActiveFrame){InteractWithShadedSquare(MouseXY);}
 }
 
 
 void ToolContainer::SetElementInteraction(Vector2 MouseXY)
 {
-    if(CheckCollisionPointRec(MouseXY, RGBDialFrame.FrameArea)){CursorOnDial = true;}
-    if(CheckCollisionPointRec(MouseXY, SelectedShadeFrame.FrameArea)){CursorOnShadeSquare = true;}
-}
+    //Cycle through each element currently loaded and compare its Frame area to the CLICKED cursor, sets the Frame of the clicked element to true
+    //Also enables Frame draggign and scaling, which might cause issues down the line
+    //Since it'll be set as Frame: True, Button: True
+    for(Frames* Frame: ElementFrames)
+    {
+        if(CheckCollisionPointRec(MouseXY, Frame->FrameArea))
+        {
+            Frame->ActiveFrame = true;
 
-
-void ToolContainer::SetFrameInteraction(Vector2 MouseXY)
-{
-    if(CheckCollisionPointRec(MouseXY, RGBDialFrame.MoveButton)){RGBDialFrame.IsDragging = true;}
-    if(CheckCollisionPointRec(MouseXY, RGBDialFrame.ScaleButton)){RGBDialFrame.IsScaling = true;}  
-    if(CheckCollisionPointRec(MouseXY, SelectedShadeFrame.MoveButton)){SelectedShadeFrame.IsDragging = true;}
-    if(CheckCollisionPointRec(MouseXY, SelectedShadeFrame.ScaleButton)){SelectedShadeFrame.IsScaling = true;}
+            if(FrameIsMutable) //Perhaps we're supposed to interact with the frame and not the element itself
+            {
+                if(CheckCollisionPointRec(MouseXY, Frame->MoveButton))
+                {
+                    Frame->IsDragging = true;
+                }
+                if(CheckCollisionPointRec(MouseXY, Frame->ScaleButton))
+                {
+                    Frame->IsScaling = true;
+                }
+            }
+            return;
+        }
+    }
 }
 
 
 void ToolContainer::SetAllInterActionsToFalse()
 {
-    //This feels like such a bandaid solution until I can wrap my head around these event handlers properly
-    CursorOnDial= false;
-    CursorOnShadeSquare = false;
-    RGBDialFrame.IsDragging = false;
-    RGBDialFrame.IsScaling = false;
-    SelectedShadeFrame.IsScaling = false;
-    SelectedShadeFrame.IsDragging = false;
+    //Forces all interactions to false as soon as a mouse-up is detected
+    for(Frames* Frame: ElementFrames)
+    {
+        Frame->ActiveFrame = false;
+        Frame->IsDragging = false;
+        Frame->IsScaling = false;
+    }
 }
 
 
@@ -112,7 +123,6 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
     else
     {   
         //Mouse clicks are meant to move and scale the Frame
-        SetFrameInteraction(MouseXY);
         RGBDialFrame.AdjustFrame(MouseXY);
         int SmallestFrameSide = RGBDialFrame.GetSmallestFrameSide(RGBDialFrame.LenX/2, RGBDialFrame.LenY/2);  //This ensures the dial is sized to the smallest side of the frame
         RGBDial.Update(RGBDialFrame.AnchorX + RGBDialFrame.LenX/2, RGBDialFrame.AnchorY + RGBDialFrame.LenY/2, SmallestFrameSide);
@@ -130,7 +140,6 @@ void ToolContainer::InteractWithShadedSquare(Vector2 MouseXY)
     else
     {
         //Mouse clicks are meant to move and scale the Frame
-        SetFrameInteraction(MouseXY);
         SelectedShadeFrame.AdjustFrame(MouseXY);
     }
 }

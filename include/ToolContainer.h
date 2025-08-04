@@ -17,14 +17,10 @@ class ToolContainer
         void MouseClickHandler();
 
     private:  
-        bool CursorOnDial;
-        bool CursorOnShadeSquare;  
-
         void InteractWithRGBDial(Vector2 MouseXY);
         void InteractWithShadedSquare(Vector2 MouseXY);
 
         void SetElementInteraction(Vector2 MouseXY);
-        void SetFrameInteraction(Vector2 MouseXY);
         void SetAllInterActionsToFalse();
 
         void InteractWithElement(Vector2 MouseXY);
@@ -35,4 +31,7 @@ class ToolContainer
 
         //Preview the selected Shade
         Frames SelectedShadeFrame;
+
+        //A vector of pointers to all frames so we can for-loop through 'em
+        std::vector<Frames*> ElementFrames;
 };

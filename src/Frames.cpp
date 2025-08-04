@@ -4,6 +4,7 @@ Frames::Frames()
 {
     EdgeButtonSize = 20;
     MainWindow = {0, 0, float(GetScreenWidth()), float(GetScreenHeight())};
+    ActiveFrame = false;
     IsDragging = false;
     IsScaling = false;
 }
@@ -48,7 +49,7 @@ void Frames::AdjustFrame(Vector2 MouseXY)
     Vector2 MouseXYDelta = GetMouseDelta();
 
     if (IsDragging) //The click occurs on the move button
-    {   
+    {
         //Stops it from being dragged off-screen, but feels kind of clunky?
         if(CheckCollisionPointRec({AnchorX + MouseXYDelta.x, AnchorY + MouseXYDelta.y}, MainWindow) && 
            CheckCollisionPointRec({ScaleButton.x + ScaleButton.width + MouseXYDelta.x, ScaleButton.y + ScaleButton.height + MouseXYDelta.y}, MainWindow)) 
@@ -62,7 +63,6 @@ void Frames::AdjustFrame(Vector2 MouseXY)
         //Not allowing it to scale off-screen
         if(CheckCollisionPointRec({ScaleButton.x + ScaleButton.width + MouseXYDelta.x, ScaleButton.y + ScaleButton.height + MouseXYDelta.y}, MainWindow))
         {   
-            
             Update(AnchorX, AnchorY, LenX + MouseXYDelta.x, LenY + MouseXYDelta.y);
         }
     }

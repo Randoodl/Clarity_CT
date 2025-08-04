@@ -25,6 +25,7 @@ class Frames
         int GetSmallestFrameSide(float SideX, float SideY);
         int EdgeButtonSize;
 
+        bool ActiveFrame;
         bool IsDragging;
         bool IsScaling;
 
