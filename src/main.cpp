@@ -22,8 +22,7 @@ int main()
         EndDrawing();
 
 
-        ToolInstance.LeftMouseClickHandler();
-        ToolInstance.RightMouseClickHandler();
+        ToolInstance.MouseClickHandler();
     }
     CloseWindow();
 

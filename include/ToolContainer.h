@@ -14,8 +14,7 @@ class ToolContainer
         bool FrameIsMutable;  //This toggles whether or not you can move/scale frames
 
         void DrawElements();
-        void LeftMouseClickHandler();
-        void RightMouseClickHandler();  //Not in use yet
+        void MouseClickHandler();
 
     private:  
         bool CursorOnDial;
@@ -23,7 +22,12 @@ class ToolContainer
 
         void InteractWithRGBDial(Vector2 MouseXY);
         void InteractWithShadedSquare(Vector2 MouseXY);
+
+        void SetElementInteraction(Vector2 MouseXY);
+        void SetFrameInteraction(Vector2 MouseXY);
         void SetAllInterActionsToFalse();
+
+        void InteractWithElement(Vector2 MouseXY);
         
         //Colour picker
         Frames RGBDialFrame;
