@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./ColourDial.h"
+#include "./ShadeSquare.h"
 #include "./Frames.h"
 
 class ToolContainer
@@ -18,19 +19,26 @@ class ToolContainer
 
     private:  
         void InteractWithRGBDial(Vector2 MouseXY);
-        void InteractWithShadedSquare(Vector2 MouseXY);
+        void InteractWithShadeSquare(Vector2 MouseXY);
+        void InteractWithShadePreview(Vector2 MouseXY);
 
         void SetElementInteraction(Vector2 MouseXY);
         void SetAllInterActionsToFalse();
 
-        void InteractWithElement(Vector2 MouseXY);
+        void DecideElementInteraction(Vector2 MouseXY);
         
         //Colour picker
         Frames RGBDialFrame;
-        ColourDial RGBDial; //Includes ShadeSquare
+        ColourDial RGBDial; 
+
+        //The Shade square within the RGBDial
+        Vector3 DialOffsets;
+        Frames RGBSquareFrame;
+        ShadeSquare RGBSquare;
 
         //Preview the selected Shade
         Frames SelectedShadeFrame;
+        Color CurrentShadeColour;
 
         //A vector of pointers to all frames so we can for-loop through 'em
         std::vector<Frames*> ElementFrames;

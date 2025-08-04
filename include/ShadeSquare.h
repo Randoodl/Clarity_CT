@@ -16,12 +16,9 @@ class ShadeSquare
 
         Color SquareBaseColour;
 
-        void Update(int OffsetX, int OffsetY, int DialInnerRadius);
+        void Update(Rectangle TotalFrameArea);
         void DrawShadeSquare();
         Color GetSquareRGB(Vector2 MouseXY);
 
         Vector2 CurrentShadeMouseLocation;
-
-    private:
-        Rectangle ColouredSquare;
 };

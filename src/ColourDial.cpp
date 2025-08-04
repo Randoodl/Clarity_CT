@@ -5,7 +5,7 @@ ColourDial::ColourDial()
     BandsAmount = 1530;  //More or less forced, 3 values in RGB, 2 states each (rising, falling), between 0-255 totals (6 *255) 1530 possible bands
     MapOfRGBSaturates = GenerateRGBTuples(); 
     Current_iRGB = 0;
-    CurrentShadeColour = {255, 0, 0, 255};
+    CurrentSaturateColour = {255, 0, 0, 255};
     ElementOutLines =  {45, 45, 45, 255};
 }
 
@@ -21,12 +21,7 @@ void ColourDial::Update(int SetOriginX, int SetOriginY, int SetOuterRadius)
     DialOuterRadius = SetOuterRadius;
     DialBandThickness = (DialOuterRadius - DialInnerRadius) * 0.05; //5% of the Dial's thickness is a wild guess, might update later
 
-    RGBSquare.Update(DialOriginXY.x, DialOriginXY.y, DialInnerRadius);
-    RGBSquare.GetSquareRGB({float(RGBSquare.XAnchorPoint), float(RGBSquare.XAnchorPoint)}); //Set an initial ShadeSquare position at the saturated top left
     UpdateBubblePosition();
-
-    ShadeSelectSquare = {float(RGBSquare.XAnchorPoint), float(RGBSquare.YAnchorPoint), 
-                         float(RGBSquare.SquareEdgeLength), float(RGBSquare.SquareEdgeLength)};
 
     MapOFDialPositions = CalculateDialPositions();  
 }
@@ -104,16 +99,13 @@ void ColourDial::DrawRGBDial()
         );
     }
 
-    //Draw the Shade Square
-    RGBSquare.DrawShadeSquare();
-
     //Draw the colour preview bubble
     DrawCircle(BubbleOriginXY.x, BubbleOriginXY.y, (DialOuterRadius - DialInnerRadius)/2, ElementOutLines);
-    DrawCircle(BubbleOriginXY.x, BubbleOriginXY.y, BubbleRadius * 0.8 , RGBSquare.SquareBaseColour);
+    DrawCircle(BubbleOriginXY.x, BubbleOriginXY.y, BubbleRadius * 0.8 , CurrentSaturateColour);
 }
 
 
-void ColourDial::UpdateRGBSquareColour(Vector2 MouseXY)
+Color ColourDial::GetSaturateColour(Vector2 MouseXY)
 {
     //Set a base saturate colour if the dial is clicked, from which a shade and tint can be generated
 
@@ -124,24 +116,19 @@ void ColourDial::UpdateRGBSquareColour(Vector2 MouseXY)
     {
         //The click occurs within the bounds of the dial
 
+        //Using the remainder of GetRGBColour because the Map is created left-to-right, but the dial is created as a unit circle
+        //which increments to 2 PI in a counter-clockwise (right-to-left) fashion
+        //Using GetRGBColour directly would have colours and the bubble flipped along the Y-axis 
         Current_iRGB = (1530 - GetRGBColour(MouseXY, DistanceToClick)) % 1530;
-        /* Using the remainder of GetRGBColour because the Map is created left-to-right, but the dial is created as a unit circle
-           which increments to 2 PI in a counter-clockwise (right-to-left) fashion
-           Using GetRGBColour directly would have colours and the bubble flipped along the Y-axis */
-    
-        RGBSquare.SquareBaseColour.r = MapOfRGBSaturates[Current_iRGB][2]; 
-        RGBSquare.SquareBaseColour.g = MapOfRGBSaturates[Current_iRGB][1]; 
-        RGBSquare.SquareBaseColour.b = MapOfRGBSaturates[Current_iRGB][0]; 
         
+        CurrentSaturateColour.r = MapOfRGBSaturates[Current_iRGB][2];
+        CurrentSaturateColour.g = MapOfRGBSaturates[Current_iRGB][1];
+        CurrentSaturateColour.b = MapOfRGBSaturates[Current_iRGB][0];
+       
         UpdateBubblePosition();
-        
     }
-    else if (CheckCollisionPointRec(MouseXY, ShadeSelectSquare))
-    {
-        //The click occurs within the bounds of the square
-        //I hate everything about the way I do this, gotta rework it
-        CurrentShadeColour = RGBSquare.GetSquareRGB(MouseXY);
-    }
+
+    return CurrentSaturateColour;
 }
 
 
@@ -166,6 +153,22 @@ int ColourDial::GetRGBColour(Vector2 MouseXY, float DistanceToClick)
     return i_RGBSaturatesMap;
 }
 
+Vector3 ColourDial::GetSquareInDialOffsets()
+{
+
+    //Essentially, from the centre off the RGB Dial, how much do I offset XY
+    //To get a corner coordinate that touches the circle of the inner dial.
+    //Think of it as drawing a triangle from the centre of the dial with InnerRadius as the hypo
+    //the straight sides are then the length of half the square
+    
+    Vector3 Offsets = {};
+    double AnchorPointOffset = sqrt(0.5 * pow(DialInnerRadius, 2));
+    Offsets.z = 2 * AnchorPointOffset;  
+    Offsets.x = DialOriginXY.x - AnchorPointOffset;
+    Offsets.y = DialOriginXY.y - AnchorPointOffset;
+
+    return Offsets;
+}
 
 void ColourDial::UpdateBubblePosition()
 {

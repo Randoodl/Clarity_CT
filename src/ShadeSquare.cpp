@@ -7,24 +7,11 @@ ShadeSquare::ShadeSquare()
 }
 
 
-void ShadeSquare::Update(int OffsetX, int OffsetY, int DialInnerRadius)
+void ShadeSquare::Update(Rectangle TotalFrameArea)
 {
-    /*
-    Essentially, from the centre off the RGB Dial, how much do I offset XY
-    To get a corner coordinate that touches the circle of the inner dial.
-    Think of it as drawing a triangle from the centre of the dial with InnerRadius as the hypo
-    the straight sides are then the length of half the square
-    */
-
-    double AnchorPointOffset = sqrt(0.5 * pow(DialInnerRadius, 2));
-    SquareEdgeLength = 2 * AnchorPointOffset;  
-    XAnchorPoint = OffsetX - AnchorPointOffset;
-    YAnchorPoint = OffsetY - AnchorPointOffset;
-
-    ColouredSquare.x = XAnchorPoint;
-    ColouredSquare.y = YAnchorPoint;
-    ColouredSquare.height = ColouredSquare.width = SquareEdgeLength;
-
+    XAnchorPoint = TotalFrameArea.x;
+    YAnchorPoint = TotalFrameArea.y;
+    SquareEdgeLength = TotalFrameArea.height;
 }
 
 
