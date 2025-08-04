@@ -14,7 +14,12 @@ class ShadeSquare
         int YAnchorPoint;
         int SquareEdgeLength;
 
+        //Everything related to generating the texture for the Shade Square
         Color SquareBaseColour;
+        std::vector<std::vector<Color>> GetVectorOfPixels();
+        void ConvertVectorToTexture(const std::vector<std::vector<Color>>& VectorOfPixels);
+        Texture2D ShadedImage;
+        bool ShadedImageIsLoaded; 
 
         void Update(Rectangle TotalFrameArea);
         void DrawShadeSquare();

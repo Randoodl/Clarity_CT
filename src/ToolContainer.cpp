@@ -126,7 +126,7 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
 
         //Get the base saturate colour for the RGB square and draw a small indicator bubble
         RGBSquare.SquareBaseColour = RGBDial.GetSaturateColour(MouseXY);
-        RGBSquare.DrawShadeSquare();
+        RGBSquare.ConvertVectorToTexture(RGBSquare.GetVectorOfPixels());
 
         //This now links back to the shade square, updating it to reflect the new Hue selected from the dial
         CurrentShadeColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation); 

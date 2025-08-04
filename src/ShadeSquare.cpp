@@ -4,6 +4,7 @@
 ShadeSquare::ShadeSquare()
 {
     SquareBaseColour = {255, 0, 0, 255};
+    ShadedImageIsLoaded = false;   
 }
 
 
@@ -12,23 +13,19 @@ void ShadeSquare::Update(Rectangle TotalFrameArea)
     XAnchorPoint = TotalFrameArea.x;
     YAnchorPoint = TotalFrameArea.y;
     SquareEdgeLength = TotalFrameArea.height;
+    CurrentShadeMouseLocation = {float(XAnchorPoint), float(YAnchorPoint)};
+    ConvertVectorToTexture(GetVectorOfPixels());
 }
 
 
-void ShadeSquare::DrawShadeSquare()
+std::vector<std::vector<Color>> ShadeSquare::GetVectorOfPixels()
 {
-    //This seems like a very heavy-handed approach to do something as seemingly simple as a shade square
-    //doing 255^2 calculations each frame seems silly at best
-    //There has to be a better way of doing this, but it is solid for now
-
-    //How much EdgeLength per one of the 255 colours
-    float EdgePerBand = float(SquareEdgeLength / 255.);
-    float BandThickness = EdgePerBand;
-    if(BandThickness < 1){BandThickness = 1;} //Square stops being visible with thicknessess under 1
+    //Turn a ShadeSquare into a collection of pixels that can be redrawn for each frame, initialise it to 255x255
+    std::vector<std::vector<Color>> VectorOfPixels(255, std::vector<Color>(255));
 
     //Create a vector to hold the colour as floats (to avoid narrowing fuckery)
     std::vector<float> ShadeRGBFloats = {float(SquareBaseColour.r), float(SquareBaseColour.g), float(SquareBaseColour.b)};
-
+    
     //The proportional difference from the R, G or B value to 0, per 1 step in 255 total steps
     float ShadingFactorRed   = ShadeRGBFloats[0] / 255.;
     float ShadingFactorGreen = ShadeRGBFloats[1] / 255.;
@@ -63,9 +60,77 @@ void ShadeSquare::DrawShadeSquare()
             ShadeColour.g = TintRGBFloats[1];
             ShadeColour.b = TintRGBFloats[2];
 
-            DrawRectangle(XAnchorPoint + (EdgePerBand * TinterStep), YAnchorPoint + (EdgePerBand * ShaderStep), std::ceil(BandThickness), std::ceil(BandThickness), ShadeColour);
+            VectorOfPixels[ShaderStep][TinterStep] = ShadeColour;
+            //DrawRectangle(XAnchorPoint + (EdgePerBand * TinterStep), YAnchorPoint + (EdgePerBand * ShaderStep), std::ceil(BandThickness), std::ceil(BandThickness), ShadeColour);
         }               
     }
+    return VectorOfPixels;
+}
+
+
+void ShadeSquare::ConvertVectorToTexture(const std::vector<std::vector<Color>>& VectorOfPixels)
+{
+    //Turn the vector of pixel colours into a texture
+    //This is some voodoo that I need to delve into deeper to fully understand
+
+    int Height = VectorOfPixels.size();
+    int Width  = VectorOfPixels[0].size();
+
+    //Allocate memory to hold all the pixel data
+    //RL_MALLOC() is Raylib's malloc() and we are setting aside the whole 2D vector * 4 bytes, as each pixel is [RGBA] or 4 bytes.
+    unsigned char* RawPixelData = (unsigned char*)RL_MALLOC(Width * Height * 4);
+
+    //Raylib stores pixel data as a single line, so turning everything into a 2D vector is probably stupid, now we're just turning it back to a single line, what was the point?
+    for(int Row {0}; Row < Height; ++Row)
+    {
+        for(int Column {0}; Column < Width; ++Column)
+        {
+            Color ColourOfPixel = VectorOfPixels[Row][Column];
+
+            int IndexInSingleString = (Row * Width + Column) * 4;     //Essentially starting a new [RGBA] block in the single stream string
+            RawPixelData[IndexInSingleString]     = ColourOfPixel.r;  //[R]
+            RawPixelData[IndexInSingleString + 1] = ColourOfPixel.g;  //[G]
+            RawPixelData[IndexInSingleString + 2] = ColourOfPixel.b;  //[B]
+            RawPixelData[IndexInSingleString + 3] = ColourOfPixel.a;  //[A]
+        }
+    }
+
+    //Now we have turned the 2D Vector into a single string of [RGBA] blocks, let's load it into a texture
+    Image ConvertedImage = {
+                            .data = RawPixelData,
+                            .width = Width,
+                            .height = Height,
+                            .mipmaps = 1,  //mipmaps are not strictly needed, but better to set it to a safe value regardless
+                            .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
+                           };
+
+    //Now size it to the actual frame size within the dial
+    ImageResize(&ConvertedImage, SquareEdgeLength, SquareEdgeLength);
+
+    //And finally, turn it into a texture, free the used memory and return the texture
+    if(ShadedImageIsLoaded)
+    {
+        //If a texture already exists, unload it to avoid GPU leaks
+        UnloadTexture(ShadedImage);
+        ShadedImageIsLoaded = false;
+    }
+
+    ShadedImage = LoadTextureFromImage(ConvertedImage);   //Load Image into the texture
+    ShadedImageIsLoaded = true;                           //Set memory flag
+    UnloadImage(ConvertedImage);                          //Free image memory for use down the line
+}
+
+
+void ShadeSquare::DrawShadeSquare()
+{
+    DrawTexturePro(
+        ShadedImage, //The generated texture
+        {0, 0, float(ShadedImage.width), float(ShadedImage.height)},  //what area of the texture to use, in this case all of it
+        {float(XAnchorPoint), float(YAnchorPoint), float(SquareEdgeLength), float(SquareEdgeLength)}, //from which point to project the texture and at what scale 
+        {0, 0}, //Origin for rotational movement, not needed here so set to 0
+        0.0f, //Rotation angle, set to zero due to no need
+        WHITE //No tinting needed, set to White
+    );
 }
 
 
