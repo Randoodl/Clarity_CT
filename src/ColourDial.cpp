@@ -25,6 +25,9 @@ void ColourDial::Update(int SetOriginX, int SetOriginY, int SetOuterRadius)
     RGBSquare.GetSquareRGB({float(RGBSquare.XAnchorPoint), float(RGBSquare.XAnchorPoint)}); //Set an initial ShadeSquare position at the saturated top left
     UpdateBubblePosition();
 
+    ShadeSelectSquare = {float(RGBSquare.XAnchorPoint), float(RGBSquare.YAnchorPoint), 
+                         float(RGBSquare.SquareEdgeLength), float(RGBSquare.SquareEdgeLength)};
+
     MapOFDialPositions = CalculateDialPositions();  
 }
 
@@ -118,28 +121,27 @@ void ColourDial::UpdateRGBSquareColour(Vector2 MouseXY)
     float DistanceToClick = sqrt(pow(MouseXY.x - DialOriginXY.x, 2) + pow(MouseXY.y - DialOriginXY.y, 2));
 
     if(DistanceToClick > DialInnerRadius && DistanceToClick < DialOuterRadius)
-        {
-            //The click occurs within the bounds of the dial
+    {
+        //The click occurs within the bounds of the dial
 
-            Current_iRGB = (1530 - GetRGBColour(MouseXY, DistanceToClick)) % 1530;
-            /* Using the remainder of GetRGBColour because the Map is created left-to-right, but the dial is created as a unit circle
-               which increments to 2 PI in a counter-clockwise (right-to-left) fashion
-               Using GetRGBColour directly would have colours and the bubble flipped along the Y-axis */
+        Current_iRGB = (1530 - GetRGBColour(MouseXY, DistanceToClick)) % 1530;
+        /* Using the remainder of GetRGBColour because the Map is created left-to-right, but the dial is created as a unit circle
+           which increments to 2 PI in a counter-clockwise (right-to-left) fashion
+           Using GetRGBColour directly would have colours and the bubble flipped along the Y-axis */
     
-            RGBSquare.SquareBaseColour.r = MapOfRGBSaturates[Current_iRGB][2]; 
-            RGBSquare.SquareBaseColour.g = MapOfRGBSaturates[Current_iRGB][1]; 
-            RGBSquare.SquareBaseColour.b = MapOfRGBSaturates[Current_iRGB][0]; 
+        RGBSquare.SquareBaseColour.r = MapOfRGBSaturates[Current_iRGB][2]; 
+        RGBSquare.SquareBaseColour.g = MapOfRGBSaturates[Current_iRGB][1]; 
+        RGBSquare.SquareBaseColour.b = MapOfRGBSaturates[Current_iRGB][0]; 
         
-            UpdateBubblePosition();
+        UpdateBubblePosition();
         
-        }
-        else if (MouseXY.x > RGBSquare.XAnchorPoint && MouseXY.x < (RGBSquare.XAnchorPoint + RGBSquare.SquareEdgeLength) &&
-                 MouseXY.y > RGBSquare.YAnchorPoint && MouseXY.y < (RGBSquare.YAnchorPoint + RGBSquare.SquareEdgeLength))
-        {
-            //The click occurs within the bounds of the square
-            //I hate everything about the way I do this, gotta rework it
-            CurrentShadeColour = RGBSquare.GetSquareRGB(MouseXY);
-        }
+    }
+    else if (CheckCollisionPointRec(MouseXY, ShadeSelectSquare))
+    {
+        //The click occurs within the bounds of the square
+        //I hate everything about the way I do this, gotta rework it
+        CurrentShadeColour = RGBSquare.GetSquareRGB(MouseXY);
+    }
 }
 
 

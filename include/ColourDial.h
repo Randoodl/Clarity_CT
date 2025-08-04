@@ -19,6 +19,8 @@ class ColourDial
         Color CurrentShadeColour;
         ShadeSquare RGBSquare;   
 
+        Rectangle ShadeSelectSquare;
+
     private:
         Color ElementOutLines;
         int Current_iRGB;   //The current index in the RGBSaturates map that updates when a colour is selected
@@ -37,7 +39,5 @@ class ColourDial
         std::map<int, std::vector<float>> CalculateDialPositions();
 
         Vector2 BubbleOriginXY;
-        float BubbleRadius;
-
-         
+        float BubbleRadius;  
 };
