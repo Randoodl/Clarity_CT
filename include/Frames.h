@@ -9,12 +9,6 @@ class Frames
     
     public:
         Frames();
-
-        int AnchorX;
-        int AnchorY;
-        int LenX;
-        int LenY;
-
         Rectangle FrameArea;
         Rectangle MoveButton;
         Rectangle ScaleButton;

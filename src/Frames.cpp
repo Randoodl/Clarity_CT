@@ -3,7 +3,6 @@
 Frames::Frames()
 {
     EdgeButtonSize = 20;
-    MainWindow = {0, 0, float(GetScreenWidth()), float(GetScreenHeight())};
     ActiveFrame = false;
     IsDragging = false;
     IsScaling = false;
@@ -13,33 +12,29 @@ Frames::Frames()
 void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
 {
     //Update all position and size data when frame is moved or scaled
-
-    AnchorX = SetAnchorX;
-    AnchorY = SetAnchorY;
-    LenX = SetLenX;
-    LenY = SetLenY;
-
     FrameArea.width = SetLenX;
     FrameArea.height = SetLenY;
     FrameArea.x = SetAnchorX;
     FrameArea.y = SetAnchorY;
 
     MoveButton.height = MoveButton.width = EdgeButtonSize;
-    MoveButton.x = AnchorX;
-    MoveButton.y = AnchorY;
+    MoveButton.x = FrameArea.x;
+    MoveButton.y = FrameArea.y;
 
     ScaleButton.height = ScaleButton.width = EdgeButtonSize;
-    ScaleButton.x = LenX + AnchorX - EdgeButtonSize;
-    ScaleButton.y = LenY + AnchorY - EdgeButtonSize;
+    ScaleButton.x = FrameArea.width + FrameArea.x - EdgeButtonSize;
+    ScaleButton.y = FrameArea.height + FrameArea.y - EdgeButtonSize;
+
+    MainWindow = {0, 0, float(GetScreenWidth()), float(GetScreenHeight())};
 }
 
 
 void Frames::DrawFrameBox()
 {
     //Draw the Frame surrounding the element, as well as the two corner button areas
-    DrawRectangleLines(AnchorX, AnchorY, LenX, LenY, RAYWHITE);
-    DrawRectangle(MoveButton.x, MoveButton.y, EdgeButtonSize, EdgeButtonSize, RAYWHITE);
-    DrawRectangle(ScaleButton.x, ScaleButton.y, EdgeButtonSize, EdgeButtonSize, RAYWHITE);
+    DrawRectangleLines(FrameArea.x, FrameArea.y, FrameArea.width, FrameArea.height, RAYWHITE);
+    DrawRectangle(MoveButton.x, MoveButton.y, MoveButton.width, MoveButton.height, RAYWHITE);
+    DrawRectangle(ScaleButton.x, ScaleButton.y, ScaleButton.width, ScaleButton.height, RAYWHITE);
 } 
 
 
@@ -51,10 +46,14 @@ void Frames::AdjustFrame(Vector2 MouseXY)
     if (IsDragging) //The click occurs on the move button
     {
         //Stops it from being dragged off-screen, but feels kind of clunky?
-        if(CheckCollisionPointRec({AnchorX + MouseXYDelta.x, AnchorY + MouseXYDelta.y}, MainWindow) && 
-           CheckCollisionPointRec({ScaleButton.x + ScaleButton.width + MouseXYDelta.x, ScaleButton.y + ScaleButton.height + MouseXYDelta.y}, MainWindow)) 
+        
+        if(CheckCollisionRecs(FrameArea, MainWindow))
         {
-            Update(MouseXYDelta.x + AnchorX, MouseXYDelta.y + AnchorY, LenX , LenY);
+            Update(MouseXY.x - EdgeButtonSize/2, MouseXY.y - EdgeButtonSize/2, FrameArea.width, FrameArea.height);
+        }
+        else
+        {
+            IsDragging= false;
         }
 
     }
@@ -63,7 +62,7 @@ void Frames::AdjustFrame(Vector2 MouseXY)
         //Not allowing it to scale off-screen
         if(CheckCollisionPointRec({ScaleButton.x + ScaleButton.width + MouseXYDelta.x, ScaleButton.y + ScaleButton.height + MouseXYDelta.y}, MainWindow))
         {   
-            Update(AnchorX, AnchorY, LenX + MouseXYDelta.x, LenY + MouseXYDelta.y);
+            Update(FrameArea.x, FrameArea.y, FrameArea.width + MouseXYDelta.x, FrameArea.height + MouseXYDelta.y);
         }
     }
 }

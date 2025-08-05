@@ -26,4 +26,10 @@ class ShadeSquare
         Color GetSquareRGB(Vector2 MouseXY);
 
         Vector2 CurrentShadeMouseLocation;
+
+    private:
+        Vector2 ShadeViewBoxXY;
+        float ShadeViewBoxDimensions;
+        void UpdateShadeViewBoxPosition(Vector2 MouseXY);
+        Color ShadeViewBoxOutline;
 };

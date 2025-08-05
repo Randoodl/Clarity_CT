@@ -13,7 +13,6 @@ class ColourDial
 
         void Update(int SetOriginX, int SetOriginY, int SetOuterRadius);
         void DrawRGBDial();
-        void UpdateBubblePosition();
 
         Color GetSaturateColour(Vector2 MouseXY);
         
@@ -41,4 +40,5 @@ class ColourDial
 
         Vector2 BubbleOriginXY;
         float BubbleRadius;  
+        void UpdateBubblePosition();
 };

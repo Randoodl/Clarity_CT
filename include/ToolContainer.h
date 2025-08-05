@@ -3,6 +3,7 @@
 #include "./ColourDial.h"
 #include "./ShadeSquare.h"
 #include "./Frames.h"
+#include "./Palette.h"
 
 class ToolContainer
 {
@@ -35,11 +36,11 @@ class ToolContainer
         Vector3 DialOffsets;
         Frames RGBSquareFrame;
         ShadeSquare RGBSquare;
+        Color CurrentShadeColour;
 
         //Preview the selected Shade
         Frames SelectedShadeFrame;
-        Color CurrentShadeColour;
-
+        
         //A vector of pointers to all frames so we can for-loop through 'em
         std::vector<Frames*> ElementFrames;
 };

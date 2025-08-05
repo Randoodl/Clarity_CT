@@ -1,5 +1,5 @@
 #include "../include/ShadeSquare.h"
-
+#include <iostream>
 
 ShadeSquare::ShadeSquare()
 {
@@ -14,6 +14,7 @@ void ShadeSquare::Update(Rectangle TotalFrameArea)
     YAnchorPoint = TotalFrameArea.y;
     SquareEdgeLength = TotalFrameArea.height;
     CurrentShadeMouseLocation = {float(XAnchorPoint), float(YAnchorPoint)};
+    UpdateShadeViewBoxPosition(CurrentShadeMouseLocation);
     ConvertVectorToTexture(GetVectorOfPixels());
 }
 
@@ -61,8 +62,7 @@ std::vector<std::vector<Color>> ShadeSquare::GetVectorOfPixels()
             ShadeColour.b = TintRGBFloats[2];
 
             VectorOfPixels[ShaderStep][TinterStep] = ShadeColour;
-            //DrawRectangle(XAnchorPoint + (EdgePerBand * TinterStep), YAnchorPoint + (EdgePerBand * ShaderStep), std::ceil(BandThickness), std::ceil(BandThickness), ShadeColour);
-        }               
+        }
     }
     return VectorOfPixels;
 }
@@ -123,14 +123,13 @@ void ShadeSquare::ConvertVectorToTexture(const std::vector<std::vector<Color>>& 
 
 void ShadeSquare::DrawShadeSquare()
 {
-    DrawTexturePro(
-        ShadedImage, //The generated texture
-        {0, 0, float(ShadedImage.width), float(ShadedImage.height)},  //what area of the texture to use, in this case all of it
-        {float(XAnchorPoint), float(YAnchorPoint), float(SquareEdgeLength), float(SquareEdgeLength)}, //from which point to project the texture and at what scale 
-        {0, 0}, //Origin for rotational movement, not needed here so set to 0
-        0.0f, //Rotation angle, set to zero due to no need
-        WHITE //No tinting needed, set to White
-    );
+    DrawTexture(ShadedImage, XAnchorPoint, YAnchorPoint, WHITE);
+
+    //Draw the ShadeBox to preview the selected shade
+    int OutLineOffset = ShadeViewBoxDimensions * 0.1; 
+    DrawRectangle(ShadeViewBoxXY.x, ShadeViewBoxXY.y, ShadeViewBoxDimensions, ShadeViewBoxDimensions , ShadeViewBoxOutline);
+    DrawRectangle(ShadeViewBoxXY.x + OutLineOffset, ShadeViewBoxXY.y + OutLineOffset, 
+                  ShadeViewBoxDimensions - OutLineOffset * 2, ShadeViewBoxDimensions - OutLineOffset * 2, GetSquareRGB(CurrentShadeMouseLocation));
 }
 
 
@@ -146,26 +145,54 @@ Color ShadeSquare::GetSquareRGB(Vector2 MouseXY)
     Color CalculatedColour = SquareBaseColour;
 
     //The mouse distance within the square translated to a value between 0-255, from top left to bottom right
-    int RelativeX = ((MouseXY.x - XAnchorPoint) / SquareEdgeLength) * 255.;
-    int RelativeY = ((MouseXY.y - YAnchorPoint) / SquareEdgeLength) * 255.;
+    int RelativeX = ((MouseXY.x - XAnchorPoint) / SquareEdgeLength) * 255;
+    int RelativeY = ((MouseXY.y - YAnchorPoint) / SquareEdgeLength) * 255;
 
     //Updating the colour in the Y direction, making it lighter (tint)
     float TintingFactorRed   = ((255. - CalculatedColour.r) / 255.);
     float TintingFactorGreen = ((255. - CalculatedColour.g) / 255.);
     float TintingFactorBlue  = ((255. - CalculatedColour.b) / 255.);
 
-    CalculatedColour.r += (TintingFactorRed * RelativeX);
-    CalculatedColour.g += (TintingFactorGreen * RelativeX);
-    CalculatedColour.b += (TintingFactorBlue * RelativeX);
+    CalculatedColour.r += (TintingFactorRed * float(RelativeX));
+    CalculatedColour.g += (TintingFactorGreen * float(RelativeX));
+    CalculatedColour.b += (TintingFactorBlue * float(RelativeX));
 
     //Updating the colour in the X direction, making it darker (shade)
     float ShadingFactorRed   = (CalculatedColour.r / 255.);
     float ShadingFactorGreen = (CalculatedColour.g / 255.);
     float ShadingFactorBlue  = (CalculatedColour.b / 255.);
 
-    CalculatedColour.r -= (ShadingFactorRed * RelativeY);
-    CalculatedColour.g -= (ShadingFactorGreen * RelativeY);
-    CalculatedColour.b -= (ShadingFactorBlue * RelativeY);
+    CalculatedColour.r -= (ShadingFactorRed * float(RelativeY));
+    CalculatedColour.g -= (ShadingFactorGreen * float(RelativeY));
+    CalculatedColour.b -= (ShadingFactorBlue * float(RelativeY));
     
+    UpdateShadeViewBoxPosition(MouseXY);
+
     return CalculatedColour;
+}
+
+
+void ShadeSquare::UpdateShadeViewBoxPosition(Vector2 MouseXY)
+{
+    //TODO: Currently snaps box to top left during ColourDial scaling
+    //      because the scaling calls ShadeSquare.Update, which calls UpDateViewBoxLocation with CurrentShadeMouseLocation
+    //      which, in this update, is set to to X and Y anchor points of the Shade Square, hence it snaps to the top left
+
+    //Moves the Shade Preview Box around the Shade Square when clicked and dragged
+    ShadeViewBoxDimensions = SquareEdgeLength / 5;
+    ShadeViewBoxXY.x = MouseXY.x - (ShadeViewBoxDimensions/2);
+    ShadeViewBoxXY.y = MouseXY.y - (ShadeViewBoxDimensions/2);
+
+    //Clunky, (hopefully?) temporary way to lock the viewbox within the frame
+    if(ShadeViewBoxXY.x < XAnchorPoint){ShadeViewBoxXY.x = XAnchorPoint;}
+    if(ShadeViewBoxXY.y < YAnchorPoint){ShadeViewBoxXY.y = YAnchorPoint;}
+    if(ShadeViewBoxXY.x + ShadeViewBoxDimensions > XAnchorPoint + SquareEdgeLength){ShadeViewBoxXY.x = XAnchorPoint + SquareEdgeLength - ShadeViewBoxDimensions;}
+    if(ShadeViewBoxXY.y + ShadeViewBoxDimensions > YAnchorPoint + SquareEdgeLength){ShadeViewBoxXY.y = YAnchorPoint + SquareEdgeLength - ShadeViewBoxDimensions;}
+    
+    //This makes the outline lighter/darker based on the Y postion in the square, keeping it visible
+    ShadeViewBoxOutline = {45, 45, 45, 255};
+    int ShadeFactor = (255./SquareEdgeLength) * (ShadeViewBoxXY.y - YAnchorPoint) * 0.8;
+    ShadeViewBoxOutline.r += (ShadeFactor);
+    ShadeViewBoxOutline.g += (ShadeFactor);
+    ShadeViewBoxOutline.b += (ShadeFactor);
 }

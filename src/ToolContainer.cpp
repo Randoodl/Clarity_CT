@@ -5,7 +5,9 @@ ToolContainer::ToolContainer()
 {
     //Initialise the Colour Dial's Frame and Element
     RGBDialFrame.Update(20, 20, 400, 400);
-    RGBDial.Update(RGBDialFrame.AnchorX + RGBDialFrame.LenX/2, RGBDialFrame.AnchorY + RGBDialFrame.LenY/2, RGBDialFrame.LenX/2);
+    RGBDial.Update(RGBDialFrame.FrameArea.x + RGBDialFrame.FrameArea.width/2, 
+                   RGBDialFrame.FrameArea.y + RGBDialFrame.FrameArea.height/2, 
+                   RGBDialFrame.FrameArea.width/2);
 
     //Initialise the Square's Frame and Element
     DialOffsets = RGBDial.GetSquareInDialOffsets();
@@ -32,7 +34,8 @@ void ToolContainer::DrawElements()
 
     //TEMPORARY FRAME TO SHOW SHADES
     //MOVE THIS TO OWN CLASS - PERHAPS SOME KIND OF PALETTE PICKER
-    DrawRectangle(SelectedShadeFrame.AnchorX, SelectedShadeFrame.AnchorY, SelectedShadeFrame.LenX, SelectedShadeFrame.LenY, CurrentShadeColour);
+    DrawRectangle(SelectedShadeFrame.FrameArea.x, SelectedShadeFrame.FrameArea.y, 
+                  SelectedShadeFrame.FrameArea.width, SelectedShadeFrame.FrameArea.height, CurrentShadeColour);
 
     if(FrameIsMutable)
     {
@@ -138,8 +141,12 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
         RGBDialFrame.AdjustFrame(MouseXY);
 
         //Then, adjust the RGBDial
-        int SmallestFrameSide = RGBDialFrame.GetSmallestFrameSide(RGBDialFrame.LenX/2, RGBDialFrame.LenY/2);  //This ensures the dial is sized to the smallest side of the frame
-        RGBDial.Update(RGBDialFrame.AnchorX + RGBDialFrame.LenX/2, RGBDialFrame.AnchorY + RGBDialFrame.LenY/2, SmallestFrameSide);
+        int SmallestFrameSide = RGBDialFrame.GetSmallestFrameSide(RGBDialFrame.FrameArea.width/2, 
+                                                                  RGBDialFrame.FrameArea.height/2);  //This ensures the dial is sized to the smallest side of the frame
+        
+        RGBDial.Update(RGBDialFrame.FrameArea.x + RGBDialFrame.FrameArea.width/2,
+                       RGBDialFrame.FrameArea.y + RGBDialFrame.FrameArea.height/2, 
+                       SmallestFrameSide);
         
         //Lastly, the RGBSquareFrame is relative to the dial, update that one too
         DialOffsets = RGBDial.GetSquareInDialOffsets();
@@ -151,9 +158,12 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
 
 void ToolContainer::InteractWithShadeSquare(Vector2 MouseXY)
 {
-    if(CheckCollisionPointRec(MouseXY, RGBSquareFrame.FrameArea))  //Ensure the cursor can't add MouseXY values outside of the given frame
+    if(!FrameIsMutable)
     {
-        CurrentShadeColour = RGBSquare.GetSquareRGB(MouseXY);
+        if(CheckCollisionPointRec(MouseXY, RGBSquareFrame.FrameArea))  //Ensure the cursor can't add MouseXY values outside of the given frame
+        {
+            CurrentShadeColour = RGBSquare.GetSquareRGB(MouseXY);
+        }
     }
 }
 
