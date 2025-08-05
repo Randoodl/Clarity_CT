@@ -9,7 +9,7 @@ class Frames
     
     public:
         Frames();
-        Rectangle FrameArea;
+        Rectangle FrameArea;  //XY absolute in relation to MainWindow
         Rectangle MoveButton;
         Rectangle ScaleButton;
 
@@ -24,6 +24,6 @@ class Frames
         bool IsScaling;
 
     private:
-        Rectangle MainWindow; //For bounds checking on the boxes
+        Rectangle MainWindow; //For bounds checking on the Frames
         
 };      
