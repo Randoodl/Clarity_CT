@@ -1,4 +1,5 @@
 #include "../include/Frames.h"
+#include <iostream>
 
 Frames::Frames()
 {
@@ -6,6 +7,8 @@ Frames::Frames()
     ActiveFrame = false;
     IsDragging = false;
     IsScaling = false;
+    MouseOffsetX = 0;
+    MouseOffsetY = 0;
 }
 
 
@@ -17,7 +20,8 @@ void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
     FrameArea.x = SetAnchorX;
     FrameArea.y = SetAnchorY;
 
-    MoveButton.height = MoveButton.width = EdgeButtonSize;
+    MoveButton.height =  EdgeButtonSize;
+    MoveButton.width = FrameArea.width;
     MoveButton.x = FrameArea.x;
     MoveButton.y = FrameArea.y;
 
@@ -47,6 +51,10 @@ void Frames::AdjustFrame(Vector2 MouseXY)
 
     Vector2 MouseXYDelta = GetMouseDelta();
 
+    //Update MouseXY to handle the click relative to the topleft point of the button
+    MouseXY.x += MouseOffsetX;
+    MouseXY.y += MouseOffsetY;
+
     if(IsDragging)
     {
         Update(MouseXY.x, MouseXY.y, FrameArea.width, FrameArea.height);
@@ -66,7 +74,7 @@ void Frames::AdjustFrame(Vector2 MouseXY)
             (((FrameArea.x + FrameArea.width) > MainWindow.width) * (MainWindow.width - FrameArea.width)) + (((FrameArea.x + FrameArea.width) <= MainWindow.width) * FrameArea.x), 
             (((FrameArea.y + FrameArea.height) > MainWindow.height) * (MainWindow.height - FrameArea.height)) + (((FrameArea.y + FrameArea.height) <= MainWindow.height) * FrameArea.y),  
             FrameArea.width,
-            FrameArea.height);                   
+            FrameArea.height);    
         }
     }
     if(IsScaling)

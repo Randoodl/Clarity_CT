@@ -15,7 +15,7 @@ ToolContainer::ToolContainer()
     RGBSquare.Update(RGBSquareFrame.FrameArea);
 
     //Initialise the currently selected Shade from the ShadeSquare
-    SelectedShadeFrame.Update(500, 20, 300, 300);
+    SelectedShadeFrame.Update(500, 200, 150, 150);
     CurrentShadeColour = {255, 0, 0, 255};
     
     FrameIsMutable = false;
@@ -92,6 +92,9 @@ void ToolContainer::SetElementInteraction(Vector2 MouseXY)
         {
             Frame->ActiveFrame = true;
 
+            Frame->MouseOffsetX = Frame->FrameArea.x - MouseXY.x;
+            Frame->MouseOffsetY = Frame->FrameArea.y - MouseXY.y;
+
             if(FrameIsMutable) //Perhaps we're supposed to interact with the frame and not the element itself
             {
                 if(CheckCollisionPointRec(MouseXY, Frame->MoveButton))
@@ -111,12 +114,14 @@ void ToolContainer::SetElementInteraction(Vector2 MouseXY)
 
 void ToolContainer::SetAllInterActionsToFalse()
 {
-    //Forces all interactions to false as soon as a mouse-up is detected
+    //Reset all frame interactions as soon as a mouse-up is detected
     for(Frames* Frame: ElementFrames)
     {
         Frame->ActiveFrame = false;
         Frame->IsDragging = false;
         Frame->IsScaling = false;
+        Frame->MouseOffsetX = 0;        
+        Frame->MouseOffsetY = 0;        
     }
 }
 

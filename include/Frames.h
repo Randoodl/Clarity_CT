@@ -23,6 +23,9 @@ class Frames
         bool IsDragging;
         bool IsScaling;
 
+        int MouseOffsetX;
+        int MouseOffsetY;
+
     private:
         Rectangle MainWindow; //For bounds checking on the Frames
         

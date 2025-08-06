@@ -112,21 +112,20 @@ Color ColourDial::GetSaturateColour(Vector2 MouseXY)
     //Using good ol' pythagoras we can calculate the distance from the centre of the dial to the mouseclick
     float DistanceToClick = sqrt(pow(MouseXY.x - DialOriginXY.x, 2) + pow(MouseXY.y - DialOriginXY.y, 2));
 
-    if(DistanceToClick > DialInnerRadius && DistanceToClick < DialOuterRadius)
-    {
-        //The click occurs within the bounds of the dial
+    //if(DistanceToClick > DialInnerRadius && DistanceToClick < DialOuterRadius) {} DIAL NOW WORKS SMOOTHLY BUT ACCEPTS ALL CLICKS WITHIN THE FRAME
 
-        //Using the remainder of GetRGBColour because the Map is created left-to-right, but the dial is created as a unit circle
-        //which increments to 2 PI in a counter-clockwise (right-to-left) fashion
-        //Using GetRGBColour directly would have colours and the bubble flipped along the Y-axis 
-        Current_iRGB = (1530 - GetRGBColour(MouseXY, DistanceToClick)) % 1530;
+    //The click occurs within the bounds of the dial
+
+    //Using the remainder of GetRGBColour because the Map is created left-to-right, but the dial is created as a unit circle
+    //which increments to 2 PI in a counter-clockwise (right-to-left) fashion
+    //Using GetRGBColour directly would have colours and the bubble flipped along the Y-axis 
+    Current_iRGB = (1530 - GetRGBColour(MouseXY, DistanceToClick)) % 1530;
         
-        CurrentSaturateColour.r = MapOfRGBSaturates[Current_iRGB][2];
-        CurrentSaturateColour.g = MapOfRGBSaturates[Current_iRGB][1];
-        CurrentSaturateColour.b = MapOfRGBSaturates[Current_iRGB][0];
-       
-        UpdateBubblePosition();
-    }
+    CurrentSaturateColour.r = MapOfRGBSaturates[Current_iRGB][2];
+    CurrentSaturateColour.g = MapOfRGBSaturates[Current_iRGB][1];
+    CurrentSaturateColour.b = MapOfRGBSaturates[Current_iRGB][0];
+    
+    UpdateBubblePosition();
 
     return CurrentSaturateColour;
 }
