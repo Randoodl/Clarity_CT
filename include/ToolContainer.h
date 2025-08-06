@@ -3,7 +3,7 @@
 #include "./ColourDial.h"
 #include "./ShadeSquare.h"
 #include "./Frames.h"
-#include "./Palette.h"
+//#include "./Palette.h"
 
 class ToolContainer
 {

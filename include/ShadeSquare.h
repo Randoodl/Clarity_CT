@@ -10,9 +10,7 @@ class ShadeSquare
 
     public:
         ShadeSquare();
-        int XAnchorPoint;
-        int YAnchorPoint;
-        int SquareEdgeLength;
+        Rectangle ShadeSquareRectangle;
 
         //Everything related to generating the texture for the Shade Square
         Color SquareBaseColour;
@@ -32,4 +30,5 @@ class ShadeSquare
         float ShadeViewBoxDimensions;
         void UpdateShadeViewBoxPosition(Vector2 MouseXY);
         Color ShadeViewBoxOutline;
+        Vector2 GetCorrectedMouseXY(Vector2 MouseXY);
 };

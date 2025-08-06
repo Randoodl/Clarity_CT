@@ -84,7 +84,7 @@ void ToolContainer::DecideElementInteraction(Vector2 MouseXY)
 void ToolContainer::SetElementInteraction(Vector2 MouseXY)
 {
     //Cycle through each element currently loaded and compare its Frame area to the CLICKED cursor, sets the Frame of the clicked element to true
-    //Also enables Frame draggign and scaling, which might cause issues down the line
+    //Also enables Frame dragging and scaling, which might cause issues down the line
     //Since it'll be set as Frame: True, Button: True
     for(Frames* Frame: ElementFrames)
     {
@@ -160,7 +160,7 @@ void ToolContainer::InteractWithShadeSquare(Vector2 MouseXY)
 {
     if(!FrameIsMutable)
     {
-        if(CheckCollisionPointRec(MouseXY, RGBSquareFrame.FrameArea))  //Ensure the cursor can't add MouseXY values outside of the given frame
+        if(RGBSquareFrame.ActiveFrame)  //Ensure the cursor can't add MouseXY values outside of the given frame
         {
             CurrentShadeColour = RGBSquare.GetSquareRGB(MouseXY);
         }

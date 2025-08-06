@@ -10,10 +10,9 @@ ShadeSquare::ShadeSquare()
 
 void ShadeSquare::Update(Rectangle TotalFrameArea)
 {
-    XAnchorPoint = TotalFrameArea.x;
-    YAnchorPoint = TotalFrameArea.y;
-    SquareEdgeLength = TotalFrameArea.height;
-    CurrentShadeMouseLocation = {float(XAnchorPoint), float(YAnchorPoint)};
+    ShadeSquareRectangle.x = TotalFrameArea.x;
+    ShadeSquareRectangle.y  = TotalFrameArea.y;
+    ShadeSquareRectangle.width = ShadeSquareRectangle.height = TotalFrameArea.height;
     UpdateShadeViewBoxPosition(CurrentShadeMouseLocation);
     ConvertVectorToTexture(GetVectorOfPixels());
 }
@@ -105,7 +104,7 @@ void ShadeSquare::ConvertVectorToTexture(const std::vector<std::vector<Color>>& 
                            };
 
     //Now size it to the actual frame size within the dial
-    ImageResize(&ConvertedImage, SquareEdgeLength, SquareEdgeLength);
+    ImageResize(&ConvertedImage, ShadeSquareRectangle.width, ShadeSquareRectangle.height);
 
     //And finally, turn it into a texture, free the used memory and return the texture
     if(ShadedImageIsLoaded)
@@ -123,7 +122,7 @@ void ShadeSquare::ConvertVectorToTexture(const std::vector<std::vector<Color>>& 
 
 void ShadeSquare::DrawShadeSquare()
 {
-    DrawTexture(ShadedImage, XAnchorPoint, YAnchorPoint, WHITE);
+    DrawTexture(ShadedImage, ShadeSquareRectangle.x, ShadeSquareRectangle.y, WHITE);
 
     //Draw the ShadeBox to preview the selected shade
     int OutLineOffset = ShadeViewBoxDimensions * 0.1; 
@@ -133,10 +132,45 @@ void ShadeSquare::DrawShadeSquare()
 }
 
 
+Vector2 ShadeSquare::GetCorrectedMouseXY(Vector2 MouseXY)
+{
+    //This restricts the cursor's movement to the ShadeSquare
+    //MouseXY cannot be corrected independently since ToolContainer.InteractWithRGBDial()
+    //calls this as well, it needs to be called with GetSquareRGB
+
+    //Honestly, this is just me having dumb fun. Will it come back to bite me in the ass? Oh definitely, but that is for future me to deal with
+    //This could all be done with a bunch of if statements, but where is the fun in that? It is essentially just one sum per coordinate where:
+    //
+    //  "Is too low"     *   minimum value     
+    //  "Is too high"    *   maximum value
+    //  "Is just right"  *   current value
+    //
+    //Since only one of these conditionials can be right at one time, only the minimum, maximum or current value is set
+    //Yes, it is needless and dumb, but it was fun rigging it up like this
+
+    MouseXY.x = (
+        ((MouseXY.x < ShadeSquareRectangle.x) * ShadeSquareRectangle.x) +                                                               
+        ((MouseXY.x > (ShadeSquareRectangle.x + ShadeSquareRectangle.width)) * (ShadeSquareRectangle.x + ShadeSquareRectangle.width)) +
+        (((MouseXY.x >= ShadeSquareRectangle.x) && (MouseXY.x <= (ShadeSquareRectangle.x + ShadeSquareRectangle.width))) * MouseXY.x));
+
+    MouseXY.y = (
+        ((MouseXY.y < ShadeSquareRectangle.y) * ShadeSquareRectangle.y) +                                                               
+        ((MouseXY.y > (ShadeSquareRectangle.y + ShadeSquareRectangle.height)) * (ShadeSquareRectangle.y + ShadeSquareRectangle.height)) +
+        (((MouseXY.y >= ShadeSquareRectangle.y) && (MouseXY.y <= (ShadeSquareRectangle.y + ShadeSquareRectangle.height))) * MouseXY.y));
+    
+    return MouseXY;
+}
+
+
 Color ShadeSquare::GetSquareRGB(Vector2 MouseXY)
 {
     //Turn the mouse's XY coordinates back into a colour doing a bunch of math translations
     //Essentially the inverse of DrawShadeSquare()
+
+    if(!CheckCollisionPointRec(MouseXY, ShadeSquareRectangle))
+    {
+        MouseXY = GetCorrectedMouseXY(MouseXY);
+    }
 
     //Storing this for Dial feedback use
     CurrentShadeMouseLocation = MouseXY;
@@ -145,8 +179,8 @@ Color ShadeSquare::GetSquareRGB(Vector2 MouseXY)
     Color CalculatedColour = SquareBaseColour;
 
     //The mouse distance within the square translated to a value between 0-255, from top left to bottom right
-    int RelativeX = ((MouseXY.x - XAnchorPoint) / SquareEdgeLength) * 255;
-    int RelativeY = ((MouseXY.y - YAnchorPoint) / SquareEdgeLength) * 255;
+    int RelativeX = ((MouseXY.x - ShadeSquareRectangle.x) / ShadeSquareRectangle.width) * 255;
+    int RelativeY = ((MouseXY.y - ShadeSquareRectangle.y) / ShadeSquareRectangle.height) * 255;
 
     //Updating the colour in the Y direction, making it lighter (tint)
     float TintingFactorRed   = ((255. - CalculatedColour.r) / 255.);
@@ -179,19 +213,13 @@ void ShadeSquare::UpdateShadeViewBoxPosition(Vector2 MouseXY)
     //      which, in this update, is set to to X and Y anchor points of the Shade Square, hence it snaps to the top left
 
     //Moves the Shade Preview Box around the Shade Square when clicked and dragged
-    ShadeViewBoxDimensions = SquareEdgeLength / 5;
+    ShadeViewBoxDimensions = ShadeSquareRectangle.height / 10;
     ShadeViewBoxXY.x = MouseXY.x - (ShadeViewBoxDimensions/2);
     ShadeViewBoxXY.y = MouseXY.y - (ShadeViewBoxDimensions/2);
 
-    //Clunky, (hopefully?) temporary way to lock the viewbox within the frame
-    if(ShadeViewBoxXY.x < XAnchorPoint){ShadeViewBoxXY.x = XAnchorPoint;}
-    if(ShadeViewBoxXY.y < YAnchorPoint){ShadeViewBoxXY.y = YAnchorPoint;}
-    if(ShadeViewBoxXY.x + ShadeViewBoxDimensions > XAnchorPoint + SquareEdgeLength){ShadeViewBoxXY.x = XAnchorPoint + SquareEdgeLength - ShadeViewBoxDimensions;}
-    if(ShadeViewBoxXY.y + ShadeViewBoxDimensions > YAnchorPoint + SquareEdgeLength){ShadeViewBoxXY.y = YAnchorPoint + SquareEdgeLength - ShadeViewBoxDimensions;}
-    
     //This makes the outline lighter/darker based on the Y postion in the square, keeping it visible
     ShadeViewBoxOutline = {45, 45, 45, 255};
-    int ShadeFactor = (255./SquareEdgeLength) * (ShadeViewBoxXY.y - YAnchorPoint) * 0.8;
+    int ShadeFactor = (255./ShadeSquareRectangle.height) * (ShadeViewBoxXY.y - ShadeSquareRectangle.y) * 0.8;
     ShadeViewBoxOutline.r += (ShadeFactor);
     ShadeViewBoxOutline.g += (ShadeFactor);
     ShadeViewBoxOutline.b += (ShadeFactor);

@@ -1,42 +1,56 @@
-#Compiler
-CXX = g++
-
-#Relevant Directories
-SOURCE_DIR = ./src
-BUILD_DIR  = ./build
-OBJ_DIR    = $(BUILD_DIR)/obj
-OUTPUT     = $(BUILD_DIR)/Clarity_CT
+#OS checks for Windows or otherwise Linux
+ifeq ($(OS), Windows_NT)
+  CXX = g++
+  LIBS = -lraylib -lgd32 -lwinmm
+  SOURCE_DIR = .\src
+  BUILD_DIR  = .\build
+  OBJ_DIR    = $(BUILD_DIR)\obj
+  OUTPUT = $(BUILD_DIR)\Clarity_CT.exe
+  RM = rmdir -r
+  MKDIR = @if not exist "$(OBJ_DIR)" mkdir "$(OBJ_DIR)"
+  PLATFORM = WINDOWS
+else
+  CXX = g++
+  LIBS = -lraylib 
+  SOURCE_DIR = ./src
+  BUILD_DIR  = ./build
+  OBJ_DIR    = $(BUILD_DIR)/obj
+  OUTPUT = $(BUILD_DIR)/Clarity_CT
+  RM = rm -rf
+  MKDIR = mkdir -p
+  PLATFORM = LINUX
+endif
 
 #Compiler flags
 CXXFLAGS = -std=c++20 -Wall -Werror -Wformat -O2 
 
-#Linker options
-LIBS = -lraylib
-
-#Lists of sourcefile names
+#Lists of source file names
 SOURCENAMES := $(wildcard $(SOURCE_DIR)/*.cpp)
 
 #Derrived object file names
 OBJECTNAMES := $(patsubst $(SOURCE_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SOURCENAMES))
 
-#object file linking
+#Object file linking
 $(OUTPUT): $(OBJECTNAMES)
 	$(CXX) -o $@ $^  $(LIBS) 
 
-#object file generation
+#Object file generation
 $(OBJ_DIR)/%.o: $(SOURCE_DIR)/%.cpp
-	@mkdir -p $(OBJ_DIR)
+	@$(MKDIR) $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 run: $(OUTPUT)
+ifeq ($(PLATFORM), WINDOWS)
+	.\$<
+else
 	./$<
+endif
 
+#For debugging purposes only
 check: $(OUTPUT)
 	valgrind --leak-check=full ./$<
 
 clean:
-ifneq ($(wildcard $(BUILD_DIR)),)
-	@rm -rf $(BUILD_DIR)
-endif
+	@$(RM) $(BUILD_DIR)
 
 .PHONY: run check clean
