@@ -126,6 +126,7 @@ void ShadeSquare::DrawShadeSquare()
 
     //Draw the ShadeBox to preview the selected shade
     int OutLineOffset = ShadeViewBoxDimensions * 0.1; 
+    if(OutLineOffset < 1){OutLineOffset = 1;} //Stops it from disappearing if scaled down to miniscule size, why would anyone do this? I have no idea. But let's handle it anyway
     DrawRectangle(ShadeViewBoxXY.x, ShadeViewBoxXY.y, ShadeViewBoxDimensions, ShadeViewBoxDimensions , ShadeViewBoxOutline);
     DrawRectangle(ShadeViewBoxXY.x + OutLineOffset, ShadeViewBoxXY.y + OutLineOffset, 
                   ShadeViewBoxDimensions - OutLineOffset * 2, ShadeViewBoxDimensions - OutLineOffset * 2, GetSquareRGB(CurrentShadeMouseLocation));

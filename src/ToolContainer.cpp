@@ -137,7 +137,12 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
     else
     {   
         //Mouse clicks are meant to move and scale the Frame
-        //First, adjust the frame
+
+        //So that the ShadeViewBox updates alongside, we need a relative location of the PreviewerXY to the ShadeSquare
+        float RelativeDistanceX = float(RGBSquare.CurrentShadeMouseLocation.x - RGBSquareFrame.FrameArea.x) / float(RGBSquareFrame.FrameArea.width);
+        float RelativeDistanceY = float(RGBSquare.CurrentShadeMouseLocation.y - RGBSquareFrame.FrameArea.y) / float(RGBSquareFrame.FrameArea.height);
+
+        //Then, adjust the frame
         RGBDialFrame.AdjustFrame(MouseXY);
 
         //Then, adjust the RGBDial
@@ -151,6 +156,11 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
         //Lastly, the RGBSquareFrame is relative to the dial, update that one too
         DialOffsets = RGBDial.GetSquareInDialOffsets();
         RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z);
+
+        //Preserve the realtive locations between the ShadeSquare and ShadeViewBox
+        RGBSquare.CurrentShadeMouseLocation.x = RGBSquareFrame.FrameArea.x + float(RGBSquareFrame.FrameArea.width * RelativeDistanceX);
+        RGBSquare.CurrentShadeMouseLocation.y = RGBSquareFrame.FrameArea.y + float(RGBSquareFrame.FrameArea.height * RelativeDistanceY);
+
         RGBSquare.Update(RGBSquareFrame.FrameArea);
     }
 }
