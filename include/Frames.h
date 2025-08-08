@@ -23,10 +23,9 @@ class Frames
         bool IsDragging;
         bool IsScaling;
 
-        int MouseOffsetX;
-        int MouseOffsetY;
+        int MouseOffsetX; //These are used to account for the offset of the mouse click
+        int MouseOffsetY; //when targetting the move button (Stops Frame's topleft snapping to cursor)
 
     private:
-        Rectangle MainWindow; //For bounds checking on the Frames
-        
+        Rectangle MainWindow; //For bounds checking on the Frames      
 };      

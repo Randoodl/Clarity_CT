@@ -1,12 +1,19 @@
 #include "../include/ColourDial.h"
-
+#include <iostream>
 ColourDial::ColourDial() 
 {
-    BandsAmount = 1530;  //More or less forced, 3 values in RGB, 2 states each (rising, falling), between 0-255 totals (6 *255) 1530 possible bands
-    MapOfRGBSaturates = GenerateRGBTuples(); 
-    Current_iRGB = 0;
     CurrentSaturateColour = {255, 0, 0, 255};
+    DialBandThickness = 0;
+    DialOriginXY = {0, 0};
+    DialInnerRadius = 0;
+    DialOuterRadius = 0;
     ElementOutLines =  {45, 45, 45, 255};
+    Current_iRGB = 0;
+    BandsAmount = 1530;  //More or less forced, 3 values in RGB, 2 states each (rising, falling), between 0-255 totals (6 *255) 1530 possible bands
+    MapOFDialPositions = {};
+    MapOfRGBSaturates = GenerateRGBTuples(); 
+    BubbleOriginXY = {0, 0};
+    BubbleRadius = 0;
 }
 
 

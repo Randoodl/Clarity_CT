@@ -48,7 +48,7 @@ endif
 
 #For debugging purposes only
 check: $(OUTPUT)
-	valgrind --leak-check=full ./$<
+	valgrind -s --log-file=./build/log_"`date +%Y-%m-%d-%T`".txt --leak-check=full ./$<
 
 clean:
 	@$(RM) $(BUILD_DIR)

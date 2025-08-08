@@ -7,11 +7,11 @@ int main()
     Color BackGroundColour {51, 66, 89, 255};
 
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE);    
-   
+    
     InitWindow(1530, 750, "Clarity CT");
-    //SetTargetFPS(30); //Perhaps not super relevant
+    SetTargetFPS(60); //Perhaps not super relevant
 
-    ToolContainer ToolInstance; //Create all Elements (Colour Picker)
+    ToolContainer ToolInstance;
     
     while(!WindowShouldClose())
     {
@@ -19,7 +19,6 @@ int main()
             ClearBackground(BackGroundColour);
             ToolInstance.DrawElements();
         EndDrawing();
-
 
         ToolInstance.MouseClickHandler();
     }

@@ -3,12 +3,16 @@
 
 Frames::Frames()
 {
+    FrameArea = {0, 0, 0, 0};
+    MoveButton = {0, 0, 0, 0};
+    ScaleButton = {0, 0, 0, 0};
     EdgeButtonSize = 20;
     ActiveFrame = false;
     IsDragging = false;
     IsScaling = false;
     MouseOffsetX = 0;
     MouseOffsetY = 0;
+    MainWindow = {0, 0, float(GetScreenWidth()), float(GetScreenHeight())};
 }
 
 

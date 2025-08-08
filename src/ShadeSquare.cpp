@@ -3,8 +3,14 @@
 
 ShadeSquare::ShadeSquare()
 {
+    ShadeSquareRectangle = {0, 0, 0, 0};
     SquareBaseColour = {255, 0, 0, 255};
+    ShadedImage = {};
     ShadedImageIsLoaded = false;   
+    CurrentShadeMouseLocation = {0, 0};
+    ShadeViewBoxXY = {0, 0};
+    ShadeViewBoxDimensions = 0;
+    ShadeViewBoxOutline = {0, 0, 0, 0};
 }
 
 

@@ -3,6 +3,11 @@
 
 ToolContainer::ToolContainer()
 {
+    FrameIsMutable = false;
+    DialOffsets = {0, 0, 0};
+    CurrentShadeColour = {255, 0, 0, 255};
+    ElementFrames = {&RGBSquareFrame, &RGBDialFrame, &SelectedShadeFrame};
+
     //Initialise the Colour Dial's Frame and Element
     RGBDialFrame.Update(20, 20, 400, 400);
     RGBDial.Update(RGBDialFrame.FrameArea.x + RGBDialFrame.FrameArea.width/2, 
@@ -16,13 +21,8 @@ ToolContainer::ToolContainer()
 
     //Initialise the currently selected Shade from the ShadeSquare
     SelectedShadeFrame.Update(500, 200, 150, 150);
-    CurrentShadeColour = {255, 0, 0, 255};
     
-    FrameIsMutable = false;
-
-    ElementFrames = {&RGBSquareFrame, &RGBDialFrame, &SelectedShadeFrame};
-
-    SetAllInterActionsToFalse(); //This used to set FrameIsMutable to False!
+    SetAllInterActionsToFalse();
 }
 
 
