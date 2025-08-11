@@ -4,6 +4,7 @@
 #include "./ShadeSquare.h"
 #include "./Frames.h"
 #include "./Palette.h"
+#include "./ToolBar.h"
 
 class ToolContainer
 {
@@ -22,6 +23,7 @@ class ToolContainer
         void InteractWithRGBDial(Vector2 MouseXY);
         void InteractWithShadeSquare(Vector2 MouseXY);
         void InteractWithShadePreview(Vector2 MouseXY);
+        void InteractWithToolBar(Vector2 MouseXY);
 
         void SetElementInteraction(Vector2 MouseXY);
         void SetAllInterActionsToFalse();
@@ -43,4 +45,9 @@ class ToolContainer
         
         //A vector of pointers to all frames so we can for-loop through 'em
         std::vector<Frames*> ElementFrames;
+
+        //Toolbar
+        Frames ToolBarFrame;
+        ToolBar Tools;
+
 };

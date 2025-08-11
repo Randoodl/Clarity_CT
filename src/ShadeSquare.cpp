@@ -16,6 +16,8 @@ ShadeSquare::ShadeSquare()
 
 void ShadeSquare::Update(Rectangle TotalFrameArea)
 {
+    //RGBSquare will always take up the whole of RGBSquareFrame
+    //The frame itself is relative to RGBColourDial
     ShadeSquareRectangle.x = TotalFrameArea.x;
     ShadeSquareRectangle.y  = TotalFrameArea.y;
     ShadeSquareRectangle.width = ShadeSquareRectangle.height = TotalFrameArea.height;
