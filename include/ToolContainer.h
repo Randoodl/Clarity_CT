@@ -22,15 +22,15 @@ class ToolContainer
     private:  
         void InteractWithRGBDial(Vector2 MouseXY);
         void InteractWithShadeSquare(Vector2 MouseXY);
-        void InteractWithShadePreview(Vector2 MouseXY);
         void InteractWithToolBar(Vector2 MouseXY);
-
+        void InteractWithShadesAndTints(Vector2 MouseXY);
         void SetElementInteraction(Vector2 MouseXY);
         void SetAllInterActionsToFalse();
 
         void DecideElementInteraction(Vector2 MouseXY);
 
         void SnapFrames();
+        void UpdateWindowMinimumSize();
         
         //Colour picker
         Frames RGBDialFrame;
@@ -42,8 +42,9 @@ class ToolContainer
         ShadeSquare RGBSquare;
         Color CurrentShadeColour;
 
-        //Preview the selected Shade
-        Frames SelectedShadeFrame;
+        //Shades and tints of selected colour
+        Frames ShadesAndTintsFrame;
+        Palette ShadesAndTints;
         
         //A vector of pointers to all frames so we can for-loop through 'em
         std::vector<Frames*> ElementFrames;

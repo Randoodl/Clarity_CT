@@ -6,7 +6,7 @@ ToolContainer::ToolContainer()
     FrameIsMutable = false;
     DialOffsets = {0, 0, 0};
     CurrentShadeColour = {255, 0, 0, 255};
-    ElementFrames = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &SelectedShadeFrame};
+    ElementFrames = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &ShadesAndTintsFrame};
 
     //Initialise the Colour Dial's Frame and Element
     RGBDialFrame.Update(0, 0, 400, 400);
@@ -19,13 +19,15 @@ ToolContainer::ToolContainer()
     RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z);
     RGBSquare.Update(RGBSquareFrame.FrameArea);
 
-    //Initialise the currently selected Shade from the ShadeSquare
-    SelectedShadeFrame.Update(400, 0, 200, 400);
+    //Initialise the shades and tints of currently selected colour
+    ShadesAndTintsFrame.Update(0, 400, 400, 50);
+    ShadesAndTints.UpdateShadesTints(CurrentShadeColour, ShadesAndTintsFrame.FrameArea);
     
     //Toolbar for various utilities
     ToolBarFrame.Update(700, 600, 280, 70);
     Tools.Update(ToolBarFrame.FrameArea);
     SetAllInterActionsToFalse();
+    UpdateWindowMinimumSize();
 }
 
 
@@ -34,18 +36,14 @@ void ToolContainer::DrawElements()
     //Simply combining all drawing calls
     RGBDial.DrawRGBDial();
     RGBSquare.DrawShadeSquare();
+    ShadesAndTints.DrawShadesAndTints();
     Tools.DrawToolBar();  //This has to be the last draw call, it has to ALWAYS be accessible
-
-    //TEMPORARY FRAME TO SHOW SHADES
-    //MOVE THIS TO OWN CLASS - PERHAPS SOME KIND OF PALETTE PICKER
-    DrawRectangle(SelectedShadeFrame.FrameArea.x, SelectedShadeFrame.FrameArea.y, 
-                  SelectedShadeFrame.FrameArea.width, SelectedShadeFrame.FrameArea.height, CurrentShadeColour);
 
     if(FrameIsMutable)
     {
         RGBDialFrame.DrawFrameBox();
-        SelectedShadeFrame.DrawFrameBox();
         ToolBarFrame.DrawFrameBox();
+        ShadesAndTintsFrame.DrawFrameBox();
     }
 }
 
@@ -61,6 +59,7 @@ void ToolContainer::SnapFrames()
     RGBDialFrame.Update(RGBDial.DialOriginXY.x - RGBDial.DialOuterRadius, RGBDial.DialOriginXY.y - RGBDial.DialOuterRadius, 
                         RGBDial.DialOuterRadius * 2, RGBDial.DialOuterRadius * 2);
 
+    UpdateWindowMinimumSize();
 }
 
 
@@ -92,7 +91,7 @@ void ToolContainer::DecideElementInteraction(Vector2 MouseXY)
     if(ToolBarFrame.ActiveFrame){InteractWithToolBar(MouseXY); return;}
     if(RGBSquareFrame.ActiveFrame){InteractWithShadeSquare(MouseXY); return;}
     if(RGBDialFrame.ActiveFrame){InteractWithRGBDial(MouseXY); return;}
-    if(SelectedShadeFrame.ActiveFrame){InteractWithShadePreview(MouseXY); return;}
+    if(ShadesAndTintsFrame.ActiveFrame){InteractWithShadesAndTints(MouseXY); return;}
 }
 
 
@@ -153,6 +152,7 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
 
         //This now links back to the shade square, updating it to reflect the new Hue selected from the dial
         CurrentShadeColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation); 
+        ShadesAndTints.UpdateShadesTints(CurrentShadeColour, ShadesAndTintsFrame.FrameArea);
     }
     else
     {   
@@ -193,22 +193,8 @@ void ToolContainer::InteractWithShadeSquare(Vector2 MouseXY)
         if(RGBSquareFrame.ActiveFrame)  //Ensure the cursor can't add MouseXY values outside of the given frame
         {
             CurrentShadeColour = RGBSquare.GetSquareRGB(MouseXY);
+            ShadesAndTints.UpdateShadesTints(CurrentShadeColour, ShadesAndTintsFrame.FrameArea);
         }
-    }
-}
-
-
-void ToolContainer::InteractWithShadePreview(Vector2 MouseXY)
-{
-    if(!FrameIsMutable)
-    {   
-        //Mouse clicks are meant to deal with the Shade Square itself 
-        std::cout << "(" << int(CurrentShadeColour.r) << ", " << int(CurrentShadeColour.g) << ", " << int(CurrentShadeColour.b) << ")\n";
-    }
-    else
-    {
-        //Mouse clicks are meant to move and scale the Frame
-        SelectedShadeFrame.AdjustFrame(MouseXY);
     }
 }
 
@@ -255,4 +241,43 @@ void ToolContainer::InteractWithToolBar(Vector2 MouseXY)
              std::cout << "Reset\n";
         }
     }
+}
+
+
+void ToolContainer::InteractWithShadesAndTints(Vector2 MouseXY)
+{
+    if(!FrameIsMutable)
+    {
+
+    }
+    else
+    {
+        ShadesAndTintsFrame.AdjustFrame(MouseXY);
+        ShadesAndTints.UpdateShadesTints(CurrentShadeColour, ShadesAndTintsFrame.FrameArea);
+    }
+
+}
+
+
+void ToolContainer::UpdateWindowMinimumSize()
+{
+    //Make sure the window can't size down to exclude parts of, or entire Frames
+    int MinWidth {0};
+    int MinHeight  {0};
+
+    //Keep trawling through Frames' bottomright points and retain the largest coordinate point
+    for(Frames* Frame : ElementFrames)
+    {
+        if((Frame->FrameArea.x + Frame->FrameArea.width) > MinWidth)
+        {
+            MinWidth = (Frame->FrameArea.x + Frame->FrameArea.width);
+        }
+        if((Frame->FrameArea.y + Frame->FrameArea.height) > MinHeight)
+        {
+            MinHeight = (Frame->FrameArea.y + Frame->FrameArea.height);
+        }
+    }
+
+    //Then set the max coordinate point as the min window size
+    SetWindowMinSize(MinWidth, MinHeight);
 }

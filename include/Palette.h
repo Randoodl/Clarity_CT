@@ -1,6 +1,7 @@
 #pragma once
 
 #include <raylib.h>
+#include <vector>
 
 class Palette
 {
@@ -8,6 +9,12 @@ class Palette
     public:
         Palette();
         Color BasePaletteColour;
+        std::vector<Color> ColourRange;
+        
+        Rectangle ShadesAndTintsRectangle;
+        void UpdateShadesTints(Color SeedColour, Rectangle SeedArea);
+        void DrawShadesAndTints();
 
-    private:
+    private:      
+        int ShadeAmount;
 };
