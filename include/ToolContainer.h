@@ -29,6 +29,8 @@ class ToolContainer
         void SetAllInterActionsToFalse();
 
         void DecideElementInteraction(Vector2 MouseXY);
+
+        void SnapFrames();
         
         //Colour picker
         Frames RGBDialFrame;

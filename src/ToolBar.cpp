@@ -10,31 +10,59 @@ ToolBar::ToolBar()
     LockButton = {0, 0, 100, 100};
     ResetButton = {0, 0, 0, 0};
     SaveButton = {0, 0, 0, 0};
+    ColourModeButton = {0, 0, 0, 0};
     ButtonMargin = 5;
-    Buttons = {&LockButton, &ResetButton, &SaveButton};
+    Buttons = {&LockButton, &ResetButton, &SaveButton, &ColourModeButton};
+    ButtonAmount = Buttons.size();
 }
+
 
 void ToolBar::Update(Rectangle TotalFrameArea)
 {
     //Setup the button container
     ButtonContainer.x = TotalFrameArea.x;
     ButtonContainer.y  = TotalFrameArea.y;
-    ButtonContainer.width = TotalFrameArea.width; 
-    ButtonContainer.height = TotalFrameArea.height;
 
-    //Relative button variables
-    int ButtonWidth = ((ButtonContainer.width - ButtonMargin)/3) - ButtonMargin;
-    int ButtonHeight = (ButtonContainer.height) - ButtonMargin * 2;
-
-    //Cycle through all Button references and update their members respectively
-    for (int IndexOfButton {0}; IndexOfButton < int(Buttons.size()); ++IndexOfButton)
+    if(TotalFrameArea.width >= TotalFrameArea.height) //Sort the bar horizontally
     {
-        (*Buttons[IndexOfButton]).x = ButtonContainer.x + ButtonMargin + (IndexOfButton * (ButtonWidth + ButtonMargin));
-        (*Buttons[IndexOfButton]).y = ButtonContainer.y + ButtonMargin;
-        (*Buttons[IndexOfButton]).width = ButtonWidth;
-        (*Buttons[IndexOfButton]).height = ButtonHeight;
-    }
+        ButtonContainer.width = TotalFrameArea.width;
+        ButtonContainer.height = ButtonContainer.width/ButtonAmount;
+        if(ButtonContainer.height >= TotalFrameArea.height){ButtonContainer.height = TotalFrameArea.height;}
+
+        //Relative button variables
+        int ButtonWidth = ((ButtonContainer.width - ButtonMargin)/ButtonAmount) - ButtonMargin;
+        int ButtonHeight = (ButtonContainer.height) - ButtonMargin * 2;
     
+        //Cycle through all Button references and update their members respectively
+        for (int IndexOfButton {0}; IndexOfButton < ButtonAmount; ++IndexOfButton)
+        {
+            Buttons[IndexOfButton]->x = ButtonContainer.x + ButtonMargin + (IndexOfButton * (ButtonWidth + ButtonMargin));
+            Buttons[IndexOfButton]->y = ButtonContainer.y + ButtonMargin;
+            Buttons[IndexOfButton]->width = ButtonWidth;
+            Buttons[IndexOfButton]->height = ButtonHeight;
+        }
+        
+    }
+    else //sort the bar vertically
+    {
+        ButtonContainer.height = TotalFrameArea.height;
+        ButtonContainer.width = ButtonContainer.height/ButtonAmount;
+        if(ButtonContainer.width >= TotalFrameArea.width){ButtonContainer.width = TotalFrameArea.width;}
+
+        //Relative button variables
+        int ButtonWidth = (ButtonContainer.width) - ButtonMargin * 2;
+        int ButtonHeight = ((ButtonContainer.height - ButtonMargin)/ButtonAmount) - ButtonMargin;
+        
+
+        //Cycle through all Button references and update their members respectively
+        for (int IndexOfButton {0}; IndexOfButton < ButtonAmount; ++IndexOfButton)
+        {
+            Buttons[IndexOfButton]->x = ButtonContainer.x + ButtonMargin;
+            Buttons[IndexOfButton]->y = ButtonContainer.y + ButtonMargin + (IndexOfButton * (ButtonHeight + ButtonMargin));
+            Buttons[IndexOfButton]->width = ButtonWidth;
+            Buttons[IndexOfButton]->height = ButtonHeight;
+        }
+    }    
 }
 
 

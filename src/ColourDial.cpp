@@ -7,7 +7,7 @@ ColourDial::ColourDial()
     DialOriginXY = {0, 0};
     DialInnerRadius = 0;
     DialOuterRadius = 0;
-    ElementOutLines =  {45, 45, 45, 255};
+    ElementOutLines =  {51, 66, 89, 255};
     Current_iRGB = 0;
     BandsAmount = 1530;  //More or less forced, 3 values in RGB, 2 states each (rising, falling), between 0-255 totals (6 *255) 1530 possible bands
     MapOFDialPositions = {};

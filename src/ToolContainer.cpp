@@ -6,10 +6,10 @@ ToolContainer::ToolContainer()
     FrameIsMutable = false;
     DialOffsets = {0, 0, 0};
     CurrentShadeColour = {255, 0, 0, 255};
-    ElementFrames = {&RGBSquareFrame, &RGBDialFrame, &SelectedShadeFrame, &ToolBarFrame};
+    ElementFrames = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &SelectedShadeFrame};
 
     //Initialise the Colour Dial's Frame and Element
-    RGBDialFrame.Update(20, 20, 400, 400);
+    RGBDialFrame.Update(0, 0, 400, 400);
     RGBDial.Update(RGBDialFrame.FrameArea.x + RGBDialFrame.FrameArea.width/2, 
                    RGBDialFrame.FrameArea.y + RGBDialFrame.FrameArea.height/2, 
                    RGBDialFrame.FrameArea.width/2);
@@ -20,10 +20,10 @@ ToolContainer::ToolContainer()
     RGBSquare.Update(RGBSquareFrame.FrameArea);
 
     //Initialise the currently selected Shade from the ShadeSquare
-    SelectedShadeFrame.Update(500, 200, 150, 150);
+    SelectedShadeFrame.Update(400, 0, 200, 400);
     
     //Toolbar for various utilities
-    ToolBarFrame.Update(700, 600, 210, 70);
+    ToolBarFrame.Update(700, 600, 280, 70);
     Tools.Update(ToolBarFrame.FrameArea);
     SetAllInterActionsToFalse();
 }
@@ -47,6 +47,20 @@ void ToolContainer::DrawElements()
         SelectedShadeFrame.DrawFrameBox();
         ToolBarFrame.DrawFrameBox();
     }
+}
+
+
+void ToolContainer::SnapFrames()
+{
+    //Size all frames down to snugly wrap the element they contain after frame mutability is toggled
+
+    //Snap Frame to ToolBar
+    ToolBarFrame.Update(ToolBarFrame.FrameArea.x, ToolBarFrame.FrameArea.y, Tools.ButtonContainer.width, Tools.ButtonContainer.height);
+
+    //Snap Frame to RGBDial
+    RGBDialFrame.Update(RGBDial.DialOriginXY.x - RGBDial.DialOuterRadius, RGBDial.DialOriginXY.y - RGBDial.DialOuterRadius, 
+                        RGBDial.DialOuterRadius * 2, RGBDial.DialOuterRadius * 2);
+
 }
 
 
@@ -75,11 +89,10 @@ void ToolContainer::MouseClickHandler()
 void ToolContainer::DecideElementInteraction(Vector2 MouseXY)
 {
     //Still a wee bit clunky, but gets the job done for now
-    if(RGBDialFrame.ActiveFrame){InteractWithRGBDial(MouseXY);}
-    if(RGBSquareFrame.ActiveFrame){InteractWithShadeSquare(MouseXY);}
-    if(SelectedShadeFrame.ActiveFrame){InteractWithShadePreview(MouseXY);}
-    if(ToolBarFrame.ActiveFrame){InteractWithToolBar(MouseXY);}
-
+    if(ToolBarFrame.ActiveFrame){InteractWithToolBar(MouseXY); return;}
+    if(RGBSquareFrame.ActiveFrame){InteractWithShadeSquare(MouseXY); return;}
+    if(RGBDialFrame.ActiveFrame){InteractWithRGBDial(MouseXY); return;}
+    if(SelectedShadeFrame.ActiveFrame){InteractWithShadePreview(MouseXY); return;}
 }
 
 
@@ -209,7 +222,11 @@ void ToolContainer::InteractWithToolBar(Vector2 MouseXY)
     {
         if(CheckCollisionPointRec(MouseXY, Tools.SaveButton))
         {
-             std::cout << "Save\n";
+            std::cout << "Save\n";
+        }   
+        if(CheckCollisionPointRec(MouseXY, Tools.ColourModeButton))
+        {
+            std::cout << "Colour\n";
         }   
     }
     else
@@ -222,7 +239,15 @@ void ToolContainer::InteractWithToolBar(Vector2 MouseXY)
     {
         if(CheckCollisionPointRec(MouseXY, Tools.LockButton))
         {
-            if(FrameIsMutable){FrameIsMutable = false;}else{FrameIsMutable=true;} //Simple bool swap statement
+            if(FrameIsMutable)
+            {
+                FrameIsMutable = false;
+                SnapFrames();
+            }
+            else
+            {
+                FrameIsMutable=true;
+            }
             ToolBarFrame.ActiveFrame = false; //stops a held down click from spamming the button
         }
         if(CheckCollisionPointRec(MouseXY, Tools.ResetButton))
