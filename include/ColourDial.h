@@ -3,6 +3,7 @@
 #include <map>
 
 #include "./ShadeSquare.h"
+#include "./Constants.h"
 
 class ColourDial
 {

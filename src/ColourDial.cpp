@@ -47,7 +47,7 @@ std::map<int, std::vector<int>> ColourDial::GenerateRGBTuples()
         MapOfRGBTuples[RGBStep] = BGRTuple;
         for(int RGBValue {0}; RGBValue < 3; ++RGBValue)
         {
-            BGRTuple[RGBValue] += PatternArray[(int(RGBStep / 255) + RGBValue * 2)% 6];
+            BGRTuple[RGBValue] += PatternArray[(int(RGBStep / RGBValMax) + RGBValue * 2)% 6];
         }
     }
     return MapOfRGBTuples;
@@ -126,7 +126,7 @@ Color ColourDial::GetSaturateColour(Vector2 MouseXY)
     //Using the remainder of GetRGBColour because the Map is created left-to-right, but the dial is created as a unit circle
     //which increments to 2 PI in a counter-clockwise (right-to-left) fashion
     //Using GetRGBColour directly would have colours and the bubble flipped along the Y-axis 
-    Current_iRGB = (1530 - GetRGBColour(MouseXY, DistanceToClick)) % 1530;
+    Current_iRGB = (BandsAmount - GetRGBColour(MouseXY, DistanceToClick)) % BandsAmount;
         
     CurrentSaturateColour.r = MapOfRGBSaturates[Current_iRGB][2];
     CurrentSaturateColour.g = MapOfRGBSaturates[Current_iRGB][1];

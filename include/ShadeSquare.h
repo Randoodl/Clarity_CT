@@ -4,6 +4,8 @@
 #include <cmath>
 #include <vector>
 
+#include "./Constants.h"
+
 class ShadeSquare
 {
     //This class is meant to hold all the information for the shade square in the centre of the colour dial

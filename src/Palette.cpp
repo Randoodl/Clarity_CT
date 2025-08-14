@@ -43,15 +43,15 @@ void Palette::UpdateShadesTints(Color SeedColour, bool GenerateShades, int Varia
     //The proportional difference from the R, G or B value to either 0 or 255, based on GenerateShades' state
     if(GenerateShades)
     {
-        FactorRed   = RGBFloats[0] / 255.;
-        FactorGreen = RGBFloats[1] / 255.;
-        FactorBlue  = RGBFloats[2] / 255.;
+        FactorRed   = RGBFloats[0] / float(RGBValMax);
+        FactorGreen = RGBFloats[1] / float(RGBValMax);
+        FactorBlue  = RGBFloats[2] / float(RGBValMax);
     }
     else if(!GenerateShades)
     {
-        FactorRed   = -((255 - RGBFloats[0]) / 255.); //These are negative to turn into additions when subtracting later
-        FactorGreen = -((255 - RGBFloats[1]) / 255.);
-        FactorBlue  = -((255 - RGBFloats[2]) / 255.);
+        FactorRed   = -((RGBValMax - RGBFloats[0]) / float(RGBValMax)); //These are negative to turn into additions when subtracting later
+        FactorGreen = -((RGBValMax - RGBFloats[1]) / float(RGBValMax));
+        FactorBlue  = -((RGBValMax - RGBFloats[2]) / float(RGBValMax));
     }
 
     //Generate a spread of variations 
@@ -63,7 +63,7 @@ void Palette::UpdateShadesTints(Color SeedColour, bool GenerateShades, int Varia
         //Update Variation's RGB values, keeping it between 0-255
         
         //RED
-        if(RGBFloats[0] - (FactorRed * VariationDelta) >= 0 && RGBFloats[0] - (FactorRed * VariationDelta) <= 255)
+        if(RGBFloats[0] - (FactorRed * VariationDelta) >= RGBValMin && RGBFloats[0] - (FactorRed * VariationDelta) <= RGBValMax)
         {
             RGBFloats[0] -= (FactorRed * VariationDelta);
         }
@@ -73,7 +73,7 @@ void Palette::UpdateShadesTints(Color SeedColour, bool GenerateShades, int Varia
         }
 
         //GREEN
-        if(RGBFloats[1] - (FactorGreen * VariationDelta) >= 0 && RGBFloats[1] - (FactorGreen * VariationDelta) <= 255)
+        if(RGBFloats[1] - (FactorGreen * VariationDelta) >= RGBValMin && RGBFloats[1] - (FactorGreen * VariationDelta) <= RGBValMax)
         {
             RGBFloats[1] -= (FactorGreen * VariationDelta);
         }
@@ -83,7 +83,7 @@ void Palette::UpdateShadesTints(Color SeedColour, bool GenerateShades, int Varia
         }
 
         //BLUE
-        if(RGBFloats[2] - (FactorBlue * VariationDelta) >= 0 && RGBFloats[2] - (FactorBlue * VariationDelta) <= 255)
+        if(RGBFloats[2] - (FactorBlue * VariationDelta) >= RGBValMin && RGBFloats[2] - (FactorBlue * VariationDelta) <= RGBValMax)
         {
             RGBFloats[2] -= (FactorBlue * VariationDelta);
         }

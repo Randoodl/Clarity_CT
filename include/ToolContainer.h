@@ -46,8 +46,11 @@ class ToolContainer
 
         //Shades and tints of selected colour
         Frames ShadesTintsFrame;
+        int ShadesTintsAmount; //How many 'cells' to display
+        int ShadesTintsStep; //How much the RGB values should differ between cells
         Palette Shades;
         Palette Tints;
+        void CombinedShadesTintsUpdate(bool FrameHasChanged);  //To make updating the position less of a mouthfull
         
         //A vector of pointers to all frames so we can for-loop through 'em
         std::vector<Frames*> ElementFrames;

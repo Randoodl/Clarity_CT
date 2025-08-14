@@ -3,6 +3,8 @@
 #include <raylib.h>
 #include <vector>
 
+#include "./Constants.h"
+
 class Palette
 {
     //This class is meant to hold all the information for a small collection of related colours

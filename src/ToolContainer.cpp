@@ -21,10 +21,9 @@ ToolContainer::ToolContainer()
 
     //Initialise the shades and tints of currently selected colour
     ShadesTintsFrame.Update(0, 400, 400, 70);
-    Shades.Update(ShadesTintsFrame.FrameArea, 10);
-    Shades.UpdateShadesTints(CurrentShadeColour, true, 15, 0);
-    Tints.Update(ShadesTintsFrame.FrameArea, 10);
-    Tints.UpdateShadesTints(CurrentShadeColour, false, 15, 255);
+    ShadesTintsAmount = 10; 
+    ShadesTintsStep = 15;   
+    CombinedShadesTintsUpdate(true);  //passed true here since FrameIsMutable is still set to false at this point
     
     //Toolbar for various utilities
     ToolBarFrame.Update(700, 600, 280, 70);
@@ -156,8 +155,7 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
 
         //This now links back to the shade square, updating it to reflect the new Hue selected from the dial
         CurrentShadeColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation); 
-        Shades.UpdateShadesTints(CurrentShadeColour, true, 15, 0);
-        Tints.UpdateShadesTints(CurrentShadeColour, false, 15, 255);
+        CombinedShadesTintsUpdate(FrameIsMutable);
     }
     else
     {   
@@ -198,8 +196,7 @@ void ToolContainer::InteractWithShadeSquare(Vector2 MouseXY)
         if(RGBSquareFrame.ActiveFrame)  //Ensure the cursor can't add MouseXY values outside of the given frame
         {
             CurrentShadeColour = RGBSquare.GetSquareRGB(MouseXY);
-            Shades.UpdateShadesTints(CurrentShadeColour, true, 15, 0);
-            Tints.UpdateShadesTints(CurrentShadeColour, false, 15, 255);
+            CombinedShadesTintsUpdate(FrameIsMutable);
         }
     }
 }
@@ -276,12 +273,25 @@ void ToolContainer::InteractWithShadesAndTints(Vector2 MouseXY)
     else
     {
         ShadesTintsFrame.AdjustFrame(MouseXY);
-        Shades.Update(ShadesTintsFrame.FrameArea, 10);
-        Shades.UpdateShadesTints(CurrentShadeColour, true, 15, 0);
-        Tints.Update(ShadesTintsFrame.FrameArea, 10);
-        Tints.UpdateShadesTints(CurrentShadeColour, false, 15, 255);
+        CombinedShadesTintsUpdate(FrameIsMutable);
     }
 
+}
+
+
+void ToolContainer::CombinedShadesTintsUpdate(bool FrameHasChanged)
+{
+    //Since this gets called multiple times, might as well do a combined single call
+    
+    if(FrameHasChanged) //Only need to invoke moving/scaling logic if the frame has been touched
+    {
+        Shades.Update(ShadesTintsFrame.FrameArea, ShadesTintsAmount);
+        Tints.Update(ShadesTintsFrame.FrameArea, ShadesTintsAmount);
+    }
+
+    //At any rate, recalculate the square positions and colours
+    Shades.UpdateShadesTints(CurrentShadeColour, true, ShadesTintsStep, RGBValMin);
+    Tints.UpdateShadesTints(CurrentShadeColour, false, ShadesTintsStep, RGBValMax);
 }
 
 

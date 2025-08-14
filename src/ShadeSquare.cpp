@@ -29,17 +29,17 @@ void ShadeSquare::Update(Rectangle TotalFrameArea)
 std::vector<std::vector<Color>> ShadeSquare::GetVectorOfPixels()
 {
     //Turn a ShadeSquare into a collection of pixels that can be redrawn for each frame, initialise it to 255x255
-    std::vector<std::vector<Color>> VectorOfPixels(255, std::vector<Color>(255));
+    std::vector<std::vector<Color>> VectorOfPixels(RGBValMax, std::vector<Color>(RGBValMax));
 
     //Create a vector to hold the colour as floats (to avoid narrowing fuckery)
     std::vector<float> ShadeRGBFloats = {float(SquareBaseColour.r), float(SquareBaseColour.g), float(SquareBaseColour.b)};
     
     //The proportional difference from the R, G or B value to 0, per 1 step in 255 total steps
-    float ShadingFactorRed   = ShadeRGBFloats[0] / 255.;
-    float ShadingFactorGreen = ShadeRGBFloats[1] / 255.;
-    float ShadingFactorBlue  = ShadeRGBFloats[2] / 255.;
+    float ShadingFactorRed   = ShadeRGBFloats[0] / float(RGBValMax);
+    float ShadingFactorGreen = ShadeRGBFloats[1] / float(RGBValMax);
+    float ShadingFactorBlue  = ShadeRGBFloats[2] / float(RGBValMax);
 
-    for(int ShaderStep {0}; ShaderStep < 255; ++ShaderStep)
+    for(int ShaderStep {0}; ShaderStep < RGBValMax; ++ShaderStep)
     {
         //Update the row to be slightly darker than the last one
         ShadeRGBFloats[0] -= ShadingFactorRed;  
@@ -53,11 +53,11 @@ std::vector<std::vector<Color>> ShadeSquare::GetVectorOfPixels()
         std::vector<float> TintRGBFloats = {float(ShadeRGBFloats[0]), float(ShadeRGBFloats[1]), float(ShadeRGBFloats[2])};
 
         //The proportional difference from the R, G or B value to the highest RGB (255 - Darkstep), per 1 step in 255 total steps
-        float TintingFactorRed   = ((255 - ShaderStep) - TintRGBFloats[0]) / 255;
-        float TintingFactorGreen = ((255 - ShaderStep) - TintRGBFloats[1]) / 255;
-        float TintingFactorBlue  = ((255 - ShaderStep) - TintRGBFloats[2]) / 255;
+        float TintingFactorRed   = ((RGBValMax - ShaderStep) - TintRGBFloats[0]) / RGBValMax;
+        float TintingFactorGreen = ((RGBValMax - ShaderStep) - TintRGBFloats[1]) / RGBValMax;
+        float TintingFactorBlue  = ((RGBValMax - ShaderStep) - TintRGBFloats[2]) / RGBValMax;
 
-        for(int TinterStep {0}; TinterStep < 255; ++TinterStep)
+        for(int TinterStep {0}; TinterStep < RGBValMax; ++TinterStep)
         {
             //Update the Row-Column pair (pixel) to be slightly lighter
             TintRGBFloats[0] += TintingFactorRed;
@@ -188,22 +188,22 @@ Color ShadeSquare::GetSquareRGB(Vector2 MouseXY)
     Color CalculatedColour = SquareBaseColour;
 
     //The mouse distance within the square translated to a value between 0-255, from top left to bottom right
-    int RelativeX = ((MouseXY.x - ShadeSquareRectangle.x) / ShadeSquareRectangle.width) * 255;
-    int RelativeY = ((MouseXY.y - ShadeSquareRectangle.y) / ShadeSquareRectangle.height) * 255;
+    int RelativeX = ((MouseXY.x - ShadeSquareRectangle.x) / ShadeSquareRectangle.width) * RGBValMax;
+    int RelativeY = ((MouseXY.y - ShadeSquareRectangle.y) / ShadeSquareRectangle.height) * RGBValMax;
 
     //Updating the colour in the Y direction, making it lighter (tint)
-    float TintingFactorRed   = ((255. - CalculatedColour.r) / 255.);
-    float TintingFactorGreen = ((255. - CalculatedColour.g) / 255.);
-    float TintingFactorBlue  = ((255. - CalculatedColour.b) / 255.);
+    float TintingFactorRed   = ((float(RGBValMax) - CalculatedColour.r) / float(RGBValMax));
+    float TintingFactorGreen = ((float(RGBValMax) - CalculatedColour.g) / float(RGBValMax));
+    float TintingFactorBlue  = ((float(RGBValMax) - CalculatedColour.b) / float(RGBValMax));
 
     CalculatedColour.r += (TintingFactorRed * float(RelativeX));
     CalculatedColour.g += (TintingFactorGreen * float(RelativeX));
     CalculatedColour.b += (TintingFactorBlue * float(RelativeX));
 
     //Updating the colour in the X direction, making it darker (shade)
-    float ShadingFactorRed   = (CalculatedColour.r / 255.);
-    float ShadingFactorGreen = (CalculatedColour.g / 255.);
-    float ShadingFactorBlue  = (CalculatedColour.b / 255.);
+    float ShadingFactorRed   = (CalculatedColour.r / float(RGBValMax));
+    float ShadingFactorGreen = (CalculatedColour.g / float(RGBValMax));
+    float ShadingFactorBlue  = (CalculatedColour.b / float(RGBValMax));
 
     CalculatedColour.r -= (ShadingFactorRed * float(RelativeY));
     CalculatedColour.g -= (ShadingFactorGreen * float(RelativeY));
@@ -228,7 +228,7 @@ void ShadeSquare::UpdateShadeViewBoxPosition(Vector2 MouseXY)
 
     //This makes the outline lighter/darker based on the Y postion in the square, keeping it visible
     ShadeViewBoxOutline = {45, 45, 45, 255};
-    int ShadeFactor = (255./ShadeSquareRectangle.height) * (ShadeViewBoxXY.y - ShadeSquareRectangle.y) * 0.8;
+    int ShadeFactor = (float(RGBValMax)/ShadeSquareRectangle.height) * (ShadeViewBoxXY.y - ShadeSquareRectangle.y) * 0.8;
     ShadeViewBoxOutline.r += (ShadeFactor);
     ShadeViewBoxOutline.g += (ShadeFactor);
     ShadeViewBoxOutline.b += (ShadeFactor);
