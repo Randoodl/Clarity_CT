@@ -6,7 +6,7 @@ ToolContainer::ToolContainer()
     FrameIsMutable = false;
     DialOffsets = {0, 0, 0};
     CurrentShadeColour = {255, 0, 0, 255};
-    ElementFrames = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &ShadesAndTintsFrame};
+    ElementFrames = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &ShadesTintsFrame};
 
     //Initialise the Colour Dial's Frame and Element
     RGBDialFrame.Update(0, 0, 400, 400);
@@ -20,8 +20,11 @@ ToolContainer::ToolContainer()
     RGBSquare.Update(RGBSquareFrame.FrameArea);
 
     //Initialise the shades and tints of currently selected colour
-    ShadesAndTintsFrame.Update(0, 400, 400, 50);
-    ShadesAndTints.UpdateShadesTints(CurrentShadeColour, ShadesAndTintsFrame.FrameArea);
+    ShadesTintsFrame.Update(0, 400, 400, 70);
+    Shades.Update(ShadesTintsFrame.FrameArea, 10);
+    Shades.UpdateShadesTints(CurrentShadeColour, true, 15, 0);
+    Tints.Update(ShadesTintsFrame.FrameArea, 10);
+    Tints.UpdateShadesTints(CurrentShadeColour, false, 15, 255);
     
     //Toolbar for various utilities
     ToolBarFrame.Update(700, 600, 280, 70);
@@ -36,14 +39,15 @@ void ToolContainer::DrawElements()
     //Simply combining all drawing calls
     RGBDial.DrawRGBDial();
     RGBSquare.DrawShadeSquare();
-    ShadesAndTints.DrawShadesAndTints();
+    Shades.DrawPalette();
+    Tints.DrawPalette();
     Tools.DrawToolBar();  //This has to be the last draw call, it has to ALWAYS be accessible
 
     if(FrameIsMutable)
     {
         RGBDialFrame.DrawFrameBox();
         ToolBarFrame.DrawFrameBox();
-        ShadesAndTintsFrame.DrawFrameBox();
+        ShadesTintsFrame.DrawFrameBox();
     }
 }
 
@@ -91,7 +95,7 @@ void ToolContainer::DecideElementInteraction(Vector2 MouseXY)
     if(ToolBarFrame.ActiveFrame){InteractWithToolBar(MouseXY); return;}
     if(RGBSquareFrame.ActiveFrame){InteractWithShadeSquare(MouseXY); return;}
     if(RGBDialFrame.ActiveFrame){InteractWithRGBDial(MouseXY); return;}
-    if(ShadesAndTintsFrame.ActiveFrame){InteractWithShadesAndTints(MouseXY); return;}
+    if(ShadesTintsFrame.ActiveFrame){InteractWithShadesAndTints(MouseXY); return;}
 }
 
 
@@ -152,7 +156,8 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
 
         //This now links back to the shade square, updating it to reflect the new Hue selected from the dial
         CurrentShadeColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation); 
-        ShadesAndTints.UpdateShadesTints(CurrentShadeColour, ShadesAndTintsFrame.FrameArea);
+        Shades.UpdateShadesTints(CurrentShadeColour, true, 15, 0);
+        Tints.UpdateShadesTints(CurrentShadeColour, false, 15, 255);
     }
     else
     {   
@@ -193,7 +198,8 @@ void ToolContainer::InteractWithShadeSquare(Vector2 MouseXY)
         if(RGBSquareFrame.ActiveFrame)  //Ensure the cursor can't add MouseXY values outside of the given frame
         {
             CurrentShadeColour = RGBSquare.GetSquareRGB(MouseXY);
-            ShadesAndTints.UpdateShadesTints(CurrentShadeColour, ShadesAndTintsFrame.FrameArea);
+            Shades.UpdateShadesTints(CurrentShadeColour, true, 15, 0);
+            Tints.UpdateShadesTints(CurrentShadeColour, false, 15, 255);
         }
     }
 }
@@ -247,13 +253,33 @@ void ToolContainer::InteractWithToolBar(Vector2 MouseXY)
 void ToolContainer::InteractWithShadesAndTints(Vector2 MouseXY)
 {
     if(!FrameIsMutable)
-    {
+    {   
+        Color SelectedColour {};
 
+        //This is a really dumb consequence of combining the Palette for Tints and Shades together in the same Frame
+        //PaletteBar is the SAME area for both Tints and Shades, meaning checking for clicks in the PaletteBar will always
+        //default to Shades. This boolean circus math fuckery here is to remedy that oversight
+        //Essentially halving the PaletteBar area based on if it is cascading horizontally or vertically
+        if(CheckCollisionPointRec(MouseXY, {ShadesTintsFrame.FrameArea.x, ShadesTintsFrame.FrameArea.y, 
+        ShadesTintsFrame.FrameArea.width  / (1 + (ShadesTintsFrame.FrameArea.height > ShadesTintsFrame.FrameArea.width)), 
+        ShadesTintsFrame.FrameArea.height / (1 + (ShadesTintsFrame.FrameArea.height < ShadesTintsFrame.FrameArea.width))}))
+        {
+            SelectedColour = Shades.GetVariationColour(MouseXY);
+        }
+        else
+        {
+            SelectedColour = Tints.GetVariationColour(MouseXY);
+        }
+
+        std::cout << "(" << int(SelectedColour.r) << ", " << int(SelectedColour.g) << ", " << int(SelectedColour.b) << ")\n"; 
     }
     else
     {
-        ShadesAndTintsFrame.AdjustFrame(MouseXY);
-        ShadesAndTints.UpdateShadesTints(CurrentShadeColour, ShadesAndTintsFrame.FrameArea);
+        ShadesTintsFrame.AdjustFrame(MouseXY);
+        Shades.Update(ShadesTintsFrame.FrameArea, 10);
+        Shades.UpdateShadesTints(CurrentShadeColour, true, 15, 0);
+        Tints.Update(ShadesTintsFrame.FrameArea, 10);
+        Tints.UpdateShadesTints(CurrentShadeColour, false, 15, 255);
     }
 
 }
@@ -280,4 +306,11 @@ void ToolContainer::UpdateWindowMinimumSize()
 
     //Then set the max coordinate point as the min window size
     SetWindowMinSize(MinWidth, MinHeight);
+}
+
+
+void ToolContainer::UnloadAllFonts()
+{
+    UnloadFont(Shades.SetFont);
+    UnloadFont(Tints.SetFont);
 }

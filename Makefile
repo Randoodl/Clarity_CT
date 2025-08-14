@@ -1,3 +1,5 @@
+#Currently broken for Windows 
+
 #OS checks for Windows or otherwise Linux
 ifeq ($(OS), Windows_NT)
   CXX = g++

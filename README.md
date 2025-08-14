@@ -9,12 +9,12 @@ A C++ based RGB Colour Picker built with the raylib library.
 + [Build from Source](#build)
 
 ### ❓About <a name = "about"></a>
-Clarity CT is a simple, customisable RGB colour picker and pallete tool intended to be used alongside graphic design applications.
+Clarity CT is a simple, customisable RGB colour picker and palette tool intended to be used alongside graphic design applications.
 
 ### 🛠️ Planned Features <a name = "features"></a>
 - **Interactive Colour Picker:** - Select and narrow down specific colours using the colour dial.
 - **Display related colours:** - Generate palettes of related colours.
-- **Copyable HEX and RGB values:** - Easily copy colour values for use in other programs.
+- **Copyable HEX and RGB values:** - Easily copy colour values for use in other applications.
 - **Custom UI:** - Scale and move elements to create a comfortable layout.
 - **Colour sampler:** - Sample colours from elsewhere on the desktop.
 

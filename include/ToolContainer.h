@@ -19,6 +19,8 @@ class ToolContainer
         void DrawElements();
         void MouseClickHandler();
 
+        void UnloadAllFonts();
+
     private:  
         void InteractWithRGBDial(Vector2 MouseXY);
         void InteractWithShadeSquare(Vector2 MouseXY);
@@ -43,8 +45,9 @@ class ToolContainer
         Color CurrentShadeColour;
 
         //Shades and tints of selected colour
-        Frames ShadesAndTintsFrame;
-        Palette ShadesAndTints;
+        Frames ShadesTintsFrame;
+        Palette Shades;
+        Palette Tints;
         
         //A vector of pointers to all frames so we can for-loop through 'em
         std::vector<Frames*> ElementFrames;
