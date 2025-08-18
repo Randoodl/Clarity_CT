@@ -2,6 +2,7 @@
 
 #include <raylib.h>
 #include <vector>
+#include <algorithm>
 
 #include "./Constants.h"
 

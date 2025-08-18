@@ -1,6 +1,7 @@
 #include "../include/Palette.h"
 
-//#include <iostream>
+ //#include <iostream>
+
 
 Palette::Palette()
 {
@@ -96,26 +97,31 @@ void Palette::UpdateShadesTints(Color SeedColour, bool GenerateShades, int Varia
         SetColour.r = RGBFloats[0];
         SetColour.g = RGBFloats[1];
         SetColour.b = RGBFloats[2];
-        PaletteSquareColours[Variation] = SetColour;
+        PaletteSquareColours.emplace_back(SetColour);
 
         //Time to generate the Rectangle area which will contain the above calculated Color
-        PaletteSquares[Variation] = SetRectangle;
+        PaletteSquares.emplace_back(SetRectangle);
 
         if(PaletteBar.width >= PaletteBar.height)  //Sort Horizontally
         {
-            PaletteSquares[Variation].x = PaletteBar.x + (int(PaletteBar.width / VariationAmount) * Variation);
-            PaletteSquares[Variation].y = PaletteBar.y;
-            PaletteSquares[Variation].width = int(PaletteBar.width / VariationAmount);
-            PaletteSquares[Variation].height = PaletteBar.height;
+            PaletteSquares.back().x = PaletteBar.x + (int(PaletteBar.width / VariationAmount) * Variation);
+            PaletteSquares.back().y = PaletteBar.y;
+            PaletteSquares.back().width = int(PaletteBar.width / VariationAmount);
+            PaletteSquares.back().height = PaletteBar.height;
         }
         else //Sort Palette vertically
         {
-            PaletteSquares[Variation].x = PaletteBar.x;
-            PaletteSquares[Variation].y = PaletteBar.y + (int(PaletteBar.height / VariationAmount) * Variation);
-            PaletteSquares[Variation].width = PaletteBar.width;
-            PaletteSquares[Variation].height = int(PaletteBar.height / VariationAmount);
+            PaletteSquares.back().x = PaletteBar.x;
+            PaletteSquares.back().y = PaletteBar.y + (int(PaletteBar.height / VariationAmount) * Variation);
+            PaletteSquares.back().width = PaletteBar.width;
+            PaletteSquares.back().height = int(PaletteBar.height / VariationAmount);
         }
     } 
+
+    if(GenerateShades) //Make the Shades run from dark > light, purely for pleasing visuals
+    {
+        std::reverse(PaletteSquares.begin(), PaletteSquares.end());
+    }
 }
 
 

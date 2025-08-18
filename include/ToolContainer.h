@@ -26,6 +26,7 @@ class ToolContainer
         void InteractWithShadeSquare(Vector2 MouseXY);
         void InteractWithToolBar(Vector2 MouseXY);
         void InteractWithShadesAndTints(Vector2 MouseXY);
+        void InteractWithComplementShadesAndTints(Vector2 MouseXY);
         void SetElementInteraction(Vector2 MouseXY);
         void SetAllInterActionsToFalse();
 
@@ -52,10 +53,25 @@ class ToolContainer
         Palette Shades;
         Frames TintsFrame;
         Palette Tints;
-        void CombinedShadesTintsUpdate(bool FrameHasChanged);  //To make updating the position less of a mouthfull
+        void CombinedShadesTintsUpdate(bool FrameHasChanged, Color &SeedColour, Frames &ContainingFrame,
+                                       Frames &FrameOfShades, Palette &PaletteOfShades,
+                                       Frames &FrameOfTints,  Palette &PaletteOfTints);  //To make updating the position less of a mouthfull
+
+        //Complement colour tints and shades, borrows some members from ShadesAndTintsFrame
+        Frames ComplementsFrame;
+        //Frames ComplementColourFrame;
+        Color ComplementColour;
+        Color GetComplementColour(Color SeedColour);
+        Frames ComplementShadesFrame;
+        Palette ComplementShades;
+        Frames ComplementTintsFrame;
+        Palette ComplementTints;
+
+
         
         //A vector of pointers to all frames so we can for-loop through 'em
         std::vector<Frames*> ElementFrames;
+        std::vector<Frames*> VisibleFrames;
 
         //Toolbar
         Frames ToolBarFrame;
