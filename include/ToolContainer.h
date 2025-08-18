@@ -48,7 +48,9 @@ class ToolContainer
         Frames ShadesTintsFrame;
         int ShadesTintsAmount; //How many 'cells' to display
         int ShadesTintsStep; //How much the RGB values should differ between cells
+        Frames ShadesFrame;
         Palette Shades;
+        Frames TintsFrame;
         Palette Tints;
         void CombinedShadesTintsUpdate(bool FrameHasChanged);  //To make updating the position less of a mouthfull
         

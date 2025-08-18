@@ -104,15 +104,15 @@ void Palette::UpdateShadesTints(Color SeedColour, bool GenerateShades, int Varia
         if(PaletteBar.width >= PaletteBar.height)  //Sort Horizontally
         {
             PaletteSquares[Variation].x = PaletteBar.x + (int(PaletteBar.width / VariationAmount) * Variation);
-            PaletteSquares[Variation].y = PaletteBar.y + (!GenerateShades * (PaletteBar.height/2));
+            PaletteSquares[Variation].y = PaletteBar.y;
             PaletteSquares[Variation].width = int(PaletteBar.width / VariationAmount);
-            PaletteSquares[Variation].height = PaletteBar.height / 2;
+            PaletteSquares[Variation].height = PaletteBar.height;
         }
         else //Sort Palette vertically
         {
-            PaletteSquares[Variation].x = PaletteBar.x + (!GenerateShades * (PaletteBar.width/2));
+            PaletteSquares[Variation].x = PaletteBar.x;
             PaletteSquares[Variation].y = PaletteBar.y + (int(PaletteBar.height / VariationAmount) * Variation);
-            PaletteSquares[Variation].width = PaletteBar.width/2;
+            PaletteSquares[Variation].width = PaletteBar.width;
             PaletteSquares[Variation].height = int(PaletteBar.height / VariationAmount);
         }
     } 

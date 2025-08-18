@@ -23,7 +23,7 @@ ToolContainer::ToolContainer()
     ShadesTintsFrame.Update(0, 400, 400, 70);
     ShadesTintsAmount = 10; 
     ShadesTintsStep = 15;   
-    CombinedShadesTintsUpdate(true);  //passed true here since FrameIsMutable is still set to false at this point
+    CombinedShadesTintsUpdate(true);  //Initialises Frames and Palettes for Shades and Tints, passes True because FrameIsMutable is not set to True yet here
     
     //Toolbar for various utilities
     ToolBarFrame.Update(700, 600, 280, 70);
@@ -253,17 +253,11 @@ void ToolContainer::InteractWithShadesAndTints(Vector2 MouseXY)
     {   
         Color SelectedColour {};
 
-        //This is a really dumb consequence of combining the Palette for Tints and Shades together in the same Frame
-        //PaletteBar is the SAME area for both Tints and Shades, meaning checking for clicks in the PaletteBar will always
-        //default to Shades. This boolean circus math fuckery here is to remedy that oversight
-        //Essentially halving the PaletteBar area based on if it is cascading horizontally or vertically
-        if(CheckCollisionPointRec(MouseXY, {ShadesTintsFrame.FrameArea.x, ShadesTintsFrame.FrameArea.y, 
-        ShadesTintsFrame.FrameArea.width  / (1 + (ShadesTintsFrame.FrameArea.height > ShadesTintsFrame.FrameArea.width)), 
-        ShadesTintsFrame.FrameArea.height / (1 + (ShadesTintsFrame.FrameArea.height < ShadesTintsFrame.FrameArea.width))}))
+        if(CheckCollisionPointRec(MouseXY, ShadesFrame.FrameArea))
         {
             SelectedColour = Shades.GetVariationColour(MouseXY);
         }
-        else
+        else if(CheckCollisionPointRec(MouseXY, TintsFrame.FrameArea))
         {
             SelectedColour = Tints.GetVariationColour(MouseXY);
         }
@@ -275,7 +269,6 @@ void ToolContainer::InteractWithShadesAndTints(Vector2 MouseXY)
         ShadesTintsFrame.AdjustFrame(MouseXY);
         CombinedShadesTintsUpdate(FrameIsMutable);
     }
-
 }
 
 
@@ -285,8 +278,21 @@ void ToolContainer::CombinedShadesTintsUpdate(bool FrameHasChanged)
     
     if(FrameHasChanged) //Only need to invoke moving/scaling logic if the frame has been touched
     {
-        Shades.Update(ShadesTintsFrame.FrameArea, ShadesTintsAmount);
-        Tints.Update(ShadesTintsFrame.FrameArea, ShadesTintsAmount);
+        //Decide whether Palette cascades horizontally or vertically
+        bool CascadeHorizontally = ShadesTintsFrame.FrameArea.width >= ShadesTintsFrame.FrameArea.height;  
+        bool CascadeVertically   = ShadesTintsFrame.FrameArea.width < ShadesTintsFrame.FrameArea.height;
+
+        //This looks complex, but really just boils down to toggling "half the Frames' width" or "Offset the Frames' x" based on the above bools
+        ShadesFrame.Update(ShadesTintsFrame.FrameArea.x, ShadesTintsFrame.FrameArea.y, 
+                       ShadesTintsFrame.FrameArea.width / (1 + CascadeVertically), ShadesTintsFrame.FrameArea.height / (1 + CascadeHorizontally));
+        TintsFrame.Update(ShadesTintsFrame.FrameArea.x + (CascadeVertically * (ShadesTintsFrame.FrameArea.width / (1 + CascadeVertically))), 
+                          ShadesTintsFrame.FrameArea.y + (CascadeHorizontally * (ShadesTintsFrame.FrameArea.height / (1 + CascadeHorizontally))), 
+                          ShadesTintsFrame.FrameArea.width / (1 + CascadeVertically),
+                          ShadesTintsFrame.FrameArea.height/ (1 + CascadeHorizontally));
+
+        //Update Palette relative to frame
+        Shades.Update(ShadesFrame.FrameArea, ShadesTintsAmount);
+        Tints.Update(TintsFrame.FrameArea, ShadesTintsAmount);
     }
 
     //At any rate, recalculate the square positions and colours
