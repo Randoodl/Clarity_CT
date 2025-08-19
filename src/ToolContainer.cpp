@@ -2,10 +2,14 @@
 #include <iostream>
 
 ToolContainer::ToolContainer()
-{
+{   
+    //Initialise all colours in the collection.
+    ColourCollection.BaseHueColour = {255, 0, 0, 255};
+    ColourCollection.ShadedColour = ColourCollection.BaseHueColour;
+    ColourCollection.UpdateComplement();
+
     FrameIsMutable = false;
     DialOffsets = {0, 0, 0};
-    CurrentShadeColour = {255, 0, 0, 255};
     ElementFrames = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &MainShadesTintsFrame};
     VisibleFrames = {&RGBDialFrame, &ToolBarFrame, &MainShadesTintsFrame};
 
@@ -23,7 +27,7 @@ ToolContainer::ToolContainer()
     //Initialise Frame and Element for the main colour's Shades and Tints
     MainShadesTintsFrame.Update(410, 20, 600, 50);
     MainShadesTints.Update(MainShadesTintsFrame.FrameArea, 9, 20);
-    MainShadesTints.GenerateShadesTints(CurrentShadeColour);
+    MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
     MainShadesTints.GeneratePaletteRectangles();
 
     //Toolbar for various utilities
@@ -46,6 +50,12 @@ void ToolContainer::DrawElements()
     {
         for(Frames* ShowFrame : VisibleFrames){ShowFrame->DrawFrameBox();}
     }
+    //DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
+    DrawRectangle(1300, 100, 70, 70, ColourCollection.BaseHueColour);
+    DrawRectangle(1370, 100, 70, 70, ColourCollection.ShadedColour);
+    DrawRectangle(1300, 170, 70, 70, ColourCollection.ComplementColour);
+    DrawRectangle(1370, 170, 70, 70, ColourCollection.ShadedComplementColour);
+    //DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
 }
 
 
@@ -149,11 +159,13 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
 
         //Get the base saturate colour for the RGB square and draw a small indicator bubble
         RGBSquare.SquareBaseColour = RGBDial.GetSaturateColour(MouseXY);
+        ColourCollection.BaseHueColour = RGBSquare.SquareBaseColour;
+        ColourCollection.UpdateComplement();
         RGBSquare.ConvertVectorToTexture(RGBSquare.GetVectorOfPixels());
 
         //This now links back to the shade square, updating it to reflect the new Hue selected from the dial
-        CurrentShadeColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation); 
-        MainShadesTints.GenerateShadesTints(CurrentShadeColour);
+        ColourCollection.ShadedColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, ColourCollection.BaseHueColour); 
+        MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
     }
     else
     {   
@@ -193,8 +205,14 @@ void ToolContainer::InteractWithShadeSquare(Vector2 MouseXY)
     {
         if(RGBSquareFrame.ActiveFrame)  //Ensure the cursor can't add MouseXY values outside of the given frame
         {
-            CurrentShadeColour = RGBSquare.GetSquareRGB(MouseXY);
-            MainShadesTints.GenerateShadesTints(CurrentShadeColour);
+            //Calculate the main hue colour shade
+            ColourCollection.ShadedColour = RGBSquare.GetSquareRGB(MouseXY, ColourCollection.BaseHueColour);
+            RGBSquare.ShadedColour = ColourCollection.ShadedColour;
+
+            //Calculate the Complement colour shade
+            ColourCollection.ShadedComplementColour = RGBSquare.GetSquareRGB(MouseXY, ColourCollection.ComplementColour);
+
+            MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
         }
     }
 }
@@ -230,7 +248,9 @@ void ToolContainer::InteractWithToolBar(Vector2 MouseXY)
         if(CheckCollisionPointRec(MouseXY, Tools.ColourModeButton))
         {
             std::cout << "Colour\n";
-        }   
+        }
+
+        ToolBarFrame.ActiveFrame = false; //stops a held down click from spamming the button   
     }
     else
     {   
@@ -251,12 +271,15 @@ void ToolContainer::InteractWithToolBar(Vector2 MouseXY)
             {
                 FrameIsMutable=true;
             }
-            ToolBarFrame.ActiveFrame = false; //stops a held down click from spamming the button
         }
+
         if(CheckCollisionPointRec(MouseXY, Tools.ResetButton))
         {
-             std::cout << "Reset\n";
+            std::cout << "Reset\n";
+            
         }
+
+        ToolBarFrame.ActiveFrame = false; //stops a held down click from spamming the button
     }
 }
 

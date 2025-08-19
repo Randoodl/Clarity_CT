@@ -8,7 +8,8 @@
 
 class Palette
 {
-    //This class is meant to hold all the information for a small collection of related colours
+    //This class is meant to hold vectors of generated colours and linked rectangles to display them
+    
     public:
         Palette();
         Color BasePaletteColour;
@@ -25,7 +26,7 @@ class Palette
         void DrawPalette();
 
         Font SetFont;
-             
+
         int VariationAmount;
         int VariationDelta;
         

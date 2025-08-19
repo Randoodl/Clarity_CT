@@ -156,9 +156,8 @@ void Palette::DrawPalette()
     
     for(int Variation {0}; Variation < int(PaletteColours.size()); ++Variation)
     {
-        Color GetColour = PaletteColours[Variation];
         Rectangle GetRectangle = PaletteRectangles[Variation];
-        DrawRectangle(GetRectangle.x, GetRectangle.y, GetRectangle.width, GetRectangle.height, GetColour);
+        DrawRectangle(GetRectangle.x, GetRectangle.y, GetRectangle.width, GetRectangle.height, PaletteColours[Variation]);
     }
 }
 
@@ -168,11 +167,9 @@ Color Palette::GetVariationColour(Vector2 MouseXY)
     //Return the RGB values from a clicked-on Palette square
     for(int Variation {0}; Variation < int(PaletteColours.size()); ++Variation)
     {
-        Rectangle GetRectangle = (PaletteRectangles[Variation]);
-        if(CheckCollisionPointRec(MouseXY, GetRectangle))
+        if(CheckCollisionPointRec(MouseXY, PaletteRectangles[Variation]))
         {
-            Color GetColour = PaletteColours[Variation];
-            return GetColour;
+            return PaletteColours[Variation];
         }
     }
     return {0, 0, 0, 0}; //Alpha value 0

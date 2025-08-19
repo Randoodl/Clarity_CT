@@ -5,6 +5,7 @@
 #include "./Frames.h"
 #include "./Palette.h"
 #include "./ToolBar.h"
+#include "./ColourFamily.h"
 
 class ToolContainer
 {
@@ -34,6 +35,9 @@ class ToolContainer
         void SnapFrames();
         void UpdateWindowMinimumSize();
         
+        //The collection of relevant colours
+        ColourFamily ColourCollection;
+
         //Colour picker
         Frames RGBDialFrame;
         ColourDial RGBDial; 
@@ -42,7 +46,6 @@ class ToolContainer
         Vector3 DialOffsets;
         Frames RGBSquareFrame;
         ShadeSquare RGBSquare;
-        Color CurrentShadeColour;
 
         //Shades and tints of the currently selected colour
         Frames MainShadesTintsFrame;

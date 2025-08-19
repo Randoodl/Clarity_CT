@@ -5,6 +5,7 @@ ShadeSquare::ShadeSquare()
 {
     ShadeSquareRectangle = {0, 0, 0, 0};
     SquareBaseColour = {255, 0, 0, 255};
+    ShadedColour = SquareBaseColour;
     ShadedImage = {};
     ShadedImageIsLoaded = false;   
     CurrentShadeMouseLocation = {0, 0};
@@ -32,7 +33,7 @@ std::vector<std::vector<Color>> ShadeSquare::GetVectorOfPixels()
     std::vector<std::vector<Color>> VectorOfPixels(RGBValMax, std::vector<Color>(RGBValMax));
 
     //Create a vector to hold the colour as floats (to avoid narrowing fuckery)
-    std::vector<float> ShadeRGBFloats = {float(SquareBaseColour.r), float(SquareBaseColour.g), float(SquareBaseColour.b)};
+    float ShadeRGBFloats[3] = {float(SquareBaseColour.r), float(SquareBaseColour.g), float(SquareBaseColour.b)};
     
     //The proportional difference from the R, G or B value to 0, per 1 step in 255 total steps
     float ShadingFactorRed   = ShadeRGBFloats[0] / float(RGBValMax);
@@ -50,7 +51,7 @@ std::vector<std::vector<Color>> ShadeSquare::GetVectorOfPixels()
         Color ShadeColour = {0,0,0,255};
 
         //Create a vector to hold the colour as floats
-        std::vector<float> TintRGBFloats = {float(ShadeRGBFloats[0]), float(ShadeRGBFloats[1]), float(ShadeRGBFloats[2])};
+        float TintRGBFloats[3] = {float(ShadeRGBFloats[0]), float(ShadeRGBFloats[1]), float(ShadeRGBFloats[2])};
 
         //The proportional difference from the R, G or B value to the highest RGB (255 - Darkstep), per 1 step in 255 total steps
         float TintingFactorRed   = ((RGBValMax - ShaderStep) - TintRGBFloats[0]) / RGBValMax;
@@ -137,7 +138,7 @@ void ShadeSquare::DrawShadeSquare()
     if(OutLineOffset < 1){OutLineOffset = 1;} //Stops it from disappearing if scaled down to miniscule size, why would anyone do this? I have no idea. But let's handle it anyway
     DrawRectangle(ShadeViewBoxXY.x, ShadeViewBoxXY.y, ShadeViewBoxDimensions, ShadeViewBoxDimensions , ShadeViewBoxOutline);
     DrawRectangle(ShadeViewBoxXY.x + OutLineOffset, ShadeViewBoxXY.y + OutLineOffset, 
-                  ShadeViewBoxDimensions - OutLineOffset * 2, ShadeViewBoxDimensions - OutLineOffset * 2, GetSquareRGB(CurrentShadeMouseLocation));
+                  ShadeViewBoxDimensions - OutLineOffset * 2, ShadeViewBoxDimensions - OutLineOffset * 2, GetSquareRGB(CurrentShadeMouseLocation, SquareBaseColour));
 }
 
 
@@ -171,7 +172,7 @@ Vector2 ShadeSquare::GetCorrectedMouseXY(Vector2 MouseXY)
 }
 
 
-Color ShadeSquare::GetSquareRGB(Vector2 MouseXY)
+Color ShadeSquare::GetSquareRGB(Vector2 MouseXY, Color SeedColour)
 {
     //Turn the mouse's XY coordinates back into a colour doing a bunch of math translations
     //Essentially the inverse of DrawShadeSquare()
@@ -185,7 +186,7 @@ Color ShadeSquare::GetSquareRGB(Vector2 MouseXY)
     CurrentShadeMouseLocation = MouseXY;
 
     //Color to update and return
-    Color CalculatedColour = SquareBaseColour;
+    Color CalculatedColour = SeedColour;
 
     //The mouse distance within the square translated to a value between 0-255, from top left to bottom right
     int RelativeX = ((MouseXY.x - ShadeSquareRectangle.x) / ShadeSquareRectangle.width) * RGBValMax;
