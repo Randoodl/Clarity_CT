@@ -6,8 +6,8 @@ ToolContainer::ToolContainer()
     FrameIsMutable = false;
     DialOffsets = {0, 0, 0};
     CurrentShadeColour = {255, 0, 0, 255};
-    ElementFrames = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &ShadesTintsFrame, &ComplementsFrame};
-    VisibleFrames = {&RGBDialFrame, &ShadesTintsFrame, &ComplementsFrame, &ToolBarFrame};
+    ElementFrames = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &MainShadesTintsFrame};
+    VisibleFrames = {&RGBDialFrame, &ToolBarFrame, &MainShadesTintsFrame};
 
     //Initialise the Colour Dial's Frame and Element
     RGBDialFrame.Update(0, 0, 400, 400);
@@ -20,17 +20,11 @@ ToolContainer::ToolContainer()
     RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z);
     RGBSquare.Update(RGBSquareFrame.FrameArea);
 
-    //Initialise the shades and tints of currently selected colour
-    ShadesTintsFrame.Update(0, 415, 400, 70);
-    ShadesTintsAmount = 10; 
-    ShadesTintsStep = 15;   
-    CombinedShadesTintsUpdate(true, CurrentShadeColour, ShadesTintsFrame, ShadesFrame, Shades, TintsFrame, Tints);  //Initialises Frames and Palettes for Shades and Tints, passes True because FrameIsMutable is not set to True yet here
-
-    //Initialise the complement of the current colour, plus its shades and tints
-    ComplementsFrame.Update(0, 500, 400, 70);
-    ComplementColour = {0, 255, 255, 255};
-    CombinedShadesTintsUpdate(true, ComplementColour, ComplementsFrame, ComplementShadesFrame, ComplementShades, ComplementTintsFrame, ComplementTints);
-
+    //Initialise Frame and Element for the main colour's Shades and Tints
+    MainShadesTintsFrame.Update(410, 20, 600, 50);
+    MainShadesTints.Update(MainShadesTintsFrame.FrameArea, 9, 20);
+    MainShadesTints.GenerateShadesTints(CurrentShadeColour);
+    MainShadesTints.GeneratePaletteRectangles();
 
     //Toolbar for various utilities
     ToolBarFrame.Update(700, 600, 280, 70);
@@ -45,10 +39,7 @@ void ToolContainer::DrawElements()
     //Simply combining all drawing calls
     RGBDial.DrawRGBDial();
     RGBSquare.DrawShadeSquare();
-    Shades.DrawPalette();
-    Tints.DrawPalette();
-    ComplementShades.DrawPalette();
-    ComplementTints.DrawPalette();
+    MainShadesTints.DrawPalette();
     Tools.DrawToolBar();  //This has to be the last draw call, it has to ALWAYS be accessible
 
     if(FrameIsMutable)
@@ -101,8 +92,7 @@ void ToolContainer::DecideElementInteraction(Vector2 MouseXY)
     if(ToolBarFrame.ActiveFrame){InteractWithToolBar(MouseXY); return;}
     if(RGBSquareFrame.ActiveFrame){InteractWithShadeSquare(MouseXY); return;}
     if(RGBDialFrame.ActiveFrame){InteractWithRGBDial(MouseXY); return;}
-    if(ShadesTintsFrame.ActiveFrame){InteractWithShadesAndTints(MouseXY); return;}
-    if(ComplementsFrame.ActiveFrame){InteractWithComplementShadesAndTints (MouseXY); return;}
+    if(MainShadesTintsFrame.ActiveFrame){InteractWithMainShadesTints(MouseXY); return;}
 }
 
 
@@ -163,9 +153,7 @@ void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
 
         //This now links back to the shade square, updating it to reflect the new Hue selected from the dial
         CurrentShadeColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation); 
-        ComplementColour = GetComplementColour(CurrentShadeColour);
-        CombinedShadesTintsUpdate(FrameIsMutable, CurrentShadeColour, ShadesTintsFrame, ShadesFrame, Shades, TintsFrame, Tints);
-        CombinedShadesTintsUpdate(FrameIsMutable, ComplementColour, ComplementsFrame, ComplementShadesFrame, ComplementShades, ComplementTintsFrame, ComplementTints);
+        MainShadesTints.GenerateShadesTints(CurrentShadeColour);
     }
     else
     {   
@@ -206,10 +194,24 @@ void ToolContainer::InteractWithShadeSquare(Vector2 MouseXY)
         if(RGBSquareFrame.ActiveFrame)  //Ensure the cursor can't add MouseXY values outside of the given frame
         {
             CurrentShadeColour = RGBSquare.GetSquareRGB(MouseXY);
-            ComplementColour = GetComplementColour(CurrentShadeColour);
-            CombinedShadesTintsUpdate(FrameIsMutable, CurrentShadeColour, ShadesTintsFrame, ShadesFrame, Shades, TintsFrame, Tints);
-            CombinedShadesTintsUpdate(FrameIsMutable, ComplementColour, ComplementsFrame, ComplementShadesFrame, ComplementShades, ComplementTintsFrame, ComplementTints);
+            MainShadesTints.GenerateShadesTints(CurrentShadeColour);
         }
+    }
+}
+
+
+void ToolContainer::InteractWithMainShadesTints(Vector2 MouseXY)
+{
+    if(!FrameIsMutable)
+    {
+        Color SelectedColour = MainShadesTints.GetVariationColour(MouseXY);
+        std::cout << "(" << int(SelectedColour.r) << ", " << int(SelectedColour.g) << ", " << int(SelectedColour.b) << ")\n"; 
+    }
+    else
+    {
+        MainShadesTintsFrame.AdjustFrame(MouseXY);
+        MainShadesTints.Update(MainShadesTintsFrame.FrameArea, MainShadesTints.VariationAmount, MainShadesTints.VariationDelta);
+        MainShadesTints.GeneratePaletteRectangles();
     }
 }
 
@@ -259,97 +261,6 @@ void ToolContainer::InteractWithToolBar(Vector2 MouseXY)
 }
 
 
-void ToolContainer::InteractWithShadesAndTints(Vector2 MouseXY)
-{
-    if(!FrameIsMutable)
-    {   
-        Color SelectedColour {};
-
-        if(CheckCollisionPointRec(MouseXY, ShadesFrame.FrameArea))
-        {
-            SelectedColour = Shades.GetVariationColour(MouseXY);
-        }
-        else if(CheckCollisionPointRec(MouseXY, TintsFrame.FrameArea))
-        {
-            SelectedColour = Tints.GetVariationColour(MouseXY);
-        }
-
-        std::cout << "(" << int(SelectedColour.r) << ", " << int(SelectedColour.g) << ", " << int(SelectedColour.b) << ")\n"; 
-    }
-    else
-    {
-        ShadesTintsFrame.AdjustFrame(MouseXY);
-        CombinedShadesTintsUpdate(FrameIsMutable, CurrentShadeColour, ShadesTintsFrame, ShadesFrame, Shades, TintsFrame, Tints);
-    }
-}
-
-
-void ToolContainer::InteractWithComplementShadesAndTints(Vector2 MouseXY)
-{
-    if(!FrameIsMutable)
-    {   
-        Color SelectedColour {};
-
-        if(CheckCollisionPointRec(MouseXY, ComplementShadesFrame.FrameArea))
-        {
-            SelectedColour = ComplementShades.GetVariationColour(MouseXY);
-        }
-        else if(CheckCollisionPointRec(MouseXY, ComplementTintsFrame.FrameArea))
-        {
-            SelectedColour = ComplementTints.GetVariationColour(MouseXY);
-        }
-
-        std::cout << "(" << int(SelectedColour.r) << ", " << int(SelectedColour.g) << ", " << int(SelectedColour.b) << ")\n"; 
-    }
-    else
-    {
-        ComplementsFrame.AdjustFrame(MouseXY);
-        CombinedShadesTintsUpdate(FrameIsMutable, ComplementColour, ComplementsFrame, ComplementShadesFrame, ComplementShades, ComplementTintsFrame, ComplementTints);
-    }
-}
-
-
-void ToolContainer::CombinedShadesTintsUpdate(bool FrameHasChanged, Color &SeedColour, Frames &ContainingFrame, Frames &FrameOfShades, Palette &PaletteOfShades, Frames &FrameOfTints,  Palette &PaletteOfTints)
-{
-    //Since this gets called multiple times, might as well do a combined single call
-    
-    if(FrameHasChanged) //Only need to invoke moving/scaling logic if the frame has been touched
-    {
-        //Decide whether Palette cascades horizontally or vertically
-        bool CascadeHorizontally = ContainingFrame.FrameArea.width >= ContainingFrame.FrameArea.height;  
-        bool CascadeVertically   = ContainingFrame.FrameArea.width <  ContainingFrame.FrameArea.height;
-
-        //This looks complex, but really just boils down to toggling "half the Frames' width" or "Offset the Frames' x" based on the above bools
-        FrameOfShades.Update(ContainingFrame.FrameArea.x, ContainingFrame.FrameArea.y, 
-                      ContainingFrame.FrameArea.width / (1 + CascadeVertically), ContainingFrame.FrameArea.height / (1 + CascadeHorizontally));
-        FrameOfTints.Update(ContainingFrame.FrameArea.x + (CascadeVertically * (ContainingFrame.FrameArea.width / (1 + CascadeVertically))), 
-                          ContainingFrame.FrameArea.y + (CascadeHorizontally * (ContainingFrame.FrameArea.height / (1 + CascadeHorizontally))), 
-                          ContainingFrame.FrameArea.width / (1 + CascadeVertically),
-                          ContainingFrame.FrameArea.height/ (1 + CascadeHorizontally));
-
-        //Update Palette relative to frame
-        PaletteOfShades.Update(FrameOfShades.FrameArea, ShadesTintsAmount);
-        PaletteOfTints.Update(FrameOfTints.FrameArea, ShadesTintsAmount);
-    }
-
-    //At any rate, recalculate the square positions and colours
-    PaletteOfShades.UpdateShadesTints(SeedColour, true, ShadesTintsStep, RGBValMin);
-    PaletteOfTints.UpdateShadesTints(SeedColour, false, ShadesTintsStep, RGBValMax);
-}
-
-
-Color ToolContainer::GetComplementColour(Color SeedColour)
-{
-    //Get the complement of the current shade colour
-    Color ReturnColour = SeedColour;
-    ReturnColour.r = RGBValMax - SeedColour.r;  
-    ReturnColour.g = RGBValMax - SeedColour.g;
-    ReturnColour.b = RGBValMax - SeedColour.b;
-
-    return ReturnColour;
-}
-
-
 void ToolContainer::UpdateWindowMinimumSize()
 {
     //Make sure the window can't size down to exclude parts of, or entire Frames
@@ -376,6 +287,5 @@ void ToolContainer::UpdateWindowMinimumSize()
 
 void ToolContainer::UnloadAllFonts()
 {
-    UnloadFont(Shades.SetFont);
-    UnloadFont(Tints.SetFont);
+    UnloadFont(MainShadesTints.SetFont);
 }

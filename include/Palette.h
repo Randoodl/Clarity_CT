@@ -12,20 +12,21 @@ class Palette
     public:
         Palette();
         Color BasePaletteColour;
-        std::vector<Rectangle> PaletteSquares;
-        std::vector<Color> PaletteSquareColours;
-        Rectangle PaletteBar;
+        std::vector<Rectangle> PaletteRectangles;
+        std::vector<Color> PaletteColours;
+        Rectangle PaletteArea;
 
         Color GetVariationColour(Vector2 MouseXY);
 
-        void Update(Rectangle PaletteArea, int Variations);
-        void UpdateShadesTints(Color SeedColour, bool GenerateShades, int VariationDelta, int RGBLimit);
+        void Update(Rectangle SetPaletteArea, int SetVariationAmount, int SetVariationDelta);
+        void GenerateShadesTints(Color SeedColour);
+        void GeneratePaletteRectangles();
 
         void DrawPalette();
 
         Font SetFont;
-
-    private:      
+             
         int VariationAmount;
+        int VariationDelta;
         
 };
