@@ -24,6 +24,10 @@ void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
     FrameArea.x = SetAnchorX;
     FrameArea.y = SetAnchorY;
 
+    //This caps how small the frame can possibly be: stops Scale and Move button from overlapping
+    if(FrameArea.width < (2 * EdgeButtonSize)){FrameArea.width = (2 * EdgeButtonSize);}
+    if(FrameArea.height < (2 * EdgeButtonSize)){FrameArea.height = (2 * EdgeButtonSize);}
+
     MoveButton.height =  EdgeButtonSize;
     MoveButton.width = FrameArea.width;
     MoveButton.x = FrameArea.x;

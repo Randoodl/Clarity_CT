@@ -7,12 +7,12 @@ ToolBar::ToolBar()
     BackgroundColour = {113, 102, 128, 255};
     ButtonColour = {133, 122, 148, 255};
     ButtonContainer = {0, 0, 0, 0};
-    LockButton = {0, 0, 100, 100};
+    LockButton = {0, 0, 0, 0};
     ResetButton = {0, 0, 0, 0};
     SaveButton = {0, 0, 0, 0};
-    ColourModeButton = {0, 0, 0, 0};
+    OptionsButton = {0, 0, 0, 0};
     ButtonMargin = 5;
-    Buttons = {&LockButton, &ResetButton, &SaveButton, &ColourModeButton};
+    Buttons = {&LockButton, &ResetButton, &SaveButton, &OptionsButton};
     ButtonAmount = Buttons.size();
 }
 

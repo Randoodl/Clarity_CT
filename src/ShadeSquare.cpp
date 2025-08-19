@@ -218,10 +218,6 @@ Color ShadeSquare::GetSquareRGB(Vector2 MouseXY, Color SeedColour)
 
 void ShadeSquare::UpdateShadeViewBoxPosition(Vector2 MouseXY)
 {
-    //TODO: Currently snaps box to top left during ColourDial scaling
-    //      because the scaling calls ShadeSquare.Update, which calls UpDateViewBoxLocation with CurrentShadeMouseLocation
-    //      which, in this update, is set to to X and Y anchor points of the Shade Square, hence it snaps to the top left
-
     //Moves the Shade Preview Box around the Shade Square when clicked and dragged
     ShadeViewBoxDimensions = ShadeSquareRectangle.height / 10;
     ShadeViewBoxXY.x = MouseXY.x - (ShadeViewBoxDimensions/2);

@@ -245,7 +245,7 @@ void ToolContainer::InteractWithToolBar(Vector2 MouseXY)
         {
             std::cout << "Save\n";
         }   
-        if(CheckCollisionPointRec(MouseXY, Tools.ColourModeButton))
+        if(CheckCollisionPointRec(MouseXY, Tools.OptionsButton))
         {
             std::cout << "Colour\n";
         }
