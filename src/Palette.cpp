@@ -9,7 +9,6 @@ Palette::Palette()
     PaletteRectangles = {};
     PaletteColours = {};
     PaletteArea = {0, 0, 0, 0};
-
     VariationAmount = 0; 
     SetFont = GetFontDefault();
 }
@@ -54,7 +53,8 @@ void Palette::GenerateShadesTints(Color SeedColour)
         }
         else if(!GenerateShades)
         {
-            FactorRed   = -((RGBValMax - RGBFloats[0]) / float(RGBValMax)); //These are negative to turn into additions when subtracting later
+            //These are negative to turn into additions when subtracting later
+            FactorRed   = -((RGBValMax - RGBFloats[0]) / float(RGBValMax)); 
             FactorGreen = -((RGBValMax - RGBFloats[1]) / float(RGBValMax));
             FactorBlue  = -((RGBValMax - RGBFloats[2]) / float(RGBValMax));
         }
@@ -151,7 +151,7 @@ void Palette::GeneratePaletteRectangles()
 void Palette::DrawPalette()
 {   
     //Due to rounding in how the Rect width is calculated, the far end of the frame might show a little gap between
-    //The last rect and the frame. To remedy this we just fill the whole frame with a background colour first
+    //The last rect and the Frame. To remedy this we just fill the whole frame with a background colour first
     DrawRectangle(PaletteArea.x, PaletteArea.y, PaletteArea.width, PaletteArea.height, PaletteColours.back());
     
     for(int Variation {0}; Variation < int(PaletteColours.size()); ++Variation)
@@ -172,5 +172,5 @@ Color Palette::GetVariationColour(Vector2 MouseXY)
             return PaletteColours[Variation];
         }
     }
-    return {0, 0, 0, 0}; //Alpha value 0
+    return {0, 0, 0, 0}; //Alpha value 0 for sentinel purposes
 }

@@ -3,13 +3,14 @@
 #include <raylib.h>
 #include <vector> 
 
+
 class Frames
 {
-    //This class is meant to create the "windows" to move and scale elements
+    //This class is meant to create the frames to move and scale elements
     
     public:
         Frames();
-        Rectangle FrameArea;  //XY absolute in relation to MainWindow
+        Rectangle FrameArea;  //XY absolute in relation to MainWindowXY
         Rectangle MoveButton;
         Rectangle ScaleButton;
 

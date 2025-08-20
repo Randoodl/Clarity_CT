@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+
 ToolBar::ToolBar()
 {
     BackgroundColour = {113, 102, 128, 255};
@@ -19,7 +20,7 @@ ToolBar::ToolBar()
 
 void ToolBar::Update(Rectangle TotalFrameArea)
 {
-    //Setup the button container
+    //Set up the button container
     ButtonContainer.x = TotalFrameArea.x;
     ButtonContainer.y  = TotalFrameArea.y;
 
@@ -70,6 +71,8 @@ void ToolBar::DrawToolBar()
 {
     //Draw container background
     DrawRectangle(ButtonContainer.x, ButtonContainer.y, ButtonContainer.width, ButtonContainer.height, BackgroundColour);
+    
+    //Draw Buttons
     for(Rectangle* Button : Buttons)
     {
         DrawRectangle(Button->x, Button->y, Button->width, Button->height, ButtonColour);

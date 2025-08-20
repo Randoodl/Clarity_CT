@@ -28,15 +28,18 @@ void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
     if(FrameArea.width < (2 * EdgeButtonSize)){FrameArea.width = (2 * EdgeButtonSize);}
     if(FrameArea.height < (2 * EdgeButtonSize)){FrameArea.height = (2 * EdgeButtonSize);}
 
+    //Generate a bar at the top of the window for dragging
     MoveButton.height =  EdgeButtonSize;
     MoveButton.width = FrameArea.width;
     MoveButton.x = FrameArea.x;
     MoveButton.y = FrameArea.y;
 
+    //Generate a square button at the bottom right for scaling
     ScaleButton.height = ScaleButton.width = EdgeButtonSize;
     ScaleButton.x = FrameArea.width + FrameArea.x - EdgeButtonSize;
     ScaleButton.y = FrameArea.height + FrameArea.y - EdgeButtonSize;
 
+    //Store the current window dimensions (same for all Frames, perhaps implement this differently)
     MainWindow = {0, 0, float(GetScreenWidth()), float(GetScreenHeight())};
 }
 
@@ -103,5 +106,6 @@ void Frames::AdjustFrame(Vector2 MouseXY)
 
 int Frames::GetSmallestFrameSide(float SideX, float SideY)
 {
+    //For making sure an element can't scale outside of its Frame
     return std::min(SideX, SideY);
 }

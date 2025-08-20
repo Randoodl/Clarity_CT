@@ -36,7 +36,6 @@ void ElementInteractions::InteractWithToolBar(Vector2 MouseXY, bool& FrameIsMuta
         if(CheckCollisionPointRec(MouseXY, Tools.ResetButton))
         {
             std::cout << "Reset\n";
-            
         }
 
         ToolBarFrame.ActiveFrame = false; //stops a held down click from spamming the button
@@ -58,6 +57,7 @@ void ElementInteractions::InteractWithShadeSquare(Vector2 MouseXY, bool FrameIsM
             //Calculate the Complement colour shade
             ColourCollection.ShadedComplementColour = RGBSquare.GetSquareRGB(MouseXY, ColourCollection.ComplementColour);
 
+            //Update Palettes
             MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
         }
     }
@@ -69,36 +69,36 @@ void ElementInteractions::InteractwithRGBDial(Vector2 MouseXY, bool FrameIsMutab
 {
     if(!FrameIsMutable)
     {
-        //Mouse clicks are meant to deal with the RGBDial itself
-
         //Get the base saturate colour for the RGB square and draw a small indicator bubble
         RGBSquare.SquareBaseColour = RGBDial.GetSaturateColour(MouseXY);
+        
+        //Update the ColourCollection based on the new Hue
         ColourCollection.BaseHueColour = RGBSquare.SquareBaseColour;
         ColourCollection.UpdateComplement();
+
+        //Generate the RGBSquare for the selected Hue
         RGBSquare.ConvertVectorToTexture(RGBSquare.GetVectorOfPixels());
 
-        //This now links back to the shade square, updating it to reflect the new Hue selected from the dial
+        //Link changes made in the SquareRGB back to the Shade version of colours in ColorCollection
+        //So that when the dial is updated, the Shaded colours are updated alongside
         ColourCollection.ShadedColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, ColourCollection.BaseHueColour);
-        MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
-
-        //This now links back to the shade square, updating it to reflect the new Hue selected from the dial
-        ColourCollection.ShadedColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, ColourCollection.BaseHueColour);
+        ColourCollection.ShadedComplementColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, ColourCollection.ComplementColour);
+        
+        //Update Palettes
         MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
     }
     else
     {
-        //Mouse clicks are meant to move and scale the Frame
-
-        //So that the ShadeViewBox updates alongside, we need a relative location of the PreviewerXY to the ShadeSquare
+        //So that the ShadeViewBox updates alongside, we need a relative location of the ShadeViewBoxXY to the ShadeSquareXY
         float RelativeDistanceX = float(RGBSquare.CurrentShadeMouseLocation.x - RGBSquareFrame.FrameArea.x) / float(RGBSquareFrame.FrameArea.width);
         float RelativeDistanceY = float(RGBSquare.CurrentShadeMouseLocation.y - RGBSquareFrame.FrameArea.y) / float(RGBSquareFrame.FrameArea.height);
 
         //Then, adjust the frame
         RGBDialFrame.AdjustFrame(MouseXY);
 
-        //Then, adjust the RGBDial
+        //Then, adjust the RGBDial, making sure to scale it relative to the smallest side
         int SmallestFrameSide = RGBDialFrame.GetSmallestFrameSide(RGBDialFrame.FrameArea.width/2,
-                                                                  RGBDialFrame.FrameArea.height/2);  //This ensures the dial is sized to the smallest side of the frame
+                                                                  RGBDialFrame.FrameArea.height/2);  
 
         RGBDial.Update(RGBDialFrame.FrameArea.x + RGBDialFrame.FrameArea.width/2,
                        RGBDialFrame.FrameArea.y + RGBDialFrame.FrameArea.height/2,
@@ -111,9 +111,7 @@ void ElementInteractions::InteractwithRGBDial(Vector2 MouseXY, bool FrameIsMutab
         //Preserve the realtive locations between the ShadeSquare and ShadeViewBox
         RGBSquare.CurrentShadeMouseLocation.x = RGBSquareFrame.FrameArea.x + float(RGBSquareFrame.FrameArea.width * RelativeDistanceX);
         RGBSquare.CurrentShadeMouseLocation.y = RGBSquareFrame.FrameArea.y + float(RGBSquareFrame.FrameArea.height * RelativeDistanceY);
-
         RGBSquare.Update(RGBSquareFrame.FrameArea);
-
     }
 }
 
@@ -123,7 +121,10 @@ void ElementInteractions::InteractWithMainShadesTints(Vector2 MouseXY, bool Fram
     if(!FrameIsMutable)
     {
         Color SelectedColour = MainShadesTints.GetVariationColour(MouseXY);
-        std::cout << "(" << int(SelectedColour.r) << ", " << int(SelectedColour.g) << ", " << int(SelectedColour.b) << ")\n"; 
+        if(SelectedColour.a != 0)
+        {
+            std::cout << "(" << int(SelectedColour.r) << ", " << int(SelectedColour.g) << ", " << int(SelectedColour.b) << ")\n"; 
+        }
     }
     else
     {

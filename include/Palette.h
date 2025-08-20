@@ -6,6 +6,7 @@
 
 #include "./Constants.h"
 
+
 class Palette
 {
     //This class is meant to hold vectors of generated colours and linked rectangles to display them
@@ -13,9 +14,6 @@ class Palette
     public:
         Palette();
         Color BasePaletteColour;
-        std::vector<Rectangle> PaletteRectangles;
-        std::vector<Color> PaletteColours;
-        Rectangle PaletteArea;
 
         Color GetVariationColour(Vector2 MouseXY);
 
@@ -29,5 +27,9 @@ class Palette
 
         int VariationAmount;
         int VariationDelta;
-        
+    
+    private:
+        Rectangle PaletteArea;
+        std::vector<Rectangle> PaletteRectangles;
+        std::vector<Color> PaletteColours;
 };

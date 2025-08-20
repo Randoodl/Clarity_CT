@@ -1,5 +1,6 @@
 #include "../include/ColourDial.h"
-#include <iostream>
+
+
 ColourDial::ColourDial() 
 {
     CurrentSaturateColour = {255, 0, 0, 255};
@@ -9,7 +10,7 @@ ColourDial::ColourDial()
     DialOuterRadius = 0;
     ElementOutLines =  {51, 66, 89, 255};
     Current_iRGB = 0;
-    BandsAmount = 1530;  //More or less forced, 3 values in RGB, 2 states each (rising, falling), between 0-255 totals (6 *255) 1530 possible bands
+    BandsAmount = 1530;  
     MapOFDialPositions = {};
     MapOfRGBSaturates = GenerateRGBTuples(); 
     BubbleOriginXY = {0, 0};
@@ -19,9 +20,6 @@ ColourDial::ColourDial()
 
 void ColourDial::Update(int SetOriginX, int SetOriginY, int SetOuterRadius)
 {
-    //When the program is started, load initial conditions and apply them
-    //Perhaps UI save function in the future?
-
     DialOriginXY.x = SetOriginX;
     DialOriginXY.y = SetOriginY;
     DialInnerRadius = SetOuterRadius - (SetOuterRadius/4); //Approach the Dial's max size from the Frame holding it
@@ -40,7 +38,7 @@ std::map<int, std::vector<int>> ColourDial::GenerateRGBTuples()
     std::map<int, std::vector<int>> MapOfRGBTuples {};
 
     std::vector BGRTuple {0, 0, 255}; //In order to match the math with the pattern below, the RGB values are inverted to BGR
-    int PatternArray[6] {0, 0, 1, 0, 0, -1};
+    int PatternArray[6] {0, 0, 1, 0, 0, -1}; //All channels follow this pattern: rise from 0 to 255, stay, drop from 255 to 0, stay, repeat
 
     for(int RGBStep {0}; RGBStep < BandsAmount; ++RGBStep) //6 zones of 255 bands each, means 1530 total bands
     {
@@ -119,10 +117,6 @@ Color ColourDial::GetSaturateColour(Vector2 MouseXY)
     //Using good ol' pythagoras we can calculate the distance from the centre of the dial to the mouseclick
     float DistanceToClick = sqrt(pow(MouseXY.x - DialOriginXY.x, 2) + pow(MouseXY.y - DialOriginXY.y, 2));
 
-    //if(DistanceToClick > DialInnerRadius && DistanceToClick < DialOuterRadius) {} DIAL NOW WORKS SMOOTHLY BUT ACCEPTS ALL CLICKS WITHIN THE FRAME
-
-    //The click occurs within the bounds of the dial
-
     //Using the remainder of GetRGBColour because the Map is created left-to-right, but the dial is created as a unit circle
     //which increments to 2 PI in a counter-clockwise (right-to-left) fashion
     //Using GetRGBColour directly would have colours and the bubble flipped along the Y-axis 
@@ -159,10 +153,10 @@ int ColourDial::GetRGBColour(Vector2 MouseXY, float DistanceToClick)
     return i_RGBSaturatesMap;
 }
 
+
 Vector3 ColourDial::GetSquareInDialOffsets()
 {
-
-    //Essentially, from the centre off the RGB Dial, how much do I offset XY
+    //Essentially, from the centre off the RGB Dial, how much do we offset XY
     //To get a corner coordinate that touches the circle of the inner dial.
     //Think of it as drawing a triangle from the centre of the dial with InnerRadius as the hypo
     //the straight sides are then the length of half the square
@@ -176,9 +170,12 @@ Vector3 ColourDial::GetSquareInDialOffsets()
     return Offsets;
 }
 
+
 void ColourDial::UpdateBubblePosition()
 {
     //Move the Dial's Bubble to the clicked position to preview the selected saturate
+
+    //At any point, the bubble's Radius is half the distance between the two bounding circles of the Dial.
     BubbleRadius = (DialOuterRadius - DialInnerRadius)/2;
 
     //Essentially, convert the 0-1530 Current_iRGB back into a XY point on a unit circle, scale it up by the radii and offset it with the origin

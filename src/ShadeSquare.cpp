@@ -1,6 +1,7 @@
 #include "../include/ShadeSquare.h"
 #include <iostream>
 
+
 ShadeSquare::ShadeSquare()
 {
     ShadeSquareRectangle = {0, 0, 0, 0};
@@ -11,7 +12,7 @@ ShadeSquare::ShadeSquare()
     CurrentShadeMouseLocation = {0, 0};
     ShadeViewBoxXY = {0, 0};
     ShadeViewBoxDimensions = 0;
-    ShadeViewBoxOutline = {0, 0, 0, 0};
+    ShadeViewBoxOutline = {0, 0, 0, 255};
 }
 
 
@@ -30,6 +31,8 @@ void ShadeSquare::Update(Rectangle TotalFrameArea)
 std::vector<std::vector<Color>> ShadeSquare::GetVectorOfPixels()
 {
     //Turn a ShadeSquare into a collection of pixels that can be redrawn for each frame, initialise it to 255x255
+    
+    //Two dimensional Color array of size 255x255 to store all Possible colours
     std::vector<std::vector<Color>> VectorOfPixels(RGBValMax, std::vector<Color>(RGBValMax));
 
     //Create a vector to hold the colour as floats (to avoid narrowing fuckery)
@@ -145,8 +148,8 @@ void ShadeSquare::DrawShadeSquare()
 Vector2 ShadeSquare::GetCorrectedMouseXY(Vector2 MouseXY)
 {
     //This restricts the cursor's movement to the ShadeSquare
-    //MouseXY cannot be corrected independently since ToolContainer.InteractWithRGBDial()
-    //calls this as well, it needs to be called with GetSquareRGB
+    //MouseXY cannot be corrected independently since ToolContainer.InteractWithRGBDial() calls this as well,
+    //it needs to be called with GetSquareRGB
 
     //Honestly, this is just me having dumb fun. Will it come back to bite me in the ass? Oh definitely, but that is for future me to deal with
     //This could all be done with a bunch of if statements, but where is the fun in that? It is essentially just one sum per coordinate where:
@@ -224,9 +227,9 @@ void ShadeSquare::UpdateShadeViewBoxPosition(Vector2 MouseXY)
     ShadeViewBoxXY.y = MouseXY.y - (ShadeViewBoxDimensions/2);
 
     //This makes the outline lighter/darker based on the Y postion in the square, keeping it visible
-    ShadeViewBoxOutline = {45, 45, 45, 255};
-    int ShadeFactor = (float(RGBValMax)/ShadeSquareRectangle.height) * (ShadeViewBoxXY.y - ShadeSquareRectangle.y) * 0.8;
-    ShadeViewBoxOutline.r += (ShadeFactor);
-    ShadeViewBoxOutline.g += (ShadeFactor);
-    ShadeViewBoxOutline.b += (ShadeFactor);
+    int ShadeFactor = (RGBValMax/(ShadeSquareRectangle.height + ShadeViewBoxDimensions)) * (ShadeViewBoxXY.y - ShadeSquareRectangle.y + ShadeViewBoxDimensions);
+    ShadeViewBoxOutline = {0, 0, 0, 255}; //Stops outline from just continuously looping through all grey tones
+    ShadeViewBoxOutline.r += ShadeFactor;
+    ShadeViewBoxOutline.g += ShadeFactor;
+    ShadeViewBoxOutline.b += ShadeFactor;
 }

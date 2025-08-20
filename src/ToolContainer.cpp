@@ -7,6 +7,7 @@ ToolContainer::ToolContainer()
     ColourCollection.BaseHueColour = {255, 0, 0, 255};
     ColourCollection.ShadedColour = ColourCollection.BaseHueColour;
     ColourCollection.UpdateComplement();
+    ColourCollection.ShadedComplementColour = ColourCollection.ShadedColour;
 
     FrameIsMutable = false;
     DialOffsets = {0, 0, 0};

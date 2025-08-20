@@ -49,5 +49,4 @@ class ToolContainer
         //Toolbar
         Frames ToolBarFrame;
         ToolBar Tools;
-
 };
