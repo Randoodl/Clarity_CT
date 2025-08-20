@@ -92,25 +92,45 @@ void ToolContainer::MouseClickHandler()
     }
     //I believe only one Element can be true at a time, unless elements are stacked on top of each other and multiple point-rec checks evaluate to true
     //Since IsMousePressed should only evaluate true for one frame
-    DecideElementInteraction(MouseXY);
+
+    //This keeps looping every frame, but essentially snags the first and ONLY true active frame
+    for(int IndexOfFrame {0}; IndexOfFrame < int(ElementFrames.size()); ++IndexOfFrame)
+    {
+        if(ElementFrames[IndexOfFrame]->ActiveFrame)
+        {
+            DecideElementInteraction(MouseXY, IndexOfFrame);
+        }
+    }
 }
 
 
-void ToolContainer::DecideElementInteraction(Vector2 MouseXY)
+void ToolContainer::DecideElementInteraction(Vector2 MouseXY, int ActiveElementFrame)
 {
-    //Still a wee bit clunky, but gets the job done for now
-    if(ToolBarFrame.ActiveFrame){InteractWithToolBar(MouseXY); return;}
-    if(RGBSquareFrame.ActiveFrame){InteractWithShadeSquare(MouseXY); return;}
-    if(RGBDialFrame.ActiveFrame){InteractWithRGBDial(MouseXY); return;}
-    if(MainShadesTintsFrame.ActiveFrame){InteractWithMainShadesTints(MouseXY); return;}
+    switch(ActiveElementFrame)
+    {
+        case 0: 
+            ElementInteractions::InteractWithToolBar(MouseXY, FrameIsMutable, ToolBarFrame, Tools);
+            if(!FrameIsMutable){SnapFrames();} //This does get called every time a button is pressed, not terrible but not great?
+            break;
+        case 1:
+            ElementInteractions::InteractWithShadeSquare(MouseXY, FrameIsMutable, RGBSquareFrame, RGBSquare, MainShadesTints, ColourCollection);
+            break;
+        case 2:
+            ElementInteractions::InteractwithRGBDial(MouseXY,FrameIsMutable, RGBSquareFrame, RGBDialFrame, RGBSquare, RGBDial, MainShadesTints, ColourCollection, DialOffsets); 
+            break;
+        case 3:
+            ElementInteractions::InteractWithMainShadesTints(MouseXY, FrameIsMutable, MainShadesTintsFrame, MainShadesTints);
+            break;
+        default:
+            break;
+    }
 }
 
 
 void ToolContainer::SetElementInteraction(Vector2 MouseXY)
 {
     //Cycle through each element currently loaded and compare its Frame area to the CLICKED cursor, sets the Frame of the clicked element to true
-    //Also enables Frame dragging and scaling, which might cause issues down the line
-    //Since it'll be set as Frame: True, Button: True
+
     for(Frames* Frame: ElementFrames)
     {
         if(CheckCollisionPointRec(MouseXY, Frame->FrameArea))
@@ -147,139 +167,6 @@ void ToolContainer::SetAllInterActionsToFalse()
         Frame->IsScaling = false;
         Frame->MouseOffsetX = 0;        
         Frame->MouseOffsetY = 0;        
-    }
-}
-
-
-void ToolContainer::InteractWithRGBDial(Vector2 MouseXY)
-{
-    if(!FrameIsMutable)
-    {   
-        //Mouse clicks are meant to deal with the RGBDial itself 
-
-        //Get the base saturate colour for the RGB square and draw a small indicator bubble
-        RGBSquare.SquareBaseColour = RGBDial.GetSaturateColour(MouseXY);
-        ColourCollection.BaseHueColour = RGBSquare.SquareBaseColour;
-        ColourCollection.UpdateComplement();
-        RGBSquare.ConvertVectorToTexture(RGBSquare.GetVectorOfPixels());
-
-        //This now links back to the shade square, updating it to reflect the new Hue selected from the dial
-        ColourCollection.ShadedColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, ColourCollection.BaseHueColour); 
-        MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
-    }
-    else
-    {   
-        //Mouse clicks are meant to move and scale the Frame
-
-        //So that the ShadeViewBox updates alongside, we need a relative location of the PreviewerXY to the ShadeSquare
-        float RelativeDistanceX = float(RGBSquare.CurrentShadeMouseLocation.x - RGBSquareFrame.FrameArea.x) / float(RGBSquareFrame.FrameArea.width);
-        float RelativeDistanceY = float(RGBSquare.CurrentShadeMouseLocation.y - RGBSquareFrame.FrameArea.y) / float(RGBSquareFrame.FrameArea.height);
-
-        //Then, adjust the frame
-        RGBDialFrame.AdjustFrame(MouseXY);
-
-        //Then, adjust the RGBDial
-        int SmallestFrameSide = RGBDialFrame.GetSmallestFrameSide(RGBDialFrame.FrameArea.width/2, 
-                                                                  RGBDialFrame.FrameArea.height/2);  //This ensures the dial is sized to the smallest side of the frame
-        
-        RGBDial.Update(RGBDialFrame.FrameArea.x + RGBDialFrame.FrameArea.width/2,
-                       RGBDialFrame.FrameArea.y + RGBDialFrame.FrameArea.height/2, 
-                       SmallestFrameSide);
-        
-        //Lastly, the RGBSquareFrame is relative to the dial, update that one too
-        DialOffsets = RGBDial.GetSquareInDialOffsets();
-        RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z);
-
-        //Preserve the realtive locations between the ShadeSquare and ShadeViewBox
-        RGBSquare.CurrentShadeMouseLocation.x = RGBSquareFrame.FrameArea.x + float(RGBSquareFrame.FrameArea.width * RelativeDistanceX);
-        RGBSquare.CurrentShadeMouseLocation.y = RGBSquareFrame.FrameArea.y + float(RGBSquareFrame.FrameArea.height * RelativeDistanceY);
-
-        RGBSquare.Update(RGBSquareFrame.FrameArea);
-    }
-}
-
-
-void ToolContainer::InteractWithShadeSquare(Vector2 MouseXY)
-{
-    if(!FrameIsMutable)
-    {
-        if(RGBSquareFrame.ActiveFrame)  //Ensure the cursor can't add MouseXY values outside of the given frame
-        {
-            //Calculate the main hue colour shade
-            ColourCollection.ShadedColour = RGBSquare.GetSquareRGB(MouseXY, ColourCollection.BaseHueColour);
-            RGBSquare.ShadedColour = ColourCollection.ShadedColour;
-
-            //Calculate the Complement colour shade
-            ColourCollection.ShadedComplementColour = RGBSquare.GetSquareRGB(MouseXY, ColourCollection.ComplementColour);
-
-            MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
-        }
-    }
-}
-
-
-void ToolContainer::InteractWithMainShadesTints(Vector2 MouseXY)
-{
-    if(!FrameIsMutable)
-    {
-        Color SelectedColour = MainShadesTints.GetVariationColour(MouseXY);
-        std::cout << "(" << int(SelectedColour.r) << ", " << int(SelectedColour.g) << ", " << int(SelectedColour.b) << ")\n"; 
-    }
-    else
-    {
-        MainShadesTintsFrame.AdjustFrame(MouseXY);
-        MainShadesTints.Update(MainShadesTintsFrame.FrameArea, MainShadesTints.VariationAmount, MainShadesTints.VariationDelta);
-        MainShadesTints.GeneratePaletteRectangles();
-    }
-}
-
-
-void ToolContainer::InteractWithToolBar(Vector2 MouseXY)
-{
-    //This is going to be a fun one, because both the Lock and Reset functions
-    //need to be accessible irrespective of the FrameIsMutable state
-
-    if(!FrameIsMutable)
-    {
-        if(CheckCollisionPointRec(MouseXY, Tools.SaveButton))
-        {
-            std::cout << "Save\n";
-        }   
-        if(CheckCollisionPointRec(MouseXY, Tools.OptionsButton))
-        {
-            std::cout << "Colour\n";
-        }
-
-        ToolBarFrame.ActiveFrame = false; //stops a held down click from spamming the button   
-    }
-    else
-    {   
-        ToolBarFrame.AdjustFrame(MouseXY);
-        Tools.Update(ToolBarFrame.FrameArea);
-    }
-
-    if(!ToolBarFrame.IsDragging && !ToolBarFrame.IsScaling) //This essentially stops a click-through when using the Adjustment buttons on the frame
-    {
-        if(CheckCollisionPointRec(MouseXY, Tools.LockButton))
-        {
-            if(FrameIsMutable)
-            {
-                FrameIsMutable = false;
-                SnapFrames();
-            }
-            else
-            {
-                FrameIsMutable=true;
-            }
-        }
-
-        if(CheckCollisionPointRec(MouseXY, Tools.ResetButton))
-        {
-            std::cout << "Reset\n";
-            
-        }
-
-        ToolBarFrame.ActiveFrame = false; //stops a held down click from spamming the button
     }
 }
 

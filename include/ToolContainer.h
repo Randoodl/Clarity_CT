@@ -1,11 +1,6 @@
 #pragma once
 
-#include "./ColourDial.h"
-#include "./ShadeSquare.h"
-#include "./Frames.h"
-#include "./Palette.h"
-#include "./ToolBar.h"
-#include "./ColourFamily.h"
+#include "./Interactions.h"
 
 class ToolContainer
 {
@@ -23,14 +18,10 @@ class ToolContainer
         void UnloadAllFonts();
 
     private:  
-        void InteractWithRGBDial(Vector2 MouseXY);
-        void InteractWithShadeSquare(Vector2 MouseXY);
-        void InteractWithToolBar(Vector2 MouseXY);
-        void InteractWithMainShadesTints(Vector2 MouseXY);
         void SetElementInteraction(Vector2 MouseXY);
         void SetAllInterActionsToFalse();
 
-        void DecideElementInteraction(Vector2 MouseXY);
+        void DecideElementInteraction(Vector2 MouseXY, int ActiveElementFrame);
 
         void SnapFrames();
         void UpdateWindowMinimumSize();
