@@ -3,18 +3,24 @@
 #include <iostream>
 
 
-void ElementInteractions::InteractWithToolBar(Vector2 MouseXY, bool& FrameIsMutable, Frames& ToolBarFrame, ToolBar& Tools)
+ElementInteractions::ElementInteractions()
+{
+    PassedMouseXY = {0, 0};
+    PassedFrameState = false; 
+}
+
+void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Tools)
 {
     //This is going to be a fun one, because both the Lock and Reset functions
     //need to be accessible irrespective of the FrameIsMutable state
 
-    if(!FrameIsMutable)
+    if(!PassedFrameState)
     {
-        if(CheckCollisionPointRec(MouseXY, Tools.SaveButton))
+        if(CheckCollisionPointRec(PassedMouseXY, Tools.SaveButton))
         {
             std::cout << "Save\n";
         }   
-        if(CheckCollisionPointRec(MouseXY, Tools.OptionsButton))
+        if(CheckCollisionPointRec(PassedMouseXY, Tools.OptionsButton))
         {
             std::cout << "Colour\n";
         }
@@ -23,17 +29,17 @@ void ElementInteractions::InteractWithToolBar(Vector2 MouseXY, bool& FrameIsMuta
     }
     else
     {   
-        ToolBarFrame.AdjustFrame(MouseXY);
+        ToolBarFrame.AdjustFrame(PassedMouseXY);
         Tools.Update(ToolBarFrame.FrameArea);
     }
 
     if(!ToolBarFrame.IsDragging && !ToolBarFrame.IsScaling) //This essentially stops a click-through when using the Adjustment buttons on the frame
     {
-        if(CheckCollisionPointRec(MouseXY, Tools.LockButton))
+        if(CheckCollisionPointRec(PassedMouseXY, Tools.LockButton))
         {
-            if(FrameIsMutable){FrameIsMutable = false;}else{FrameIsMutable=true;}
+            if(PassedFrameState){PassedFrameState = false;}else{PassedFrameState = true;}  
         }
-        if(CheckCollisionPointRec(MouseXY, Tools.ResetButton))
+        if(CheckCollisionPointRec(PassedMouseXY, Tools.ResetButton))
         {
             std::cout << "Reset\n";
         }
@@ -43,38 +49,39 @@ void ElementInteractions::InteractWithToolBar(Vector2 MouseXY, bool& FrameIsMuta
 }
 
 
-void ElementInteractions::InteractWithShadeSquare(Vector2 MouseXY, bool FrameIsMutable, Frames& RGBSquareFrame, ShadeSquare& RGBSquare, 
-                                                  Palette& MainShadesTints, ColourFamily& ColourCollection)
+void ElementInteractions::InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare, 
+                                                  Palette& MainShadesTints, Palette& ComplementShadesTints, ColourFamily& ColourCollection)
 {
-    if(!FrameIsMutable)
+    if(!PassedFrameState)
     {
         if(RGBSquareFrame.ActiveFrame)  //Ensure the cursor can't add MouseXY values outside of the given frame
         {
             //Calculate the main hue colour shade
-            ColourCollection.ShadedColour = RGBSquare.GetSquareRGB(MouseXY, ColourCollection.BaseHueColour);
+            ColourCollection.ShadedColour = RGBSquare.GetSquareRGB(PassedMouseXY, ColourCollection.BaseHueColour);
             RGBSquare.ShadedColour = ColourCollection.ShadedColour;
 
             //Calculate the Complement colour shade
-            ColourCollection.ShadedComplementColour = RGBSquare.GetSquareRGB(MouseXY, ColourCollection.ComplementColour);
+            ColourCollection.ShadedComplementColour = RGBSquare.GetSquareRGB(PassedMouseXY, ColourCollection.ComplementColour);
 
             //Update Palettes
             MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
+            ComplementShadesTints.GenerateShadesTints(ColourCollection.ShadedComplementColour);
         }
     }
 }
 
 
-void ElementInteractions::InteractwithRGBDial(Vector2 MouseXY, bool FrameIsMutable, Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare,
-                                              ColourDial& RGBDial, Palette& MainShadesTints, ColourFamily& ColourCollection, Vector3& DialOffsets)
+void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare,
+                                              ColourDial& RGBDial, Palette& MainShadesTints, Palette& ComplementShadesTints, ColourFamily& ColourCollection, Vector3& DialOffsets)
 {
-    if(!FrameIsMutable)
+    if(!PassedFrameState)
     {
         //Get the base saturate colour for the RGB square and draw a small indicator bubble
-        RGBSquare.SquareBaseColour = RGBDial.GetSaturateColour(MouseXY);
+        RGBSquare.SquareBaseColour = RGBDial.GetSaturateColour(PassedMouseXY);
         
         //Update the ColourCollection based on the new Hue
         ColourCollection.BaseHueColour = RGBSquare.SquareBaseColour;
-        ColourCollection.UpdateComplement();
+        ColourCollection.SetComplement(ColourCollection.BaseHueColour, ColourCollection.ComplementColour);
 
         //Generate the RGBSquare for the selected Hue
         RGBSquare.ConvertVectorToTexture(RGBSquare.GetVectorOfPixels());
@@ -86,6 +93,7 @@ void ElementInteractions::InteractwithRGBDial(Vector2 MouseXY, bool FrameIsMutab
         
         //Update Palettes
         MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
+        ComplementShadesTints.GenerateShadesTints(ColourCollection.ShadedComplementColour);
     }
     else
     {
@@ -94,7 +102,7 @@ void ElementInteractions::InteractwithRGBDial(Vector2 MouseXY, bool FrameIsMutab
         float RelativeDistanceY = float(RGBSquare.CurrentShadeMouseLocation.y - RGBSquareFrame.FrameArea.y) / float(RGBSquareFrame.FrameArea.height);
 
         //Then, adjust the frame
-        RGBDialFrame.AdjustFrame(MouseXY);
+        RGBDialFrame.AdjustFrame(PassedMouseXY);
 
         //Then, adjust the RGBDial, making sure to scale it relative to the smallest side
         int SmallestFrameSide = RGBDialFrame.GetSmallestFrameSide(RGBDialFrame.FrameArea.width/2,
@@ -116,11 +124,11 @@ void ElementInteractions::InteractwithRGBDial(Vector2 MouseXY, bool FrameIsMutab
 }
 
 
-void ElementInteractions::InteractWithMainShadesTints(Vector2 MouseXY, bool FrameIsMutable, Frames& MainShadesTintsFrame, Palette& MainShadesTints)
+void ElementInteractions::InteractWithShadesTints(Frames& ShadesTintsFrame, Palette& ShadesTints)
 {
-    if(!FrameIsMutable)
+    if(!PassedFrameState)
     {
-        Color SelectedColour = MainShadesTints.GetVariationColour(MouseXY);
+        Color SelectedColour = ShadesTints.GetVariationColour(PassedMouseXY);
         if(SelectedColour.a != 0)
         {
             std::cout << "(" << int(SelectedColour.r) << ", " << int(SelectedColour.g) << ", " << int(SelectedColour.b) << ")\n"; 
@@ -128,9 +136,22 @@ void ElementInteractions::InteractWithMainShadesTints(Vector2 MouseXY, bool Fram
     }
     else
     {
-        MainShadesTintsFrame.AdjustFrame(MouseXY);
-        MainShadesTints.Update(MainShadesTintsFrame.FrameArea, MainShadesTints.VariationAmount, MainShadesTints.VariationDelta);
-        MainShadesTints.GeneratePaletteRectangles();
+        ShadesTintsFrame.AdjustFrame(PassedMouseXY);
+        ShadesTints.Update(ShadesTintsFrame.FrameArea, ShadesTints.VariationAmount, ShadesTints.VariationDelta);
+        ShadesTints.GeneratePaletteRectangles();
+    }
+}
+
+
+void ElementInteractions::InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour)
+{
+    if(!PassedFrameState)
+    {
+        std::cout << "(" << int(FillColour.r) << ", " << int(FillColour.g) << ", " << int(FillColour.b) << ")\n"; 
+    }
+    else
+    {
+        FloodedFrame.AdjustFrame(PassedMouseXY);
     }
 }
 

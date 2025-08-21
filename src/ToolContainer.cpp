@@ -2,19 +2,26 @@
 #include <iostream>
 
 ToolContainer::ToolContainer()
-{   
+{  
+    //Initialise Frame related data
+    FrameIsMutable = false;
+    ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &MainShadesTintsFrame, &ComplementShadesTintsFrame};
+    HiddenFrames   = {&RGBSquareFrame};
+
     //Initialise all colours in the collection.
     ColourCollection.BaseHueColour = {255, 0, 0, 255};
+    ColourCollection.SetComplement(ColourCollection.BaseHueColour, ColourCollection.ComplementColour);
     ColourCollection.ShadedColour = ColourCollection.BaseHueColour;
-    ColourCollection.UpdateComplement();
-    ColourCollection.ShadedComplementColour = ColourCollection.ShadedColour;
+    ColourCollection.SetComplement(ColourCollection.ShadedColour, ColourCollection.ShadedComplementColour);
 
-    FrameIsMutable = false;
-    DialOffsets = {0, 0, 0};
-    ElementFrames = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &MainShadesTintsFrame};
-    VisibleFrames = {&RGBDialFrame, &ToolBarFrame, &MainShadesTintsFrame};
+    //Toolbar for various utilities
+    ToolBarFrame.Update(700, 600, 280, 70);
+    Tools.Update(ToolBarFrame.FrameArea);
+    SetAllInterActionsToFalse();
+    UpdateWindowMinimumSize();
 
     //Initialise the Colour Dial's Frame and Element
+    DialOffsets = {0, 0, 0};
     RGBDialFrame.Update(0, 0, 400, 400);
     RGBDial.Update(RGBDialFrame.FrameArea.x + RGBDialFrame.FrameArea.width/2, 
                    RGBDialFrame.FrameArea.y + RGBDialFrame.FrameArea.height/2, 
@@ -25,17 +32,21 @@ ToolContainer::ToolContainer()
     RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z);
     RGBSquare.Update(RGBSquareFrame.FrameArea);
 
+    //Initialise the colour previews
+    BaseHueFrame.Update(420, 5, 100, 100);
+    ComplementFrame.Update(1140, 5, 100, 100);
+
     //Initialise Frame and Element for the main colour's Shades and Tints
-    MainShadesTintsFrame.Update(410, 20, 600, 50);
+    MainShadesTintsFrame.Update(530, 5, 600, 50);
     MainShadesTints.Update(MainShadesTintsFrame.FrameArea, 9, 20);
     MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
     MainShadesTints.GeneratePaletteRectangles();
 
-    //Toolbar for various utilities
-    ToolBarFrame.Update(700, 600, 280, 70);
-    Tools.Update(ToolBarFrame.FrameArea);
-    SetAllInterActionsToFalse();
-    UpdateWindowMinimumSize();
+    //Initialise Frame and Element for the complement's Shades and Tints
+    ComplementShadesTintsFrame.Update(530, 55, 600, 50);
+    ComplementShadesTints.Update(ComplementShadesTintsFrame.FrameArea, 9, 20);
+    ComplementShadesTints.GenerateShadesTints(ColourCollection.ShadedComplementColour);
+    ComplementShadesTints.GeneratePaletteRectangles();
 }
 
 
@@ -44,19 +55,23 @@ void ToolContainer::DrawElements()
     //Simply combining all drawing calls
     RGBDial.DrawRGBDial();
     RGBSquare.DrawShadeSquare();
+    BaseHueFrame.DrawSingleColour(ColourCollection.BaseHueColour);
     MainShadesTints.DrawPalette();
+    ComplementFrame.DrawSingleColour(ColourCollection.ComplementColour);
+    ComplementShadesTints.DrawPalette();
     Tools.DrawToolBar();  //This has to be the last draw call, it has to ALWAYS be accessible
 
     if(FrameIsMutable)
     {
-        for(Frames* ShowFrame : VisibleFrames){ShowFrame->DrawFrameBox();}
+        for(Frames* ShowFrame : ElementFrames)
+        {
+            if(std::find(HiddenFrames.begin(), HiddenFrames.end(), ShowFrame) == HiddenFrames.end())
+            {
+                //This is a laborious way of doing it, but it works. It beats having to keep two vectors updated relative to eachother
+                ShowFrame->DrawFrameBox();
+            }
+        }
     }
-    //DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
-    DrawRectangle(1300, 100, 70, 70, ColourCollection.BaseHueColour);
-    DrawRectangle(1370, 100, 70, 70, ColourCollection.ShadedColour);
-    DrawRectangle(1300, 170, 70, 70, ColourCollection.ComplementColour);
-    DrawRectangle(1370, 170, 70, 70, ColourCollection.ShadedComplementColour);
-    //DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
 }
 
 
@@ -98,34 +113,49 @@ void ToolContainer::MouseClickHandler()
     for(int IndexOfFrame {0}; IndexOfFrame < int(ElementFrames.size()); ++IndexOfFrame)
     {
         if(ElementFrames[IndexOfFrame]->ActiveFrame)
-        {
-            DecideElementInteraction(MouseXY, IndexOfFrame);
+        {   
+            Interactions.PassedFrameState =  FrameIsMutable;
+            Interactions.PassedMouseXY = MouseXY;
+            DecideElementInteraction(IndexOfFrame);
+            break;
         }
     }
 }
 
 
-void ToolContainer::DecideElementInteraction(Vector2 MouseXY, int ActiveElementFrame)
+void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
 {
     switch(ActiveElementFrame)
     {
         case 0: 
-            ElementInteractions::InteractWithToolBar(MouseXY, FrameIsMutable, ToolBarFrame, Tools);
+            Interactions.InteractWithToolBar(ToolBarFrame, Tools);
+            FrameIsMutable = Interactions.PassedFrameState;  //This is a weird game of ping pong, I should figure out how to have it refer to the one and same bool
             if(!FrameIsMutable){SnapFrames();} //This does get called every time a button is pressed, not terrible but not great?
             break;
         case 1:
-            ElementInteractions::InteractWithShadeSquare(MouseXY, FrameIsMutable, RGBSquareFrame, RGBSquare, MainShadesTints, ColourCollection);
+            Interactions.InteractWithShadeSquare(RGBSquareFrame, RGBSquare, 
+                                                         MainShadesTints, ComplementShadesTints, ColourCollection);
             break;
         case 2:
-            ElementInteractions::InteractwithRGBDial(MouseXY,FrameIsMutable, RGBSquareFrame, RGBDialFrame, RGBSquare, RGBDial, MainShadesTints, ColourCollection, DialOffsets); 
+            Interactions.InteractwithRGBDial(RGBSquareFrame, RGBDialFrame, RGBSquare, RGBDial, 
+                                                     MainShadesTints, ComplementShadesTints, ColourCollection, DialOffsets); 
             break;
         case 3:
-            ElementInteractions::InteractWithMainShadesTints(MouseXY, FrameIsMutable, MainShadesTintsFrame, MainShadesTints);
+            Interactions.InteractWithFloodFilledFrame(BaseHueFrame, ColourCollection.BaseHueColour);
+            break;
+        case 4:
+            Interactions.InteractWithFloodFilledFrame(ComplementFrame, ColourCollection.ComplementColour);
+            break;
+        case 5:
+            Interactions.InteractWithShadesTints(MainShadesTintsFrame, MainShadesTints);
+            break;
+        case 6:
+            Interactions.InteractWithShadesTints(ComplementShadesTintsFrame, ComplementShadesTints);
             break;
         default:
             break;
     }
-}
+}//{&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &MainShadesTintsFrame, &ComplementShadesTintsFrame};
 
 
 void ToolContainer::SetElementInteraction(Vector2 MouseXY)

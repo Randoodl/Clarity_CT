@@ -9,11 +9,11 @@ ColourFamily::ColourFamily()
 }
 
 
-void ColourFamily::UpdateComplement()
+void ColourFamily::SetComplement(Color Base, Color& Complement)
 {
     //Get a direct complement Hue to the base Hue currently set
 
-    ComplementColour.r = RGBValMax - BaseHueColour.r; 
-    ComplementColour.g = RGBValMax - BaseHueColour.g; 
-    ComplementColour.b = RGBValMax - BaseHueColour.b; 
+    Complement.r = RGBValMax - Base.r; 
+    Complement.g = RGBValMax - Base.g; 
+    Complement.b = RGBValMax - Base.b; 
 }

@@ -15,5 +15,5 @@ class ColourFamily
         Color ComplementColour;
         Color ShadedComplementColour;
 
-        void UpdateComplement();   
+        void SetComplement(Color Base, Color& Complement);   
 };

@@ -1,5 +1,4 @@
 #include "../include/ShadeSquare.h"
-#include <iostream>
 
 
 ShadeSquare::ShadeSquare()

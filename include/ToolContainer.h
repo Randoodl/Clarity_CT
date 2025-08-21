@@ -21,13 +21,20 @@ class ToolContainer
         void SetElementInteraction(Vector2 MouseXY);
         void SetAllInterActionsToFalse();
 
-        void DecideElementInteraction(Vector2 MouseXY, int ActiveElementFrame);
+        void DecideElementInteraction(int ActiveElementFrame);
 
         void SnapFrames();
         void UpdateWindowMinimumSize();
         
+        //Interactions of elements with the Mouse
+        ElementInteractions Interactions;
+
         //The collection of relevant colours
         ColourFamily ColourCollection;
+
+        //Previews of colours
+        Frames BaseHueFrame;
+        Frames ComplementFrame;
 
         //Colour picker
         Frames RGBDialFrame;
@@ -41,10 +48,14 @@ class ToolContainer
         //Shades and tints of the currently selected colour
         Frames MainShadesTintsFrame;
         Palette MainShadesTints;
+
+        //Shades and tints of the complement colour
+        Frames ComplementShadesTintsFrame;
+        Palette ComplementShadesTints;
         
         //A vector of pointers to all frames so we can for-loop through 'em
         std::vector<Frames*> ElementFrames;
-        std::vector<Frames*> VisibleFrames;
+        std::vector<Frames*> HiddenFrames;
 
         //Toolbar
         Frames ToolBarFrame;

@@ -1,5 +1,5 @@
 #include "../include/Frames.h"
-#include <iostream>
+
 
 Frames::Frames()
 {
@@ -101,6 +101,12 @@ void Frames::AdjustFrame(Vector2 MouseXY)
             );
         }
     }
+}
+
+
+void Frames::DrawSingleColour(Color FillColour)
+{
+    DrawRectangle(FrameArea.x, FrameArea.y, FrameArea.width, FrameArea.height, FillColour);
 }
 
 

@@ -7,13 +7,11 @@
 #include "./ToolBar.h"
 #include "./ColourFamily.h"
 
-namespace ElementInteractions
+class ElementInteractions
 {
     //This is an attempt to isolate all interactions in their own file with the intent to declutter ToolContainer
     //The arguments passed to these functions follows the following order:
     //
-    //  MouseXY
-    //  FrameIsMutable
     //  Frames
     //  Single Elements
     //  Palettes
@@ -22,13 +20,21 @@ namespace ElementInteractions
     //
     //Multiple Frames or Elements are passed in order of descending priority (i.e. ToolBarFrame is always passed as a first frame, if present)
 
-    void InteractWithToolBar(Vector2 MouseXY, bool& FrameIsMutable, Frames& ToolBarFrame, ToolBar& Tools);
+    public:
+        ElementInteractions();
 
-    void InteractWithShadeSquare(Vector2 MouseXY, bool FrameIsMutable, Frames& RGBSquareFrame, ShadeSquare& RGBSquare, 
-                                 Palette& MainShadesTints, ColourFamily& ColourCollection);
+        Vector2 PassedMouseXY;
+        bool PassedFrameState;  //The toolbar changes the state of FrameIsMutable, hence we need to work with the actual value and not a copy
 
-    void InteractwithRGBDial(Vector2 MouseXY, bool FrameIsMutable, Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare,
-                             ColourDial& RGBDial, Palette& MainShadesTints, ColourFamily& ColourCollection, Vector3& DialOffsets);
-    
-    void InteractWithMainShadesTints(Vector2 MouseXY, bool FrameIsMutable, Frames& MainShadesTintsFrame, Palette& MainShadesTints);
-}
+        void InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Tools);
+
+        void InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare, 
+                                     Palette& MainShadesTints, Palette& ComplementShadesTints, ColourFamily& ColourCollection);
+
+        void InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare,
+                                 ColourDial& RGBDial, Palette& MainShadesTints, Palette& ComplementShadesTints, ColourFamily& ColourCollection, Vector3& DialOffsets);
+
+        void InteractWithShadesTints(Frames& ShadesTintsFrame, Palette& ShadesTints);
+
+        void InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour);
+};

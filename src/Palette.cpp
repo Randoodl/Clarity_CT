@@ -1,7 +1,5 @@
 #include "../include/Palette.h"
 
-#include <iostream>
-
 
 Palette::Palette()
 {
