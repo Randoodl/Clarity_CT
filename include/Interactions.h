@@ -34,7 +34,7 @@ class ElementInteractions
         void InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare,
                                  ColourDial& RGBDial, Palette& MainShadesTints, Palette& ComplementShadesTints, ColourFamily& ColourCollection, Vector3& DialOffsets);
 
-        void InteractWithShadesTints(Frames& ShadesTintsFrame, Palette& ShadesTints);
+        void InteractWithPalette(Frames& PaletteFrame, Palette& PaletteColours);
 
         void InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour);
 };

@@ -3,16 +3,14 @@
 
 ToolContainer::ToolContainer()
 {  
+    //Initialise all colours in the collection.
+    ColourCollection = ColourFamily();
+    ColourCollection.Update();
+
     //Initialise Frame related data
     FrameIsMutable = false;
     ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &MainShadesTintsFrame, &ComplementShadesTintsFrame};
     HiddenFrames   = {&RGBSquareFrame};
-
-    //Initialise all colours in the collection.
-    ColourCollection.BaseHueColour = {255, 0, 0, 255};
-    ColourCollection.SetComplement(ColourCollection.BaseHueColour, ColourCollection.ComplementColour);
-    ColourCollection.ShadedColour = ColourCollection.BaseHueColour;
-    ColourCollection.SetComplement(ColourCollection.ShadedColour, ColourCollection.ShadedComplementColour);
 
     //Toolbar for various utilities
     ToolBarFrame.Update(700, 600, 280, 70);
@@ -55,11 +53,18 @@ void ToolContainer::DrawElements()
     //Simply combining all drawing calls
     RGBDial.DrawRGBDial();
     RGBSquare.DrawShadeSquare();
-    BaseHueFrame.DrawSingleColour(ColourCollection.BaseHueColour);
+    BaseHueFrame.DrawSingleColour(ColourCollection.BaseHueColour);                
     MainShadesTints.DrawPalette();
-    ComplementFrame.DrawSingleColour(ColourCollection.ComplementColour);
+    ComplementFrame.DrawSingleColour(ColourCollection.ComplementColour);         
     ComplementShadesTints.DrawPalette();
     Tools.DrawToolBar();  //This has to be the last draw call, it has to ALWAYS be accessible
+
+    //DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
+    DrawRectangle(600, 200, 100, 100, ColourCollection.UpperTriadColour);
+    DrawRectangle(600, 300, 100, 100, ColourCollection.LowerTriadColour);
+    DrawRectangle(700, 200, 100, 100, ColourCollection.UpperTriadShade);
+    DrawRectangle(700, 300, 100, 100, ColourCollection.LowerTriadShade);
+    //DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
 
     if(FrameIsMutable)
     {
@@ -133,12 +138,10 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
             if(!FrameIsMutable){SnapFrames();} //This does get called every time a button is pressed, not terrible but not great?
             break;
         case 1:
-            Interactions.InteractWithShadeSquare(RGBSquareFrame, RGBSquare, 
-                                                         MainShadesTints, ComplementShadesTints, ColourCollection);
+            Interactions.InteractWithShadeSquare(RGBSquareFrame, RGBSquare, MainShadesTints, ComplementShadesTints, ColourCollection);
             break;
         case 2:
-            Interactions.InteractwithRGBDial(RGBSquareFrame, RGBDialFrame, RGBSquare, RGBDial, 
-                                                     MainShadesTints, ComplementShadesTints, ColourCollection, DialOffsets); 
+            Interactions.InteractwithRGBDial(RGBSquareFrame, RGBDialFrame, RGBSquare, RGBDial, MainShadesTints, ComplementShadesTints, ColourCollection, DialOffsets); 
             break;
         case 3:
             Interactions.InteractWithFloodFilledFrame(BaseHueFrame, ColourCollection.BaseHueColour);
@@ -147,10 +150,10 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
             Interactions.InteractWithFloodFilledFrame(ComplementFrame, ColourCollection.ComplementColour);
             break;
         case 5:
-            Interactions.InteractWithShadesTints(MainShadesTintsFrame, MainShadesTints);
+            Interactions.InteractWithPalette(MainShadesTintsFrame, MainShadesTints);
             break;
         case 6:
-            Interactions.InteractWithShadesTints(ComplementShadesTintsFrame, ComplementShadesTints);
+            Interactions.InteractWithPalette(ComplementShadesTintsFrame, ComplementShadesTints);
             break;
         default:
             break;

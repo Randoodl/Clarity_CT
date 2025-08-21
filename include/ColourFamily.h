@@ -14,6 +14,16 @@ class ColourFamily
         Color ShadedColour;
         Color ComplementColour;
         Color ShadedComplementColour;
+        Color LowerTriadColour;
+        Color UpperTriadColour;
+        Color LowerTriadShade;
+        Color UpperTriadShade;
+        
+        void Update();
 
+    private:
         void SetComplement(Color Base, Color& Complement);   
+        void SetTriad(Color Base, Color& LowerTriad, Color& UpperTriad);
+
+
 };

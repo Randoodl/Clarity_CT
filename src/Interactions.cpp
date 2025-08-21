@@ -63,6 +63,9 @@ void ElementInteractions::InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeS
             //Calculate the Complement colour shade
             ColourCollection.ShadedComplementColour = RGBSquare.GetSquareRGB(PassedMouseXY, ColourCollection.ComplementColour);
 
+            //Set updated complement and triad colours
+            ColourCollection.Update();
+
             //Update Palettes
             MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
             ComplementShadesTints.GenerateShadesTints(ColourCollection.ShadedComplementColour);
@@ -81,7 +84,7 @@ void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RG
         
         //Update the ColourCollection based on the new Hue
         ColourCollection.BaseHueColour = RGBSquare.SquareBaseColour;
-        ColourCollection.SetComplement(ColourCollection.BaseHueColour, ColourCollection.ComplementColour);
+        ColourCollection.Update();
 
         //Generate the RGBSquare for the selected Hue
         RGBSquare.ConvertVectorToTexture(RGBSquare.GetVectorOfPixels());
@@ -90,7 +93,7 @@ void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RG
         //So that when the dial is updated, the Shaded colours are updated alongside
         ColourCollection.ShadedColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, ColourCollection.BaseHueColour);
         ColourCollection.ShadedComplementColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, ColourCollection.ComplementColour);
-        
+
         //Update Palettes
         MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
         ComplementShadesTints.GenerateShadesTints(ColourCollection.ShadedComplementColour);
@@ -124,11 +127,11 @@ void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RG
 }
 
 
-void ElementInteractions::InteractWithShadesTints(Frames& ShadesTintsFrame, Palette& ShadesTints)
+void ElementInteractions::InteractWithPalette(Frames& PaletteFrame, Palette& PaletteColours)
 {
     if(!PassedFrameState)
     {
-        Color SelectedColour = ShadesTints.GetVariationColour(PassedMouseXY);
+        Color SelectedColour = PaletteColours.GetVariationColour(PassedMouseXY);
         if(SelectedColour.a != 0)
         {
             std::cout << "(" << int(SelectedColour.r) << ", " << int(SelectedColour.g) << ", " << int(SelectedColour.b) << ")\n"; 
@@ -136,9 +139,9 @@ void ElementInteractions::InteractWithShadesTints(Frames& ShadesTintsFrame, Pale
     }
     else
     {
-        ShadesTintsFrame.AdjustFrame(PassedMouseXY);
-        ShadesTints.Update(ShadesTintsFrame.FrameArea, ShadesTints.VariationAmount, ShadesTints.VariationDelta);
-        ShadesTints.GeneratePaletteRectangles();
+        PaletteFrame.AdjustFrame(PassedMouseXY);
+        PaletteColours.Update(PaletteFrame.FrameArea, PaletteColours.VariationAmount, PaletteColours.VariationDelta);
+        PaletteColours.GeneratePaletteRectangles();
     }
 }
 

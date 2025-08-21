@@ -25,12 +25,12 @@ class ToolContainer
 
         void SnapFrames();
         void UpdateWindowMinimumSize();
-        
-        //Interactions of elements with the Mouse
-        ElementInteractions Interactions;
 
         //The collection of relevant colours
         ColourFamily ColourCollection;
+        
+        //Interactions of elements with the Mouse
+        ElementInteractions Interactions;
 
         //Previews of colours
         Frames BaseHueFrame;
