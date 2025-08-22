@@ -150,7 +150,7 @@ void Palette::DrawPalette()
 {   
     //Due to rounding in how the Rect width is calculated, the far end of the frame might show a little gap between
     //The last rect and the Frame. To remedy this we just fill the whole frame with a background colour first
-    DrawRectangle(PaletteArea.x, PaletteArea.y, PaletteArea.width, PaletteArea.height, PaletteColours.back());
+    //DrawRectangle(PaletteArea.x, PaletteArea.y, PaletteArea.width, PaletteArea.height, PaletteColours.back());
     
     for(int Variation {0}; Variation < int(PaletteColours.size()); ++Variation)
     {

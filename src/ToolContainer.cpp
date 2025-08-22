@@ -9,8 +9,9 @@ ToolContainer::ToolContainer()
 
     //Initialise Frame related data
     FrameIsMutable = false;
-    ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &MainShadesTintsFrame, &ComplementShadesTintsFrame};
+    ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &MainShadesTintsFrame, &ComplementShadesTintsFrame, &SelectedColourFrame};
     HiddenFrames   = {&RGBSquareFrame};
+    Interactions.R_FrameState = FrameIsMutable;
 
     //Toolbar for various utilities
     ToolBarFrame.Update(700, 600, 280, 70);
@@ -31,6 +32,7 @@ ToolContainer::ToolContainer()
     RGBSquare.Update(RGBSquareFrame.FrameArea);
 
     //Initialise the colour previews
+    SelectedColourFrame.Update(0, 420, 400, 100);
     BaseHueFrame.Update(420, 5, 100, 100);
     ComplementFrame.Update(1140, 5, 100, 100);
 
@@ -53,6 +55,7 @@ void ToolContainer::DrawElements()
     //Simply combining all drawing calls
     RGBDial.DrawRGBDial();
     RGBSquare.DrawShadeSquare();
+    SelectedColourFrame.DrawSingleColour(ColourCollection.CurrentSelectedColour);
     BaseHueFrame.DrawSingleColour(ColourCollection.BaseHueColour);                
     MainShadesTints.DrawPalette();
     ComplementFrame.DrawSingleColour(ColourCollection.ComplementColour);         
@@ -119,7 +122,7 @@ void ToolContainer::MouseClickHandler()
     {
         if(ElementFrames[IndexOfFrame]->ActiveFrame)
         {   
-            Interactions.PassedFrameState =  FrameIsMutable;
+            Interactions.R_FrameState =  FrameIsMutable;
             Interactions.PassedMouseXY = MouseXY;
             DecideElementInteraction(IndexOfFrame);
             break;
@@ -134,14 +137,13 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
     {
         case 0: 
             Interactions.InteractWithToolBar(ToolBarFrame, Tools);
-            FrameIsMutable = Interactions.PassedFrameState;  //This is a weird game of ping pong, I should figure out how to have it refer to the one and same bool
             if(!FrameIsMutable){SnapFrames();} //This does get called every time a button is pressed, not terrible but not great?
             break;
         case 1:
-            Interactions.InteractWithShadeSquare(RGBSquareFrame, RGBSquare, MainShadesTints, ComplementShadesTints, ColourCollection);
+            Interactions.InteractWithShadeSquare(RGBSquareFrame, RGBSquare, MainShadesTints, ComplementShadesTints);
             break;
         case 2:
-            Interactions.InteractwithRGBDial(RGBSquareFrame, RGBDialFrame, RGBSquare, RGBDial, MainShadesTints, ComplementShadesTints, ColourCollection, DialOffsets); 
+            Interactions.InteractwithRGBDial(RGBSquareFrame, RGBDialFrame, RGBSquare, RGBDial, MainShadesTints, ComplementShadesTints, DialOffsets); 
             break;
         case 3:
             Interactions.InteractWithFloodFilledFrame(BaseHueFrame, ColourCollection.BaseHueColour);

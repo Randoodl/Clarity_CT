@@ -30,9 +30,10 @@ class ToolContainer
         ColourFamily ColourCollection;
         
         //Interactions of elements with the Mouse
-        ElementInteractions Interactions;
+        ElementInteractions Interactions = ElementInteractions(FrameIsMutable, ColourCollection);
 
         //Previews of colours
+        Frames SelectedColourFrame;
         Frames BaseHueFrame;
         Frames ComplementFrame;
 

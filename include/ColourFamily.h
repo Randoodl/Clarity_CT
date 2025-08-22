@@ -9,7 +9,7 @@ class ColourFamily
     
     public:
         ColourFamily();
-
+        Color CurrentSelectedColour;
         Color BaseHueColour;
         Color ShadedColour;
         Color ComplementColour;

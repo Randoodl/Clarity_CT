@@ -6,6 +6,8 @@ ColourFamily::ColourFamily()
     BaseHueColour = {255, 0, 0, 255};
     ShadedColour  = {255, 0, 0, 255};
 
+    CurrentSelectedColour = {255, 0, 0, 255};
+
     ComplementColour = {0, 0, 0, 255};
     ShadedComplementColour = {0, 255, 255, 255};
     UpperTriadColour = {0, 0, 0, 255};

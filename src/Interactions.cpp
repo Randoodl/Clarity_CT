@@ -3,10 +3,9 @@
 #include <iostream>
 
 
-ElementInteractions::ElementInteractions()
+ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& PassedColourFamily) : R_FrameState(PassedFrameState), R_ColourFamily(PassedColourFamily)
 {
     PassedMouseXY = {0, 0};
-    PassedFrameState = false; 
 }
 
 void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Tools)
@@ -14,7 +13,7 @@ void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Too
     //This is going to be a fun one, because both the Lock and Reset functions
     //need to be accessible irrespective of the FrameIsMutable state
 
-    if(!PassedFrameState)
+    if(!R_FrameState)
     {
         if(CheckCollisionPointRec(PassedMouseXY, Tools.SaveButton))
         {
@@ -37,7 +36,7 @@ void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Too
     {
         if(CheckCollisionPointRec(PassedMouseXY, Tools.LockButton))
         {
-            if(PassedFrameState){PassedFrameState = false;}else{PassedFrameState = true;}  
+            if(R_FrameState){R_FrameState = false;}else{R_FrameState = true;}  
         }
         if(CheckCollisionPointRec(PassedMouseXY, Tools.ResetButton))
         {
@@ -49,54 +48,59 @@ void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Too
 }
 
 
-void ElementInteractions::InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare, 
-                                                  Palette& MainShadesTints, Palette& ComplementShadesTints, ColourFamily& ColourCollection)
+void ElementInteractions::InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare, Palette& MainShadesTints, Palette& ComplementShadesTints)
 {
-    if(!PassedFrameState)
+    if(!R_FrameState)
     {
         if(RGBSquareFrame.ActiveFrame)  //Ensure the cursor can't add MouseXY values outside of the given frame
         {
             //Calculate the main hue colour shade
-            ColourCollection.ShadedColour = RGBSquare.GetSquareRGB(PassedMouseXY, ColourCollection.BaseHueColour);
-            RGBSquare.ShadedColour = ColourCollection.ShadedColour;
+            R_ColourFamily.ShadedColour = RGBSquare.GetSquareRGB(PassedMouseXY, R_ColourFamily.BaseHueColour);
+            RGBSquare.ShadedColour = R_ColourFamily.ShadedColour;
 
             //Calculate the Complement colour shade
-            ColourCollection.ShadedComplementColour = RGBSquare.GetSquareRGB(PassedMouseXY, ColourCollection.ComplementColour);
+            R_ColourFamily.ShadedComplementColour = RGBSquare.GetSquareRGB(PassedMouseXY, R_ColourFamily.ComplementColour);
 
             //Set updated complement and triad colours
-            ColourCollection.Update();
+            R_ColourFamily.Update();
 
             //Update Palettes
-            MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
-            ComplementShadesTints.GenerateShadesTints(ColourCollection.ShadedComplementColour);
+            MainShadesTints.GenerateShadesTints(R_ColourFamily.ShadedColour);
+            ComplementShadesTints.GenerateShadesTints(R_ColourFamily.ShadedComplementColour);
+
+            //Set Current Selected Colour
+            R_ColourFamily.CurrentSelectedColour = R_ColourFamily.ShadedColour;
         }
     }
 }
 
 
 void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare,
-                                              ColourDial& RGBDial, Palette& MainShadesTints, Palette& ComplementShadesTints, ColourFamily& ColourCollection, Vector3& DialOffsets)
+                                              ColourDial& RGBDial, Palette& MainShadesTints, Palette& ComplementShadesTints, Vector3& DialOffsets)
 {
-    if(!PassedFrameState)
+    if(!R_FrameState)
     {
         //Get the base saturate colour for the RGB square and draw a small indicator bubble
         RGBSquare.SquareBaseColour = RGBDial.GetSaturateColour(PassedMouseXY);
         
         //Update the ColourCollection based on the new Hue
-        ColourCollection.BaseHueColour = RGBSquare.SquareBaseColour;
-        ColourCollection.Update();
+        R_ColourFamily.BaseHueColour = RGBSquare.SquareBaseColour;
+        R_ColourFamily.Update();
 
         //Generate the RGBSquare for the selected Hue
         RGBSquare.ConvertVectorToTexture(RGBSquare.GetVectorOfPixels());
 
         //Link changes made in the SquareRGB back to the Shade version of colours in ColorCollection
         //So that when the dial is updated, the Shaded colours are updated alongside
-        ColourCollection.ShadedColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, ColourCollection.BaseHueColour);
-        ColourCollection.ShadedComplementColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, ColourCollection.ComplementColour);
+        R_ColourFamily.ShadedColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, R_ColourFamily.BaseHueColour);
+        R_ColourFamily.ShadedComplementColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, R_ColourFamily.ComplementColour);
 
         //Update Palettes
-        MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
-        ComplementShadesTints.GenerateShadesTints(ColourCollection.ShadedComplementColour);
+        MainShadesTints.GenerateShadesTints(R_ColourFamily.ShadedColour);
+        ComplementShadesTints.GenerateShadesTints(R_ColourFamily.ShadedComplementColour);
+
+        //Set Current Selected Colour
+        R_ColourFamily.CurrentSelectedColour = R_ColourFamily.BaseHueColour;
     }
     else
     {
@@ -129,13 +133,14 @@ void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RG
 
 void ElementInteractions::InteractWithPalette(Frames& PaletteFrame, Palette& PaletteColours)
 {
-    if(!PassedFrameState)
+    if(!R_FrameState)
     {
-        Color SelectedColour = PaletteColours.GetVariationColour(PassedMouseXY);
-        if(SelectedColour.a != 0)
+        Color fSelectedColour = PaletteColours.GetVariationColour(PassedMouseXY);
+        if(fSelectedColour.a != 0)
         {
-            std::cout << "(" << int(SelectedColour.r) << ", " << int(SelectedColour.g) << ", " << int(SelectedColour.b) << ")\n"; 
+            std::cout << "(" << int(fSelectedColour.r) << ", " << int(fSelectedColour.g) << ", " << int(fSelectedColour.b) << ")\n"; 
         }
+        R_ColourFamily.CurrentSelectedColour = fSelectedColour;
     }
     else
     {
@@ -148,7 +153,7 @@ void ElementInteractions::InteractWithPalette(Frames& PaletteFrame, Palette& Pal
 
 void ElementInteractions::InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour)
 {
-    if(!PassedFrameState)
+    if(!R_FrameState)
     {
         std::cout << "(" << int(FillColour.r) << ", " << int(FillColour.g) << ", " << int(FillColour.b) << ")\n"; 
     }
