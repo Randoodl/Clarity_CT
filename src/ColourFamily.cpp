@@ -8,12 +8,12 @@ ColourFamily::ColourFamily()
 
     CurrentSelectedColour = {255, 0, 0, 255};
 
-    ComplementColour = {0, 0, 0, 255};
+    ComplementColour       = BLACK;
     ShadedComplementColour = {0, 255, 255, 255};
-    UpperTriadColour = {0, 0, 0, 255};
-    LowerTriadColour = {0, 0, 0, 255};
-    UpperTriadShade = {0, 0, 0, 255};
-    LowerTriadShade = {0, 0, 0, 255};
+    UpperTriadColour       = BLACK;
+    LowerTriadColour       = BLACK;
+    UpperTriadShade        = BLACK;
+    LowerTriadShade        = BLACK;
 }
 
 

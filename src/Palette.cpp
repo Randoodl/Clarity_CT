@@ -109,8 +109,24 @@ void Palette::GenerateShadesTints(Color SeedColour)
             GenerateShades = false;
         }
     }
+    
+    //This gives a neat little "source colour" block at the start of the palette
+    PaletteColours.insert(PaletteColours.begin(), {SeedColour, SeedColour, BLANK});
 }
 
+
+void Palette::SetHueShadePair(Color Hue, Color Shade)
+{
+    //Generates a small tw-colour palette to display a Hue and its Shade/Tint
+
+    //Reset vector
+    PaletteColours.clear();
+    PaletteColours.reserve(2);
+
+    //This should be one call
+    PaletteColours.emplace_back(Hue);
+    PaletteColours.emplace_back(Shade);  
+}
 
 void Palette::GeneratePaletteRectangles()
 {
@@ -143,15 +159,22 @@ void Palette::GeneratePaletteRectangles()
 
         PaletteRectangles.emplace_back(SetRectangle);
     }
+
+    //Fix leftover gap at the right/bottom side of the Palette as result of floats narrowing
+    //It's clumsy, but it gets the job done
+    if(PaletteArea.width >= PaletteArea.height)
+    {
+        PaletteRectangles.back().width = PaletteArea.width - (PaletteRectangles.back().x - PaletteArea.x);
+    }
+    else
+    {
+        PaletteRectangles.back().height = PaletteArea.height - (PaletteRectangles.back().y - PaletteArea.y);
+    }
 }
 
 
 void Palette::DrawPalette()
-{   
-    //Due to rounding in how the Rect width is calculated, the far end of the frame might show a little gap between
-    //The last rect and the Frame. To remedy this we just fill the whole frame with a background colour first
-    //DrawRectangle(PaletteArea.x, PaletteArea.y, PaletteArea.width, PaletteArea.height, PaletteColours.back());
-    
+{       
     for(int Variation {0}; Variation < int(PaletteColours.size()); ++Variation)
     {
         Rectangle GetRectangle = PaletteRectangles[Variation];

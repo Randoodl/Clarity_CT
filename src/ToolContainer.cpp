@@ -9,8 +9,9 @@ ToolContainer::ToolContainer()
 
     //Initialise Frame related data
     FrameIsMutable = false;
-    ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &MainShadesTintsFrame, &ComplementShadesTintsFrame, &SelectedColourFrame};
+    ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &MainShadesTintsFrame, &ComplementShadesTintsFrame};
     HiddenFrames   = {&RGBSquareFrame};
+    AllPalettes    = {&Hue, &Complement, &MainShadesTints, &ComplementShadesTints};
     Interactions.R_FrameState = FrameIsMutable;
 
     //Toolbar for various utilities
@@ -21,7 +22,7 @@ ToolContainer::ToolContainer()
 
     //Initialise the Colour Dial's Frame and Element
     DialOffsets = {0, 0, 0};
-    RGBDialFrame.Update(0, 0, 400, 400);
+    RGBDialFrame.Update(0, 0, 300, 300);
     RGBDial.Update(RGBDialFrame.FrameArea.x + RGBDialFrame.FrameArea.width/2, 
                    RGBDialFrame.FrameArea.y + RGBDialFrame.FrameArea.height/2, 
                    RGBDialFrame.FrameArea.width/2);
@@ -32,9 +33,15 @@ ToolContainer::ToolContainer()
     RGBSquare.Update(RGBSquareFrame.FrameArea);
 
     //Initialise the colour previews
-    SelectedColourFrame.Update(0, 420, 400, 100);
-    BaseHueFrame.Update(420, 5, 100, 100);
-    ComplementFrame.Update(1140, 5, 100, 100);
+    BaseHueFrame.Update(0, 310, 150, 30);
+    Hue.Update(BaseHueFrame.FrameArea, 0, 0);
+    Hue.SetHueShadePair(ColourCollection.BaseHueColour, ColourCollection.ShadedColour);
+    Hue.GeneratePaletteRectangles();
+
+    ComplementFrame.Update(0, 355, 150, 30);
+    Complement.Update(ComplementFrame.FrameArea, 0, 0);
+    Complement.SetHueShadePair(ColourCollection.ComplementColour, ColourCollection.ShadedComplementColour);
+    Complement.GeneratePaletteRectangles();
 
     //Initialise Frame and Element for the main colour's Shades and Tints
     MainShadesTintsFrame.Update(530, 5, 600, 50);
@@ -55,19 +62,14 @@ void ToolContainer::DrawElements()
     //Simply combining all drawing calls
     RGBDial.DrawRGBDial();
     RGBSquare.DrawShadeSquare();
-    SelectedColourFrame.DrawSingleColour(ColourCollection.CurrentSelectedColour);
-    BaseHueFrame.DrawSingleColour(ColourCollection.BaseHueColour);                
-    MainShadesTints.DrawPalette();
-    ComplementFrame.DrawSingleColour(ColourCollection.ComplementColour);         
-    ComplementShadesTints.DrawPalette();
-    Tools.DrawToolBar();  //This has to be the last draw call, it has to ALWAYS be accessible
+    
+    for(Palette* EachPalette : AllPalettes)
+    {
+        EachPalette->DrawPalette();
+    }
 
-    //DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
-    DrawRectangle(600, 200, 100, 100, ColourCollection.UpperTriadColour);
-    DrawRectangle(600, 300, 100, 100, ColourCollection.LowerTriadColour);
-    DrawRectangle(700, 200, 100, 100, ColourCollection.UpperTriadShade);
-    DrawRectangle(700, 300, 100, 100, ColourCollection.LowerTriadShade);
-    //DEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUGDEBUG
+
+    Tools.DrawToolBar();  //This has to be the last draw call, it has to ALWAYS be accessible
 
     if(FrameIsMutable)
     {
@@ -154,7 +156,7 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
         case 5:
             Interactions.InteractWithPalette(MainShadesTintsFrame, MainShadesTints);
             break;
-        case 6:
+;        case 6:
             Interactions.InteractWithPalette(ComplementShadesTintsFrame, ComplementShadesTints);
             break;
         default:

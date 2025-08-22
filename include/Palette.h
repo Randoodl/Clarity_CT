@@ -18,6 +18,7 @@ class Palette
         Color GetVariationColour(Vector2 MouseXY);
 
         void Update(Rectangle SetPaletteArea, int SetVariationAmount, int SetVariationDelta);
+        void SetHueShadePair(Color Hue, Color Shade);
         void GenerateShadesTints(Color SeedColour);
         void GeneratePaletteRectangles();
 

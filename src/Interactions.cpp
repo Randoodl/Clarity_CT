@@ -3,7 +3,8 @@
 #include <iostream>
 
 
-ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& PassedColourFamily) : R_FrameState(PassedFrameState), R_ColourFamily(PassedColourFamily)
+ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& PassedColourFamily, std::vector<Palette*>& PassedPalettes) : 
+                                         R_FrameState(PassedFrameState), R_ColourFamily(PassedColourFamily), R_AllPalettes(PassedPalettes)
 {
     PassedMouseXY = {0, 0};
 }
@@ -48,7 +49,7 @@ void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Too
 }
 
 
-void ElementInteractions::InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare, Palette& MainShadesTints, Palette& ComplementShadesTints)
+void ElementInteractions::InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare)
 {
     if(!R_FrameState)
     {
@@ -65,8 +66,8 @@ void ElementInteractions::InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeS
             R_ColourFamily.Update();
 
             //Update Palettes
-            MainShadesTints.GenerateShadesTints(R_ColourFamily.ShadedColour);
-            ComplementShadesTints.GenerateShadesTints(R_ColourFamily.ShadedComplementColour);
+            R_AllPalettes[2]->GenerateShadesTints(R_ColourFamily.ShadedColour);
+            R_AllPalettes[3]->GenerateShadesTints(R_ColourFamily.ShadedComplementColour);
 
             //Set Current Selected Colour
             R_ColourFamily.CurrentSelectedColour = R_ColourFamily.ShadedColour;
@@ -75,8 +76,7 @@ void ElementInteractions::InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeS
 }
 
 
-void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare,
-                                              ColourDial& RGBDial, Palette& MainShadesTints, Palette& ComplementShadesTints, Vector3& DialOffsets)
+void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare, ColourDial& RGBDial, Vector3& DialOffsets)
 {
     if(!R_FrameState)
     {
@@ -96,11 +96,11 @@ void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RG
         R_ColourFamily.ShadedComplementColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, R_ColourFamily.ComplementColour);
 
         //Update Palettes
-        MainShadesTints.GenerateShadesTints(R_ColourFamily.ShadedColour);
-        ComplementShadesTints.GenerateShadesTints(R_ColourFamily.ShadedComplementColour);
+        R_AllPalettes[2]->GenerateShadesTints(R_ColourFamily.ShadedColour);
+        R_AllPalettes[3]->GenerateShadesTints(R_ColourFamily.ShadedComplementColour);
 
         //Set Current Selected Colour
-        R_ColourFamily.CurrentSelectedColour = R_ColourFamily.BaseHueColour;
+        R_ColourFamily.CurrentSelectedColour = R_ColourFamily.ShadedColour;
     }
     else
     {
@@ -131,7 +131,7 @@ void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RG
 }
 
 
-void ElementInteractions::InteractWithPalette(Frames& PaletteFrame, Palette& PaletteColours)
+void ElementInteractions::InteractWithPalette(Frames& PaletteFrame)
 {
     if(!R_FrameState)
     {

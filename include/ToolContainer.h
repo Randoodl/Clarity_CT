@@ -30,12 +30,14 @@ class ToolContainer
         ColourFamily ColourCollection;
         
         //Interactions of elements with the Mouse
-        ElementInteractions Interactions = ElementInteractions(FrameIsMutable, ColourCollection);
+        ElementInteractions Interactions = ElementInteractions(FrameIsMutable, ColourCollection, AllPalettes);
 
         //Previews of colours
-        Frames SelectedColourFrame;
         Frames BaseHueFrame;
+        Palette Hue;
         Frames ComplementFrame;
+        Palette Complement;
+
 
         //Colour picker
         Frames RGBDialFrame;
@@ -57,6 +59,9 @@ class ToolContainer
         //A vector of pointers to all frames so we can for-loop through 'em
         std::vector<Frames*> ElementFrames;
         std::vector<Frames*> HiddenFrames;
+
+        //A vector of all Palettes
+        std::vector<Palette*> AllPalettes;
 
         //Toolbar
         Frames ToolBarFrame;

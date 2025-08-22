@@ -14,26 +14,26 @@ class ElementInteractions
     //
     //  Frames
     //  Single Elements
-    //  Palettes
     //  Additional arguments
     //
     //Multiple Frames or Elements are passed in order of descending priority (i.e. ToolBarFrame is always passed as a first frame, if present)
 
     public:
-        ElementInteractions(bool& PassedFrameState, ColourFamily& PassedColourFamily);
+        ElementInteractions(bool& PassedFrameState, ColourFamily& PassedColourFamily, std::vector<Palette*>& PassedPalettes);
 
         Vector2 PassedMouseXY;
+
         bool& R_FrameState;              //The toolbar changes the state of FrameIsMutable, hence we need to work with the actual value and not a copy
         ColourFamily& R_ColourFamily;    //Ditto for the ColourCollection
+        std::vector<Palette*>& R_AllPalettes;          //And all available Palettes
 
         void InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Tools);
 
-        void InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare, Palette& MainShadesTints, Palette& ComplementShadesTints);
+        void InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare);
 
-        void InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare,
-                                 ColourDial& RGBDial, Palette& MainShadesTints, Palette& ComplementShadesTints, Vector3& DialOffsets);
+        void InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare, ColourDial& RGBDial, Vector3& DialOffsets);
 
-        void InteractWithPalette(Frames& PaletteFrame, Palette& PaletteColours);
+        void InteractWithPalette(Frames& PaletteFrame);
 
         void InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour);
 };

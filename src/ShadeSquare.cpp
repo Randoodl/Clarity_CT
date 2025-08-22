@@ -11,7 +11,7 @@ ShadeSquare::ShadeSquare()
     CurrentShadeMouseLocation = {0, 0};
     ShadeViewBoxXY = {0, 0};
     ShadeViewBoxDimensions = 0;
-    ShadeViewBoxOutline = {0, 0, 0, 255};
+    ShadeViewBoxOutline = BLACK;
 }
 
 
