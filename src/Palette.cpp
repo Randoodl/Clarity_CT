@@ -158,6 +158,7 @@ void Palette::GeneratePaletteRectangles()
         }
 
         PaletteRectangles.emplace_back(SetRectangle);
+        
     }
 
     //Fix leftover gap at the right/bottom side of the Palette as result of floats narrowing

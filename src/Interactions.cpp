@@ -66,8 +66,14 @@ void ElementInteractions::InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeS
             R_ColourFamily.Update();
 
             //Update Palettes
-            R_AllPalettes[2]->GenerateShadesTints(R_ColourFamily.ShadedColour);
-            R_AllPalettes[3]->GenerateShadesTints(R_ColourFamily.ShadedComplementColour);
+            //                TODO
+            //                     This feels really clunky and rigid, I ought to find a better way to do this
+            R_AllPalettes[0]->SetHueShadePair(R_ColourFamily.BaseHueColour, R_ColourFamily.ShadedColour);
+            R_AllPalettes[1]->SetHueShadePair(R_ColourFamily.ComplementColour, R_ColourFamily.ShadedComplementColour);
+            R_AllPalettes[2]->SetHueShadePair(R_ColourFamily.LowerTriadColour, R_ColourFamily.LowerTriadShade);
+            R_AllPalettes[3]->SetHueShadePair(R_ColourFamily.UpperTriadColour, R_ColourFamily.UpperTriadShade);
+            R_AllPalettes[4]->GenerateShadesTints(R_ColourFamily.ShadedColour);
+            R_AllPalettes[5]->GenerateShadesTints(R_ColourFamily.ShadedComplementColour);
 
             //Set Current Selected Colour
             R_ColourFamily.CurrentSelectedColour = R_ColourFamily.ShadedColour;
@@ -96,8 +102,14 @@ void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RG
         R_ColourFamily.ShadedComplementColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, R_ColourFamily.ComplementColour);
 
         //Update Palettes
-        R_AllPalettes[2]->GenerateShadesTints(R_ColourFamily.ShadedColour);
-        R_AllPalettes[3]->GenerateShadesTints(R_ColourFamily.ShadedComplementColour);
+        //                TODO
+        //                     This feels really clunky and rigid, I ought to find a better way to do this
+        R_AllPalettes[0]->SetHueShadePair(R_ColourFamily.BaseHueColour, R_ColourFamily.ShadedColour);
+        R_AllPalettes[1]->SetHueShadePair(R_ColourFamily.ComplementColour, R_ColourFamily.ShadedComplementColour);
+        R_AllPalettes[2]->SetHueShadePair(R_ColourFamily.LowerTriadColour, R_ColourFamily.LowerTriadShade);
+        R_AllPalettes[3]->SetHueShadePair(R_ColourFamily.UpperTriadColour, R_ColourFamily.UpperTriadShade);
+        R_AllPalettes[4]->GenerateShadesTints(R_ColourFamily.ShadedColour);
+        R_AllPalettes[5]->GenerateShadesTints(R_ColourFamily.ShadedComplementColour);
 
         //Set Current Selected Colour
         R_ColourFamily.CurrentSelectedColour = R_ColourFamily.ShadedColour;
@@ -131,7 +143,7 @@ void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RG
 }
 
 
-void ElementInteractions::InteractWithPalette(Frames& PaletteFrame)
+void ElementInteractions::InteractWithPalette(Frames& PaletteFrame, Palette& PaletteColours)
 {
     if(!R_FrameState)
     {

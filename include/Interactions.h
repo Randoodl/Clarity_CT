@@ -14,6 +14,7 @@ class ElementInteractions
     //
     //  Frames
     //  Single Elements
+    //  Palettes
     //  Additional arguments
     //
     //Multiple Frames or Elements are passed in order of descending priority (i.e. ToolBarFrame is always passed as a first frame, if present)
@@ -33,7 +34,7 @@ class ElementInteractions
 
         void InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare, ColourDial& RGBDial, Vector3& DialOffsets);
 
-        void InteractWithPalette(Frames& PaletteFrame);
+        void InteractWithPalette(Frames& PaletteFrame, Palette& PaletteColours);
 
         void InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour);
 };

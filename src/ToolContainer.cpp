@@ -9,9 +9,10 @@ ToolContainer::ToolContainer()
 
     //Initialise Frame related data
     FrameIsMutable = false;
-    ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &MainShadesTintsFrame, &ComplementShadesTintsFrame};
+    ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &LowerTriadFrame, &UpperTriadFrame,
+                      &MainShadesTintsFrame, &ComplementShadesTintsFrame};
     HiddenFrames   = {&RGBSquareFrame};
-    AllPalettes    = {&Hue, &Complement, &MainShadesTints, &ComplementShadesTints};
+    AllPalettes    = {&Hue, &Complement, &LowerTriad, &UpperTriad, &MainShadesTints, &ComplementShadesTints};
     Interactions.R_FrameState = FrameIsMutable;
 
     //Toolbar for various utilities
@@ -33,15 +34,10 @@ ToolContainer::ToolContainer()
     RGBSquare.Update(RGBSquareFrame.FrameArea);
 
     //Initialise the colour previews
-    BaseHueFrame.Update(0, 310, 150, 30);
-    Hue.Update(BaseHueFrame.FrameArea, 0, 0);
-    Hue.SetHueShadePair(ColourCollection.BaseHueColour, ColourCollection.ShadedColour);
-    Hue.GeneratePaletteRectangles();
-
-    ComplementFrame.Update(0, 355, 150, 30);
-    Complement.Update(ComplementFrame.FrameArea, 0, 0);
-    Complement.SetHueShadePair(ColourCollection.ComplementColour, ColourCollection.ShadedComplementColour);
-    Complement.GeneratePaletteRectangles();
+    InitialiseColourPreview(Hue, BaseHueFrame, ColourCollection.BaseHueColour, ColourCollection.ShadedColour, 0, 310, 300, 30);
+    InitialiseColourPreview(Complement, ComplementFrame, ColourCollection.ComplementColour, ColourCollection.ShadedComplementColour, 0, 355, 300, 30);
+    InitialiseColourPreview(LowerTriad, LowerTriadFrame, ColourCollection.LowerTriadColour, ColourCollection.LowerTriadShade, 0, 400, 300, 30);
+    InitialiseColourPreview(UpperTriad, UpperTriadFrame, ColourCollection.UpperTriadColour, ColourCollection.UpperTriadShade, 0, 440, 300, 30);
 
     //Initialise Frame and Element for the main colour's Shades and Tints
     MainShadesTintsFrame.Update(530, 5, 600, 50);
@@ -142,27 +138,33 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
             if(!FrameIsMutable){SnapFrames();} //This does get called every time a button is pressed, not terrible but not great?
             break;
         case 1:
-            Interactions.InteractWithShadeSquare(RGBSquareFrame, RGBSquare, MainShadesTints, ComplementShadesTints);
+            Interactions.InteractWithShadeSquare(RGBSquareFrame, RGBSquare);
             break;
         case 2:
-            Interactions.InteractwithRGBDial(RGBSquareFrame, RGBDialFrame, RGBSquare, RGBDial, MainShadesTints, ComplementShadesTints, DialOffsets); 
+            Interactions.InteractwithRGBDial(RGBSquareFrame, RGBDialFrame, RGBSquare, RGBDial, DialOffsets); 
             break;
         case 3:
-            Interactions.InteractWithFloodFilledFrame(BaseHueFrame, ColourCollection.BaseHueColour);
+            Interactions.InteractWithPalette(BaseHueFrame, Hue);
             break;
         case 4:
-            Interactions.InteractWithFloodFilledFrame(ComplementFrame, ColourCollection.ComplementColour);
+            Interactions.InteractWithPalette(ComplementFrame, Complement);
             break;
         case 5:
+            Interactions.InteractWithPalette(LowerTriadFrame, LowerTriad);
+            break;
+        case 6:
+            Interactions.InteractWithPalette(UpperTriadFrame, UpperTriad);
+            break;
+        case 7:
             Interactions.InteractWithPalette(MainShadesTintsFrame, MainShadesTints);
             break;
-;        case 6:
+        case 8:
             Interactions.InteractWithPalette(ComplementShadesTintsFrame, ComplementShadesTints);
             break;
         default:
             break;
     }
-}//{&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &MainShadesTintsFrame, &ComplementShadesTintsFrame};
+}
 
 
 void ToolContainer::SetElementInteraction(Vector2 MouseXY)
@@ -230,6 +232,21 @@ void ToolContainer::UpdateWindowMinimumSize()
 
     //Then set the max coordinate point as the min window size
     SetWindowMinSize(MinWidth, MinHeight);
+}
+
+
+void ToolContainer::InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade,
+                                            int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
+{
+    //Method to combine all colour preview Frame initialisation
+
+    //Set the Frame
+    PreviewFrame.Update(SetAnchorX, SetAnchorY, SetLenX, SetLenY);
+
+    //Set the Palette contained within the Frame
+    PreviewPalette.Update(PreviewFrame.FrameArea, 0, 0); //Not using the Variation properties here, so those are set to 0
+    PreviewPalette.SetHueShadePair(Base, Shade);
+    PreviewPalette.GeneratePaletteRectangles();
 }
 
 

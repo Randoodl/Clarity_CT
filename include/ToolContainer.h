@@ -26,6 +26,8 @@ class ToolContainer
         void SnapFrames();
         void UpdateWindowMinimumSize();
 
+        void InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
+
         //The collection of relevant colours
         ColourFamily ColourCollection;
         
@@ -37,7 +39,10 @@ class ToolContainer
         Palette Hue;
         Frames ComplementFrame;
         Palette Complement;
-
+        Frames LowerTriadFrame;
+        Palette LowerTriad;
+        Frames UpperTriadFrame;
+        Palette UpperTriad;
 
         //Colour picker
         Frames RGBDialFrame;
