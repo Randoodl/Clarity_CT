@@ -4,7 +4,6 @@
 ToolContainer::ToolContainer()
 {  
     //Initialise all colours in the collection.
-    ColourCollection = ColourFamily();
     ColourCollection.Update();
 
     //Initialise Frame related data
@@ -148,41 +147,20 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
                                              ColourCollection.ToolBackgroundColour, ColourCollection.ToolButtonColour);
             if(!FrameIsMutable){SnapFrames();} //This does get called every time a button is pressed, not terrible but not great?
             break;
-        case 1:
-            Interactions.InteractWithShadeSquare(RGBSquareFrame, RGBSquare);
-            break;
-        case 2:
-            Interactions.InteractwithRGBDial(RGBSquareFrame, RGBDialFrame, RGBSquare, RGBDial, DialOffsets); 
-            break;
-        case 3:
-            Interactions.InteractWithPalette(BaseHueFrame, Hue);
-            break;
-        case 4:
-            Interactions.InteractWithPalette(ComplementFrame, Complement);
-            break;
-        case 5:
-            Interactions.InteractWithPalette(LowerTriadFrame, LowerTriad);
-            break;
-        case 6:
-            Interactions.InteractWithPalette(UpperTriadFrame, UpperTriad);
-            break;
-        case 7:
-            Interactions.InteractWithPalette(MainShadesTintsFrame, MainShadesTints);
-            break;
-        case 8:
-            Interactions.InteractWithPalette(ComplementShadesTintsFrame, ComplementShadesTints);
-            break;
-        case 9:
-            Interactions.InteractWithPalette(LowerTriadShadesTintsFrame, LowerTriadShadesTints);
-            break;
-        case 10:
-            Interactions.InteractWithPalette(UpperTriadShadesTintsFrame, UpperTriadShadesTints);
-            break;
-        case 11:
-            Interactions.InteractWithFloodFilledFrame(CurrentSelectedColourFrame, ColourCollection.CurrentSelectedColour);
-            break;
-        default:
-            break;
+
+        case 1:  Interactions.InteractWithShadeSquare(RGBSquareFrame, RGBSquare); break;
+        case 2:  Interactions.InteractwithRGBDial(RGBSquareFrame, RGBDialFrame, RGBSquare, RGBDial, DialOffsets); break;
+        case 3:  Interactions.InteractWithPalette(BaseHueFrame, Hue); break;
+        case 4:  Interactions.InteractWithPalette(ComplementFrame, Complement); break;
+        case 5:  Interactions.InteractWithPalette(LowerTriadFrame, LowerTriad); break;
+        case 6:  Interactions.InteractWithPalette(UpperTriadFrame, UpperTriad); break;
+        case 7:  Interactions.InteractWithPalette(MainShadesTintsFrame, MainShadesTints); break;
+        case 8:  Interactions.InteractWithPalette(ComplementShadesTintsFrame, ComplementShadesTints); break;
+        case 9:  Interactions.InteractWithPalette(LowerTriadShadesTintsFrame, LowerTriadShadesTints); break;
+        case 10: Interactions.InteractWithPalette(UpperTriadShadesTintsFrame, UpperTriadShadesTints); break;
+        case 11: Interactions.InteractWithFloodFilledFrame(CurrentSelectedColourFrame, ColourCollection.CurrentSelectedColour); break;
+        
+        default: break;
     }
 }
 
