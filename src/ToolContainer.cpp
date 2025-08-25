@@ -9,11 +9,21 @@ ToolContainer::ToolContainer()
 
     //Initialise Frame related data
     FrameIsMutable = false;
+    Interactions.R_FrameState = FrameIsMutable;
+
     ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &LowerTriadFrame, &UpperTriadFrame,
                       &MainShadesTintsFrame, &ComplementShadesTintsFrame};
     HiddenFrames   = {&RGBSquareFrame};
+
     AllPalettes    = {&Hue, &Complement, &LowerTriad, &UpperTriad, &MainShadesTints, &ComplementShadesTints};
-    Interactions.R_FrameState = FrameIsMutable;
+    PaletteActions = {
+                        {&Hue, {&ColourCollection.BaseHueColour, &ColourCollection.ShadedColour}},
+                        {&Complement, {&ColourCollection.ComplementColour, &ColourCollection.ShadedComplementColour}},
+                        {&LowerTriad, {&ColourCollection.LowerTriadColour, &ColourCollection.LowerTriadShade}},
+                        {&UpperTriad, {&ColourCollection.UpperTriadColour, &ColourCollection.UpperTriadShade}},
+                        {&MainShadesTints, {&ColourCollection.ShadedColour}},
+                        {&ComplementShadesTints, {&ColourCollection.ShadedComplementColour}}
+                     };
 
     //Toolbar for various utilities
     ToolBarFrame.Update(700, 600, 280, 70);

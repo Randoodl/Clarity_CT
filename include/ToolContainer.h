@@ -32,7 +32,7 @@ class ToolContainer
         ColourFamily ColourCollection;
         
         //Interactions of elements with the Mouse
-        ElementInteractions Interactions = ElementInteractions(FrameIsMutable, ColourCollection, AllPalettes);
+        ElementInteractions Interactions = ElementInteractions(FrameIsMutable, ColourCollection, AllPalettes, PaletteActions);
 
         //Previews of colours
         Frames BaseHueFrame;
@@ -65,8 +65,9 @@ class ToolContainer
         std::vector<Frames*> ElementFrames;
         std::vector<Frames*> HiddenFrames;
 
-        //A vector of all Palettes
+        //A vector of all Palettes and Map of Palettes for specific interactions
         std::vector<Palette*> AllPalettes;
+        std::map<Palette*, std::vector<Color*>> PaletteActions;
 
         //Toolbar
         Frames ToolBarFrame;

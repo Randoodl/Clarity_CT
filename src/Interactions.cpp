@@ -3,8 +3,8 @@
 #include <iostream>
 
 
-ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& PassedColourFamily, std::vector<Palette*>& PassedPalettes) : 
-                                         R_FrameState(PassedFrameState), R_ColourFamily(PassedColourFamily), R_AllPalettes(PassedPalettes)
+ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& PassedColourFamily, std::vector<Palette*>& PassedPalettes, std::map<Palette*, std::vector<Color*>>& PassedPaletteActions) : 
+                                         R_FrameState(PassedFrameState), R_ColourFamily(PassedColourFamily), R_AllPalettes(PassedPalettes), R_PaletteActions(PassedPaletteActions)
 {
     PassedMouseXY = {0, 0};
 }
@@ -66,14 +66,7 @@ void ElementInteractions::InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeS
             R_ColourFamily.Update();
 
             //Update Palettes
-            //                TODO
-            //                     This feels really clunky and rigid, I ought to find a better way to do this
-            R_AllPalettes[0]->SetHueShadePair(R_ColourFamily.BaseHueColour, R_ColourFamily.ShadedColour);
-            R_AllPalettes[1]->SetHueShadePair(R_ColourFamily.ComplementColour, R_ColourFamily.ShadedComplementColour);
-            R_AllPalettes[2]->SetHueShadePair(R_ColourFamily.LowerTriadColour, R_ColourFamily.LowerTriadShade);
-            R_AllPalettes[3]->SetHueShadePair(R_ColourFamily.UpperTriadColour, R_ColourFamily.UpperTriadShade);
-            R_AllPalettes[4]->GenerateShadesTints(R_ColourFamily.ShadedColour);
-            R_AllPalettes[5]->GenerateShadesTints(R_ColourFamily.ShadedComplementColour);
+            UpdatePaletteColours(R_PaletteActions);
 
             //Set Current Selected Colour
             R_ColourFamily.CurrentSelectedColour = R_ColourFamily.ShadedColour;
@@ -102,14 +95,7 @@ void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RG
         R_ColourFamily.ShadedComplementColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, R_ColourFamily.ComplementColour);
 
         //Update Palettes
-        //                TODO
-        //                     This feels really clunky and rigid, I ought to find a better way to do this
-        R_AllPalettes[0]->SetHueShadePair(R_ColourFamily.BaseHueColour, R_ColourFamily.ShadedColour);
-        R_AllPalettes[1]->SetHueShadePair(R_ColourFamily.ComplementColour, R_ColourFamily.ShadedComplementColour);
-        R_AllPalettes[2]->SetHueShadePair(R_ColourFamily.LowerTriadColour, R_ColourFamily.LowerTriadShade);
-        R_AllPalettes[3]->SetHueShadePair(R_ColourFamily.UpperTriadColour, R_ColourFamily.UpperTriadShade);
-        R_AllPalettes[4]->GenerateShadesTints(R_ColourFamily.ShadedColour);
-        R_AllPalettes[5]->GenerateShadesTints(R_ColourFamily.ShadedComplementColour);
+        UpdatePaletteColours(R_PaletteActions);
 
         //Set Current Selected Colour
         R_ColourFamily.CurrentSelectedColour = R_ColourFamily.ShadedColour;
@@ -159,6 +145,26 @@ void ElementInteractions::InteractWithPalette(Frames& PaletteFrame, Palette& Pal
         PaletteFrame.AdjustFrame(PassedMouseXY);
         PaletteColours.Update(PaletteFrame.FrameArea, PaletteColours.VariationAmount, PaletteColours.VariationDelta);
         PaletteColours.GeneratePaletteRectangles();
+    }
+}
+
+
+void ElementInteractions::UpdatePaletteColours(std::map<Palette*, std::vector<Color*>>& PassedPaletteActions)
+{
+    //This method simplifies the updating of Palette colours when RGBDial or ShadeSquare is interacted with
+
+    for(auto const& [PaletteKey, ColourVector] : PassedPaletteActions)
+    {
+        //Go through all entries of the Palette-ColourVector map
+        
+        if(ColourVector.size() == 2) //These are colour previews
+        {
+            PaletteKey->SetHueShadePair(*ColourVector[0], *ColourVector[1]);
+        }
+        else //These are ShadesTints
+        {
+            PaletteKey->GenerateShadesTints(*ColourVector[0]);
+        }
     }
 }
 
