@@ -13,7 +13,7 @@ class ColourDial
         ColourDial();
 
         void Update(int SetOriginX, int SetOriginY, int SetOuterRadius);
-        void DrawRGBDial();
+        void DrawRGBDial(Color& BackgroundColour);
 
         Color GetSaturateColour(Vector2 MouseXY);
         
@@ -27,7 +27,6 @@ class ColourDial
         int DialOuterRadius;
 
     private:
-        Color ElementOutLines;
         int Current_iRGB;   //The current index in the RGBSaturates map that updates when a colour is selected
 
         int BandsAmount; //More or less forced to 1530, 3 values in RGB, 2 states each (rising, falling), between 0-255 totals (6 *255) 1530 possible bands

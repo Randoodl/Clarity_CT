@@ -12,21 +12,23 @@ ToolContainer::ToolContainer()
     Interactions.R_FrameState = FrameIsMutable;
 
     ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &LowerTriadFrame, &UpperTriadFrame,
-                      &MainShadesTintsFrame, &ComplementShadesTintsFrame};
+                      &MainShadesTintsFrame, &ComplementShadesTintsFrame, &LowerTriadShadesTintsFrame, &UpperTriadShadesTintsFrame, &CurrentSelectedColourFrame};
     HiddenFrames   = {&RGBSquareFrame};
 
-    AllPalettes    = {&Hue, &Complement, &LowerTriad, &UpperTriad, &MainShadesTints, &ComplementShadesTints};
+    AllPalettes    = {&Hue, &Complement, &LowerTriad, &UpperTriad, &MainShadesTints, &ComplementShadesTints, &LowerTriadShadesTints, &UpperTriadShadesTints};
     PaletteActions = {
                         {&Hue, {&ColourCollection.BaseHueColour, &ColourCollection.ShadedColour}},
                         {&Complement, {&ColourCollection.ComplementColour, &ColourCollection.ShadedComplementColour}},
                         {&LowerTriad, {&ColourCollection.LowerTriadColour, &ColourCollection.LowerTriadShade}},
                         {&UpperTriad, {&ColourCollection.UpperTriadColour, &ColourCollection.UpperTriadShade}},
                         {&MainShadesTints, {&ColourCollection.ShadedColour}},
-                        {&ComplementShadesTints, {&ColourCollection.ShadedComplementColour}}
+                        {&ComplementShadesTints, {&ColourCollection.ShadedComplementColour}},
+                        {&LowerTriadShadesTints, {&ColourCollection.LowerTriadShade}},
+                        {&UpperTriadShadesTints, {&ColourCollection.UpperTriadShade}}
                      };
 
     //Toolbar for various utilities
-    ToolBarFrame.Update(700, 600, 280, 70);
+    ToolBarFrame.Update(590, 310, 320, 80);
     Tools.Update(ToolBarFrame.FrameArea);
     SetAllInterActionsToFalse();
     UpdateWindowMinimumSize();
@@ -44,30 +46,28 @@ ToolContainer::ToolContainer()
     RGBSquare.Update(RGBSquareFrame.FrameArea);
 
     //Initialise the colour previews
-    InitialiseColourPreview(Hue, BaseHueFrame, ColourCollection.BaseHueColour, ColourCollection.ShadedColour, 0, 310, 300, 30);
-    InitialiseColourPreview(Complement, ComplementFrame, ColourCollection.ComplementColour, ColourCollection.ShadedComplementColour, 0, 355, 300, 30);
-    InitialiseColourPreview(LowerTriad, LowerTriadFrame, ColourCollection.LowerTriadColour, ColourCollection.LowerTriadShade, 0, 400, 300, 30);
-    InitialiseColourPreview(UpperTriad, UpperTriadFrame, ColourCollection.UpperTriadColour, ColourCollection.UpperTriadShade, 0, 440, 300, 30);
+    CurrentSelectedColourFrame.Update(310, 310, 270, 80);
+    InitialiseColourPreview(Hue, BaseHueFrame, ColourCollection.BaseHueColour, ColourCollection.ShadedColour, 0, 310, 70, 80);
+    InitialiseColourPreview(Complement, ComplementFrame, ColourCollection.ComplementColour, ColourCollection.ShadedComplementColour, 80, 310, 70, 80);
+    InitialiseColourPreview(LowerTriad, LowerTriadFrame, ColourCollection.LowerTriadColour, ColourCollection.LowerTriadShade, 160, 310, 70, 80);
+    InitialiseColourPreview(UpperTriad, UpperTriadFrame, ColourCollection.UpperTriadColour, ColourCollection.UpperTriadShade, 230, 310, 70, 80);
 
-    //Initialise Frame and Element for the main colour's Shades and Tints
-    MainShadesTintsFrame.Update(530, 5, 600, 50);
-    MainShadesTints.Update(MainShadesTintsFrame.FrameArea, 9, 20);
-    MainShadesTints.GenerateShadesTints(ColourCollection.ShadedColour);
-    MainShadesTints.GeneratePaletteRectangles();
-
-    //Initialise Frame and Element for the complement's Shades and Tints
-    ComplementShadesTintsFrame.Update(530, 55, 600, 50);
-    ComplementShadesTints.Update(ComplementShadesTintsFrame.FrameArea, 9, 20);
-    ComplementShadesTints.GenerateShadesTints(ColourCollection.ShadedComplementColour);
-    ComplementShadesTints.GeneratePaletteRectangles();
+    //Initialise the ShadesTints
+    SetVariationAmount = 9;
+    SetVariationDelta = 20;
+    InitialiseShadesTints(MainShadesTints, MainShadesTintsFrame, ColourCollection.ShadedColour, SetVariationAmount, SetVariationDelta, 310, 0, 600, 70);
+    InitialiseShadesTints(ComplementShadesTints, ComplementShadesTintsFrame, ColourCollection.ShadedComplementColour, SetVariationAmount, SetVariationDelta, 310, 80, 600, 70);
+    InitialiseShadesTints(LowerTriadShadesTints, LowerTriadShadesTintsFrame, ColourCollection.LowerTriadColour, SetVariationAmount, SetVariationDelta, 310, 160, 600, 70);
+    InitialiseShadesTints(UpperTriadShadesTints, UpperTriadShadesTintsFrame, ColourCollection.UpperTriadColour, SetVariationAmount, SetVariationDelta, 310, 230, 600, 70);
 }
 
 
 void ToolContainer::DrawElements()
 {
     //Simply combining all drawing calls
-    RGBDial.DrawRGBDial();
+    RGBDial.DrawRGBDial(ColourCollection.BackgroundColour);
     RGBSquare.DrawShadeSquare();
+    CurrentSelectedColourFrame.DrawSingleColour(ColourCollection.CurrentSelectedColour);
     
     for(Palette* EachPalette : AllPalettes)
     {
@@ -75,7 +75,7 @@ void ToolContainer::DrawElements()
     }
 
 
-    Tools.DrawToolBar();  //This has to be the last draw call, it has to ALWAYS be accessible
+    Tools.DrawToolBar(ColourCollection.ToolBackgroundColour, ColourCollection.ToolButtonColour);  //This has to be the last draw call, it has to ALWAYS be accessible
 
     if(FrameIsMutable)
     {
@@ -144,7 +144,8 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
     switch(ActiveElementFrame)
     {
         case 0: 
-            Interactions.InteractWithToolBar(ToolBarFrame, Tools);
+            Interactions.InteractWithToolBar(ToolBarFrame, Tools, ColourCollection.BackgroundColour,
+                                             ColourCollection.ToolBackgroundColour, ColourCollection.ToolButtonColour);
             if(!FrameIsMutable){SnapFrames();} //This does get called every time a button is pressed, not terrible but not great?
             break;
         case 1:
@@ -170,6 +171,15 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
             break;
         case 8:
             Interactions.InteractWithPalette(ComplementShadesTintsFrame, ComplementShadesTints);
+            break;
+        case 9:
+            Interactions.InteractWithPalette(LowerTriadShadesTintsFrame, LowerTriadShadesTints);
+            break;
+        case 10:
+            Interactions.InteractWithPalette(UpperTriadShadesTintsFrame, UpperTriadShadesTints);
+            break;
+        case 11:
+            Interactions.InteractWithFloodFilledFrame(CurrentSelectedColourFrame, ColourCollection.CurrentSelectedColour);
             break;
         default:
             break;
@@ -201,7 +211,7 @@ void ToolContainer::SetElementInteraction(Vector2 MouseXY)
                     Frame->IsScaling = true;
                 }
             }
-            return;
+            break;
         }
     }
 }
@@ -260,7 +270,18 @@ void ToolContainer::InitialiseColourPreview(Palette& PreviewPalette, Frames& Pre
 }
 
 
-void ToolContainer::UnloadAllFonts()
+void ToolContainer::InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, 
+                                             int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
 {
-    UnloadFont(MainShadesTints.SetFont);
+    //Method to combine all ShadesTints Frames intialisation
+
+    //Set the Frame
+    ViewFrame.Update(SetAnchorX, SetAnchorY, SetLenX, SetLenY);
+
+    //Set Frame subdivide parameters
+    ViewPalette.Update(ViewFrame.FrameArea, VariationAmount, VariationDelta);
+
+    //Generate Palette colours and subdivide into rectangles
+    ViewPalette.GenerateShadesTints(PassColour);
+    ViewPalette.GeneratePaletteRectangles();
 }

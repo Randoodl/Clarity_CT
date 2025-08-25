@@ -3,6 +3,12 @@
 
 ColourFamily::ColourFamily()
 {
+    //UI colours
+    BackgroundColour = {25, 43, 62, 255};
+    ToolBackgroundColour = {50, 68, 72, 255};
+    ToolButtonColour = {62, 88, 92, 255};
+
+    //Interactible colours
     BaseHueColour = {255, 0, 0, 255};
     ShadedColour  = {255, 0, 0, 255};
 

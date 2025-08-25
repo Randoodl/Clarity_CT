@@ -14,12 +14,10 @@ class ToolBar
         Rectangle OptionsButton; //Not at all the focus for now, but good to already set aside
 
         void Update(Rectangle TotalFrameArea);
-        void DrawToolBar();
+        void DrawToolBar(Color& SetBackGroundColour, Color& SetButtonColour);
 
     private:
         std::vector<Rectangle*> Buttons;
-        Color BackgroundColour;
-        Color ButtonColour;
         int ButtonMargin;
         int ButtonAmount;
 };

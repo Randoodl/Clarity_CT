@@ -9,7 +9,7 @@ ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& P
     PassedMouseXY = {0, 0};
 }
 
-void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Tools)
+void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Tools, Color& SetBackGroundColour, Color& SetToolBarBackgroundColour, Color& SetButtonColour)
 {
     //This is going to be a fun one, because both the Lock and Reset functions
     //need to be accessible irrespective of the FrameIsMutable state
@@ -22,7 +22,21 @@ void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Too
         }   
         if(CheckCollisionPointRec(PassedMouseXY, Tools.OptionsButton))
         {
-            std::cout << "Colour\n";
+            for(auto ChangeColour : {&SetBackGroundColour, &SetToolBarBackgroundColour, &SetButtonColour})
+            {
+                if(ChangeColour->r < RGBValMax/2)
+                {
+                    ChangeColour->r = ChangeColour->r + (0.6 * RGBValMax); 
+                    ChangeColour->g = ChangeColour->g + (0.6 * RGBValMax);
+                    ChangeColour->b = ChangeColour->b + (0.6 * RGBValMax); 
+                }
+                else
+                {
+                    ChangeColour->r = ChangeColour->r - (0.6 * RGBValMax); 
+                    ChangeColour->g = ChangeColour->g - (0.6 * RGBValMax);
+                    ChangeColour->b = ChangeColour->b - (0.6 * RGBValMax); 
+                }
+            }
         }
 
         ToolBarFrame.ActiveFrame = false; //stops a held down click from spamming the button   
@@ -67,9 +81,6 @@ void ElementInteractions::InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeS
 
             //Update Palettes
             UpdatePaletteColours(R_PaletteActions);
-
-            //Set Current Selected Colour
-            R_ColourFamily.CurrentSelectedColour = R_ColourFamily.ShadedColour;
         }
     }
 }
@@ -85,20 +96,19 @@ void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RG
         //Update the ColourCollection based on the new Hue
         R_ColourFamily.BaseHueColour = RGBSquare.SquareBaseColour;
         R_ColourFamily.Update();
-
+        
         //Generate the RGBSquare for the selected Hue
         RGBSquare.ConvertVectorToTexture(RGBSquare.GetVectorOfPixels());
 
         //Link changes made in the SquareRGB back to the Shade version of colours in ColorCollection
         //So that when the dial is updated, the Shaded colours are updated alongside
+        //ColourCollection needs to be updated again to reflect changes in the Shade
         R_ColourFamily.ShadedColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, R_ColourFamily.BaseHueColour);
         R_ColourFamily.ShadedComplementColour = RGBSquare.GetSquareRGB(RGBSquare.CurrentShadeMouseLocation, R_ColourFamily.ComplementColour);
-
+        R_ColourFamily.Update();
+        
         //Update Palettes
         UpdatePaletteColours(R_PaletteActions);
-
-        //Set Current Selected Colour
-        R_ColourFamily.CurrentSelectedColour = R_ColourFamily.ShadedColour;
     }
     else
     {
@@ -133,12 +143,11 @@ void ElementInteractions::InteractWithPalette(Frames& PaletteFrame, Palette& Pal
 {
     if(!R_FrameState)
     {
-        Color fSelectedColour = PaletteColours.GetVariationColour(PassedMouseXY);
-        if(fSelectedColour.a != 0)
+        Color ChosenColour = PaletteColours.GetVariationColour(PassedMouseXY);
+        if(ChosenColour.a != 0) //Don't update if the alpha value is zero, which only happens if MouseXY is outside of the coloured Palette rects
         {
-            std::cout << "(" << int(fSelectedColour.r) << ", " << int(fSelectedColour.g) << ", " << int(fSelectedColour.b) << ")\n"; 
-        }
-        R_ColourFamily.CurrentSelectedColour = fSelectedColour;
+            R_ColourFamily.CurrentSelectedColour = ChosenColour;
+        } 
     }
     else
     {

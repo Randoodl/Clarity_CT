@@ -15,7 +15,8 @@ class ToolContainer
         void DrawElements();
         void MouseClickHandler();
 
-        void UnloadAllFonts();
+        //The collection of relevant colours
+        ColourFamily ColourCollection;
 
     private:  
         void SetElementInteraction(Vector2 MouseXY);
@@ -27,10 +28,8 @@ class ToolContainer
         void UpdateWindowMinimumSize();
 
         void InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
-
-        //The collection of relevant colours
-        ColourFamily ColourCollection;
-        
+        void InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
+  
         //Interactions of elements with the Mouse
         ElementInteractions Interactions = ElementInteractions(FrameIsMutable, ColourCollection, AllPalettes, PaletteActions);
 
@@ -44,6 +43,8 @@ class ToolContainer
         Frames UpperTriadFrame;
         Palette UpperTriad;
 
+        Frames CurrentSelectedColourFrame;
+
         //Colour picker
         Frames RGBDialFrame;
         ColourDial RGBDial; 
@@ -53,13 +54,18 @@ class ToolContainer
         Frames RGBSquareFrame;
         ShadeSquare RGBSquare;
 
-        //Shades and tints of the currently selected colour
+        //Shades and tints
+        int SetVariationAmount;
+        int SetVariationDelta;
+
         Frames MainShadesTintsFrame;
         Palette MainShadesTints;
-
-        //Shades and tints of the complement colour
         Frames ComplementShadesTintsFrame;
         Palette ComplementShadesTints;
+        Frames LowerTriadShadesTintsFrame;
+        Palette LowerTriadShadesTints;
+        Frames UpperTriadShadesTintsFrame;
+        Palette UpperTriadShadesTints;
         
         //A vector of pointers to all frames so we can for-loop through 'em
         std::vector<Frames*> ElementFrames;

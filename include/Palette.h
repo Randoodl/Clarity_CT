@@ -25,8 +25,6 @@ class Palette
 
         void DrawPalette();
 
-        Font SetFont;
-
         int VariationAmount;
         int VariationDelta;
     

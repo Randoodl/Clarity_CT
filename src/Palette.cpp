@@ -8,7 +8,6 @@ Palette::Palette()
     PaletteColours = {};
     PaletteArea = {0, 0, 0, 0};
     VariationAmount = 0; 
-    SetFont = GetFontDefault();
 }
 
 

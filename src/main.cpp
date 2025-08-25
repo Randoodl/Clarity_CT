@@ -4,11 +4,9 @@
 
 int main()
 {
-    Color BackGroundColour {51, 66, 89, 255};
-
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE);    
     
-    InitWindow(1530, 750, "Clarity CT");
+    InitWindow(910, 390, "Clarity CT");
     SetTargetFPS(60); //Perhaps not super relevant
 
     ToolContainer ToolInstance;
@@ -16,7 +14,7 @@ int main()
     while(!WindowShouldClose())
     {
         BeginDrawing();
-            ClearBackground(BackGroundColour);
+            ClearBackground(ToolInstance.ColourCollection.BackgroundColour);
             ToolInstance.DrawElements();
         EndDrawing();
 

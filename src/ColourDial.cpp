@@ -8,7 +8,6 @@ ColourDial::ColourDial()
     DialOriginXY = {0, 0};
     DialInnerRadius = 0;
     DialOuterRadius = 0;
-    ElementOutLines =  {51, 66, 89, 255};
     Current_iRGB = 0;
     BandsAmount = 1530;  
     MapOFDialPositions = {};
@@ -83,7 +82,7 @@ std::map<int, std::vector<float>> ColourDial::CalculateDialPositions()
 }
 
 
-void ColourDial::DrawRGBDial()
+void ColourDial::DrawRGBDial(Color& BackgroundColour)
 {
     //Draw a colour dial based on the data calculated in the MapOfDialPositions
 
@@ -105,7 +104,7 @@ void ColourDial::DrawRGBDial()
     }
 
     //Draw the colour preview bubble
-    DrawCircle(BubbleOriginXY.x, BubbleOriginXY.y, (DialOuterRadius - DialInnerRadius)/2, ElementOutLines);
+    DrawCircle(BubbleOriginXY.x, BubbleOriginXY.y, (DialOuterRadius - DialInnerRadius)/2, BackgroundColour);
     DrawCircle(BubbleOriginXY.x, BubbleOriginXY.y, BubbleRadius * 0.8 , CurrentSaturateColour);
 }
 

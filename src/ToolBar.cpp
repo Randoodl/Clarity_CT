@@ -5,8 +5,6 @@
 
 ToolBar::ToolBar()
 {
-    BackgroundColour = {113, 102, 128, 255};
-    ButtonColour = {133, 122, 148, 255};
     ButtonContainer = {0, 0, 0, 0};
     LockButton = {0, 0, 0, 0};
     ResetButton = {0, 0, 0, 0};
@@ -67,14 +65,14 @@ void ToolBar::Update(Rectangle TotalFrameArea)
 }
 
 
-void ToolBar::DrawToolBar()
+void ToolBar::DrawToolBar(Color& SetBackGroundColour, Color& SetButtonColour)
 {
     //Draw container background
-    DrawRectangle(ButtonContainer.x, ButtonContainer.y, ButtonContainer.width, ButtonContainer.height, BackgroundColour);
+    DrawRectangle(ButtonContainer.x, ButtonContainer.y, ButtonContainer.width, ButtonContainer.height, SetBackGroundColour);
     
     //Draw Buttons
     for(Rectangle* Button : Buttons)
     {
-        DrawRectangle(Button->x, Button->y, Button->width, Button->height, ButtonColour);
+        DrawRectangle(Button->x, Button->y, Button->width, Button->height, SetButtonColour);
     }
 }

@@ -5,10 +5,17 @@
 
 class ColourFamily
 {
-    //This class is meant to hold a collection of colours relative to a single base RGB value colour
+    //This class is meant to hold a collection of colours relative to a single base RGB value colour as well as some UI colours
     
     public:
         ColourFamily();
+
+        //UI colours
+        Color BackgroundColour;
+        Color ToolBackgroundColour;
+        Color ToolButtonColour;
+
+        //Interactible colours
         Color CurrentSelectedColour;
         Color BaseHueColour;
         Color ShadedColour;
