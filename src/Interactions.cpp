@@ -7,7 +7,7 @@ ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& P
     PassedMouseXY = {0, 0};
 }
 
-void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Tools, Color& SetBackGroundColour, Color& SetToolBarBackgroundColour, Color& SetButtonColour)
+void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Tools, Color& SetBackGroundColour, Color& SetToolBarBackgroundColour, Color& SetButtonColour, std::function<void (void)> Reset)
 {
     //This is going to be a fun one, because both the Lock and Reset functions
     //need to be accessible irrespective of the FrameIsMutable state
@@ -53,7 +53,7 @@ void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Too
         }
         if(CheckCollisionPointRec(PassedMouseXY, Tools.ResetButton))
         {
-            std::cout << "Reset\n";
+            Reset();
         }
 
         ToolBarFrame.ActiveFrame = false; //stops a held down click from spamming the button

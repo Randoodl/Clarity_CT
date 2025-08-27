@@ -17,6 +17,8 @@ class ToolContainer
         void DrawElements();
         void MouseClickHandler();
 
+        void InitialiseAllElements();
+        
         //The collection of relevant colours
         ColourFamily ColourCollection;
 

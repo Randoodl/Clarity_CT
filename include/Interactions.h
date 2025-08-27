@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "./ColourDial.h"
 #include "./ShadeSquare.h"
 #include "./Frames.h"
@@ -30,7 +32,7 @@ class ElementInteractions
         std::vector<Palette*>& R_AllPalettes;          //And all available Palettes - PERHAPS OBSOLETE BUT KEEPING IT AROUND FOR NOW IN CASE IT COMES IN HANDY LATER
         std::map<Palette*, std::vector<Color*>>& R_PaletteActions;
 
-        void InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Tools, Color& SetBackGroundColour, Color& SetToolBarBackgroundColour, Color& SetButtonColour);
+        void InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Tools, Color& SetBackGroundColour, Color& SetToolBarBackgroundColour, Color& SetButtonColour, std::function<void (void)> Reset);
 
         void InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare);
 

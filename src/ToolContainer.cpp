@@ -25,41 +25,8 @@ ToolContainer::ToolContainer()
                         {&LowerTriadShadesTints, {&ColourCollection.LowerTriadShade}},
                         {&UpperTriadShadesTints, {&ColourCollection.UpperTriadShade}}
                      };
-
-    //Toolbar for various utilities
-    ToolBarFrame.Update(Layout.TOOL.AnchorX, Layout.TOOL.AnchorY, Layout.TOOL.LenX, Layout.TOOL.LenY);
-    Tools.Update(ToolBarFrame.FrameArea);
-    SetAllInterActionsToFalse();
-    UpdateWindowMinimumSize();
-
-    //Initialise the Colour Dial's Frame and Element
-    DialOffsets = {0, 0, 0};
-    RGBDialFrame.Update(Layout.DIAL.AnchorX, Layout.DIAL.AnchorY, Layout.DIAL.LenX, Layout.DIAL.LenY);
-    RGBDial.Update(RGBDialFrame.FrameArea.x + RGBDialFrame.FrameArea.width/2, 
-                   RGBDialFrame.FrameArea.y + RGBDialFrame.FrameArea.height/2, 
-                   RGBDialFrame.FrameArea.width/2);
-
-    //Initialise the Square's Frame and Element
-    DialOffsets = RGBDial.GetSquareInDialOffsets();
-    RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z);
-    RGBSquare.Update(RGBSquareFrame.FrameArea);
-
-    //Initialise the colour previews
-    //What a goddamn mess, I need to bundle this somehow
-    CurrentSelectedColourFrame.Update(Layout.SELECT.AnchorX, Layout.SELECT.AnchorY, Layout.SELECT.LenX, Layout.SELECT.LenY);
-    InitialiseColourPreview(Hue, BaseHueFrame, ColourCollection.BaseHueColour, ColourCollection.ShadedColour, Layout.HUE);
-    InitialiseColourPreview(Complement, ComplementFrame, ColourCollection.ComplementColour, ColourCollection.ShadedComplementColour, Layout.COMP);
-    InitialiseColourPreview(LowerTriad, LowerTriadFrame, ColourCollection.LowerTriadColour, ColourCollection.LowerTriadShade, Layout.LTRIAD);
-    InitialiseColourPreview(UpperTriad, UpperTriadFrame, ColourCollection.UpperTriadColour, ColourCollection.UpperTriadShade, Layout.UTRIAD);
-
-    //Initialise the ShadesTints
-    //As above, so below, bundle this
-    SetVariationAmount = 9;
-    SetVariationDelta = 20;
-    InitialiseShadesTints(MainShadesTints, MainShadesTintsFrame, ColourCollection.ShadedColour, SetVariationAmount, SetVariationDelta, Layout.MAINST);
-    InitialiseShadesTints(ComplementShadesTints, ComplementShadesTintsFrame, ColourCollection.ShadedComplementColour, SetVariationAmount, SetVariationDelta, Layout.COMPST);
-    InitialiseShadesTints(LowerTriadShadesTints, LowerTriadShadesTintsFrame, ColourCollection.LowerTriadColour, SetVariationAmount, SetVariationDelta, Layout.LTRIST);
-    InitialiseShadesTints(UpperTriadShadesTints, UpperTriadShadesTintsFrame, ColourCollection.UpperTriadColour, SetVariationAmount, SetVariationDelta, Layout.UTRIST);
+    
+    InitialiseAllElements();
 }
 
 
@@ -146,7 +113,9 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
     {
         case 0: 
             Interactions.InteractWithToolBar(ToolBarFrame, Tools, ColourCollection.BackgroundColour,
-                                             ColourCollection.ToolBackgroundColour, ColourCollection.ToolButtonColour);
+                                             ColourCollection.ToolBackgroundColour, ColourCollection.ToolButtonColour, 
+                                             [this](){this->InitialiseAllElements();}); //This is by far the weirdest shit you've duct taped together. what the fuck.
+            
             if(!FrameIsMutable){SnapFrames();} //This does get called every time a button is pressed, not terrible but not great?
             break;
 
@@ -262,4 +231,45 @@ void ToolContainer::InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFram
     //Generate Palette colours and subdivide into rectangles
     ViewPalette.GenerateShadesTints(PassColour);
     ViewPalette.GeneratePaletteRectangles();
+}
+
+
+void ToolContainer::InitialiseAllElements()
+{
+    //Combining all initialisations under one method
+
+    //Toolbar for various utilities
+    ToolBarFrame.Update(Layout.TOOL.AnchorX, Layout.TOOL.AnchorY, Layout.TOOL.LenX, Layout.TOOL.LenY);
+    Tools.Update(ToolBarFrame.FrameArea);
+    SetAllInterActionsToFalse();
+    UpdateWindowMinimumSize();
+
+    //Initialise the Colour Dial's Frame and Element
+    DialOffsets = {0, 0, 0};
+    RGBDialFrame.Update(Layout.DIAL.AnchorX, Layout.DIAL.AnchorY, Layout.DIAL.LenX, Layout.DIAL.LenY);
+    RGBDial.Update(RGBDialFrame.FrameArea.x + RGBDialFrame.FrameArea.width/2, 
+                   RGBDialFrame.FrameArea.y + RGBDialFrame.FrameArea.height/2, 
+                   RGBDialFrame.FrameArea.width/2);
+
+    //Initialise the Square's Frame and Element
+    DialOffsets = RGBDial.GetSquareInDialOffsets();
+    RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z);
+    RGBSquare.Update(RGBSquareFrame.FrameArea);
+
+    //Initialise the colour previews
+    //What a goddamn mess, I need to bundle this somehow
+    CurrentSelectedColourFrame.Update(Layout.SELECT.AnchorX, Layout.SELECT.AnchorY, Layout.SELECT.LenX, Layout.SELECT.LenY);
+    InitialiseColourPreview(Hue, BaseHueFrame, ColourCollection.BaseHueColour, ColourCollection.ShadedColour, Layout.HUE);
+    InitialiseColourPreview(Complement, ComplementFrame, ColourCollection.ComplementColour, ColourCollection.ShadedComplementColour, Layout.COMP);
+    InitialiseColourPreview(LowerTriad, LowerTriadFrame, ColourCollection.LowerTriadColour, ColourCollection.LowerTriadShade, Layout.LTRIAD);
+    InitialiseColourPreview(UpperTriad, UpperTriadFrame, ColourCollection.UpperTriadColour, ColourCollection.UpperTriadShade, Layout.UTRIAD);
+
+    //Initialise the ShadesTints
+    //As above, so below, bundle this
+    SetVariationAmount = 9;
+    SetVariationDelta = 20;
+    InitialiseShadesTints(MainShadesTints, MainShadesTintsFrame, ColourCollection.ShadedColour, SetVariationAmount, SetVariationDelta, Layout.MAINST);
+    InitialiseShadesTints(ComplementShadesTints, ComplementShadesTintsFrame, ColourCollection.ShadedComplementColour, SetVariationAmount, SetVariationDelta, Layout.COMPST);
+    InitialiseShadesTints(LowerTriadShadesTints, LowerTriadShadesTintsFrame, ColourCollection.LowerTriadColour, SetVariationAmount, SetVariationDelta, Layout.LTRIST);
+    InitialiseShadesTints(UpperTriadShadesTints, UpperTriadShadesTintsFrame, ColourCollection.UpperTriadColour, SetVariationAmount, SetVariationDelta, Layout.UTRIST);
 }
