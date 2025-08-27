@@ -20,6 +20,7 @@ Clarity CT is a simple, customisable RGB colour picker and palette tool intended
 
 ### 🗹 Prerequisites <a name = "prerequisites"></a>
 - **raylib** (www.raylib.com)
+- **nlohmann/json** (www.github.com/nlohmann/json)
 - **GNU Make** (www.gnu.org/software/make)
 
 ### 🏗️ Building from source <a name = "build"></a>

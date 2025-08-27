@@ -1,5 +1,5 @@
 #include "../include/ToolContainer.h"
-#include <iostream>
+
 
 ToolContainer::ToolContainer()
 {  
@@ -27,14 +27,14 @@ ToolContainer::ToolContainer()
                      };
 
     //Toolbar for various utilities
-    ToolBarFrame.Update(590, 310, 320, 80);
+    ToolBarFrame.Update(Layout.TOOL.AnchorX, Layout.TOOL.AnchorY, Layout.TOOL.LenX, Layout.TOOL.LenY);
     Tools.Update(ToolBarFrame.FrameArea);
     SetAllInterActionsToFalse();
     UpdateWindowMinimumSize();
 
     //Initialise the Colour Dial's Frame and Element
     DialOffsets = {0, 0, 0};
-    RGBDialFrame.Update(0, 0, 300, 300);
+    RGBDialFrame.Update(Layout.DIAL.AnchorX, Layout.DIAL.AnchorY, Layout.DIAL.LenX, Layout.DIAL.LenY);
     RGBDial.Update(RGBDialFrame.FrameArea.x + RGBDialFrame.FrameArea.width/2, 
                    RGBDialFrame.FrameArea.y + RGBDialFrame.FrameArea.height/2, 
                    RGBDialFrame.FrameArea.width/2);
@@ -45,19 +45,21 @@ ToolContainer::ToolContainer()
     RGBSquare.Update(RGBSquareFrame.FrameArea);
 
     //Initialise the colour previews
-    CurrentSelectedColourFrame.Update(310, 310, 270, 80);
-    InitialiseColourPreview(Hue, BaseHueFrame, ColourCollection.BaseHueColour, ColourCollection.ShadedColour, 0, 310, 70, 80);
-    InitialiseColourPreview(Complement, ComplementFrame, ColourCollection.ComplementColour, ColourCollection.ShadedComplementColour, 80, 310, 70, 80);
-    InitialiseColourPreview(LowerTriad, LowerTriadFrame, ColourCollection.LowerTriadColour, ColourCollection.LowerTriadShade, 160, 310, 70, 80);
-    InitialiseColourPreview(UpperTriad, UpperTriadFrame, ColourCollection.UpperTriadColour, ColourCollection.UpperTriadShade, 230, 310, 70, 80);
+    //What a goddamn mess, I need to bundle this somehow
+    CurrentSelectedColourFrame.Update(Layout.SELECT.AnchorX, Layout.SELECT.AnchorY, Layout.SELECT.LenX, Layout.SELECT.LenY);
+    InitialiseColourPreview(Hue, BaseHueFrame, ColourCollection.BaseHueColour, ColourCollection.ShadedColour, Layout.HUE);
+    InitialiseColourPreview(Complement, ComplementFrame, ColourCollection.ComplementColour, ColourCollection.ShadedComplementColour, Layout.COMP);
+    InitialiseColourPreview(LowerTriad, LowerTriadFrame, ColourCollection.LowerTriadColour, ColourCollection.LowerTriadShade, Layout.LTRIAD);
+    InitialiseColourPreview(UpperTriad, UpperTriadFrame, ColourCollection.UpperTriadColour, ColourCollection.UpperTriadShade, Layout.UTRIAD);
 
     //Initialise the ShadesTints
+    //As above, so below, bundle this
     SetVariationAmount = 9;
     SetVariationDelta = 20;
-    InitialiseShadesTints(MainShadesTints, MainShadesTintsFrame, ColourCollection.ShadedColour, SetVariationAmount, SetVariationDelta, 310, 0, 600, 70);
-    InitialiseShadesTints(ComplementShadesTints, ComplementShadesTintsFrame, ColourCollection.ShadedComplementColour, SetVariationAmount, SetVariationDelta, 310, 80, 600, 70);
-    InitialiseShadesTints(LowerTriadShadesTints, LowerTriadShadesTintsFrame, ColourCollection.LowerTriadColour, SetVariationAmount, SetVariationDelta, 310, 160, 600, 70);
-    InitialiseShadesTints(UpperTriadShadesTints, UpperTriadShadesTintsFrame, ColourCollection.UpperTriadColour, SetVariationAmount, SetVariationDelta, 310, 230, 600, 70);
+    InitialiseShadesTints(MainShadesTints, MainShadesTintsFrame, ColourCollection.ShadedColour, SetVariationAmount, SetVariationDelta, Layout.MAINST);
+    InitialiseShadesTints(ComplementShadesTints, ComplementShadesTintsFrame, ColourCollection.ShadedComplementColour, SetVariationAmount, SetVariationDelta, Layout.COMPST);
+    InitialiseShadesTints(LowerTriadShadesTints, LowerTriadShadesTintsFrame, ColourCollection.LowerTriadColour, SetVariationAmount, SetVariationDelta, Layout.LTRIST);
+    InitialiseShadesTints(UpperTriadShadesTints, UpperTriadShadesTintsFrame, ColourCollection.UpperTriadColour, SetVariationAmount, SetVariationDelta, Layout.UTRIST);
 }
 
 
@@ -233,13 +235,12 @@ void ToolContainer::UpdateWindowMinimumSize()
 }
 
 
-void ToolContainer::InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade,
-                                            int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
+void ToolContainer::InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, ElementPosition& SetLayout)
 {
     //Method to combine all colour preview Frame initialisation
 
     //Set the Frame
-    PreviewFrame.Update(SetAnchorX, SetAnchorY, SetLenX, SetLenY);
+    PreviewFrame.Update(SetLayout.AnchorX, SetLayout.AnchorY, SetLayout.LenX, SetLayout.LenY);
 
     //Set the Palette contained within the Frame
     PreviewPalette.Update(PreviewFrame.FrameArea, 0, 0); //Not using the Variation properties here, so those are set to 0
@@ -248,13 +249,12 @@ void ToolContainer::InitialiseColourPreview(Palette& PreviewPalette, Frames& Pre
 }
 
 
-void ToolContainer::InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, 
-                                             int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
+void ToolContainer::InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, ElementPosition& SetLayout)
 {
     //Method to combine all ShadesTints Frames intialisation
 
     //Set the Frame
-    ViewFrame.Update(SetAnchorX, SetAnchorY, SetLenX, SetLenY);
+    ViewFrame.Update(SetLayout.AnchorX, SetLayout.AnchorY, SetLayout.LenX, SetLayout.LenY);
 
     //Set Frame subdivide parameters
     ViewPalette.Update(ViewFrame.FrameArea, VariationAmount, VariationDelta);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./Interactions.h"
+#include "./Defaults.h"
 
 class ToolContainer
 {
@@ -9,6 +10,7 @@ class ToolContainer
     
     public:
         ToolContainer();
+        Defaults Layout;
 
         bool FrameIsMutable;  //This toggles whether or not you can move/scale frames
 
@@ -27,8 +29,8 @@ class ToolContainer
         void SnapFrames();
         void UpdateWindowMinimumSize();
 
-        void InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
-        void InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
+        void InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, ElementPosition& SetLayout);
+        void InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, ElementPosition& SetLayout);
   
         //Interactions of elements with the Mouse
         ElementInteractions Interactions = ElementInteractions(FrameIsMutable, ColourCollection, AllPalettes, PaletteActions);
