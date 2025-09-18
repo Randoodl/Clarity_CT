@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "./Interactions.h"
 #include "./Defaults.h"
 
@@ -9,8 +11,9 @@ class ToolContainer
     //As well as the methods to interact with 'em
     
     public:
-        ToolContainer();
+        ToolContainer(char*& PassedBinPath);
         Defaults Layout;
+        Defaults BackupLayout; //This is what the Elements fall back to if reading the .conf fails
 
         bool FrameIsMutable;  //This toggles whether or not you can move/scale frames
 
@@ -33,6 +36,11 @@ class ToolContainer
 
         void InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, ElementPosition& SetLayout);
         void InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, ElementPosition& SetLayout);
+
+        char* BinPath;
+        void LoadCustomConfig(char*& PassedBinPath);
+
+        void DefaultFallback();
   
         //Interactions of elements with the Mouse
         ElementInteractions Interactions = ElementInteractions(FrameIsMutable, ColourCollection, AllPalettes, PaletteActions);
@@ -74,6 +82,7 @@ class ToolContainer
         //A vector of pointers to all frames so we can for-loop through 'em
         std::vector<Frames*> ElementFrames;
         std::vector<Frames*> HiddenFrames;
+        std::vector<ElementPosition*> LayoutPositions;
 
         //A vector of all Palettes and Map of Palettes for specific interactions
         std::vector<Palette*> AllPalettes;

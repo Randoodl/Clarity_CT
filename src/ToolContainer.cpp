@@ -1,8 +1,11 @@
 #include "../include/ToolContainer.h"
+#include <iostream>
 
-
-ToolContainer::ToolContainer()
+ToolContainer::ToolContainer(char*& PassedBinPath)
 {  
+    //Grab executable path
+    BinPath = PassedBinPath;
+
     //Initialise all colours in the collection.
     ColourCollection.Update();
 
@@ -13,6 +16,9 @@ ToolContainer::ToolContainer()
     ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &LowerTriadFrame, &UpperTriadFrame,
                       &MainShadesTintsFrame, &ComplementShadesTintsFrame, &LowerTriadShadesTintsFrame, &UpperTriadShadesTintsFrame, &CurrentSelectedColourFrame};
     HiddenFrames   = {&RGBSquareFrame};
+
+    LayoutPositions = {&Layout.TOOL, &Layout.SQUARE, &Layout.DIAL, &Layout.HUE, &Layout.COMP, &Layout.LTRIAD, &Layout.UTRIAD,
+                       &Layout.MAINST, &Layout.COMPST, &Layout.LTRIST, &Layout.UTRIST, &Layout.SELECT};
 
     AllPalettes    = {&Hue, &Complement, &LowerTriad, &UpperTriad, &MainShadesTints, &ComplementShadesTints, &LowerTriadShadesTints, &UpperTriadShadesTints};
     PaletteActions = {
@@ -26,7 +32,11 @@ ToolContainer::ToolContainer()
                         {&UpperTriadShadesTints, {&ColourCollection.UpperTriadShade}}
                      };
     
+    //Try and load in the config file
+    //If it doesn't exist/is inccessible, it falls back on the values given in Defaults.h
+    LoadCustomConfig(BinPath);
     InitialiseAllElements();
+    UpdateWindowMinimumSize();
 }
 
 
@@ -112,11 +122,18 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
     switch(ActiveElementFrame)
     {
         case 0: 
-            Interactions.InteractWithToolBar(ToolBarFrame, Tools, ColourCollection.BackgroundColour,
+            Interactions.InteractWithToolBar(ElementFrames, Tools, ColourCollection.BackgroundColour,
                                              ColourCollection.ToolBackgroundColour, ColourCollection.ToolButtonColour, 
-                                             [this](){this->InitialiseAllElements();}); //This is by far the weirdest shit you've duct taped together. what the fuck.
+                                             [this](){this->InitialiseAllElements();}, //This is by far the weirdest shit you've duct taped together. what the fuck.
+                                             BinPath); 
             
             if(!FrameIsMutable){SnapFrames();} //This does get called every time a button is pressed, not terrible but not great?
+            
+            if(Interactions.ResetFrames)
+            {
+                DefaultFallback();
+                Interactions.ResetFrames = false; 
+            }
             break;
 
         case 1:  Interactions.InteractWithShadeSquare(RGBSquareFrame, RGBSquare); break;
@@ -272,4 +289,86 @@ void ToolContainer::InitialiseAllElements()
     InitialiseShadesTints(ComplementShadesTints, ComplementShadesTintsFrame, ColourCollection.ShadedComplementColour, SetVariationAmount, SetVariationDelta, Layout.COMPST);
     InitialiseShadesTints(LowerTriadShadesTints, LowerTriadShadesTintsFrame, ColourCollection.LowerTriadColour, SetVariationAmount, SetVariationDelta, Layout.LTRIST);
     InitialiseShadesTints(UpperTriadShadesTints, UpperTriadShadesTintsFrame, ColourCollection.UpperTriadColour, SetVariationAmount, SetVariationDelta, Layout.UTRIST);
+}
+
+
+void ToolContainer::LoadCustomConfig(char*& PassedBinPath)
+{
+    //Attempts to load the custom .conf file of all Element position and dimension data
+
+    //Location of the Clarity executable
+    std::filesystem::path ExportPath {PassedBinPath};
+    ExportPath = ExportPath.parent_path();
+
+    //Check if the .conf file exists, or exit early and fall back to default Layout values
+    if(std::filesystem::exists(ExportPath / "Clarity.conf"))
+    {
+        try
+        {
+            //Stores all Element parameters as vectors of ints
+            std::vector<std::vector<int>> AllParameters;
+
+            //Open the file and create a string for reading lines
+            std::ifstream OpenExportFile(ExportPath / "Clarity.conf");
+            std::string ElementParameters;
+
+            //Read each line in the .conf
+            while(getline(OpenExportFile, ElementParameters))
+            {
+                std::stringstream ReadString(ElementParameters);
+                std::string SingleParameter;
+
+                //stores [x, y, width, height]
+                std::vector<int> ParametersPerLine;
+
+                //Read a single line and split it on the ','
+                while(getline(ReadString, SingleParameter, ','))
+                {
+                    //Create the [x, y, width, height] vector for this line
+                    ParametersPerLine.emplace_back(stoi(SingleParameter));
+                }
+                AllParameters.emplace_back(ParametersPerLine);
+            }
+
+            //Set a line counter
+            int ReadingLine {0};
+
+            //Iterate through each Frame (even the hidden ones)
+            for(ElementPosition* ElementUIData: LayoutPositions)
+            {   
+                //Overwrite the default values for all Elements with loaded .conf values
+                {
+                    ElementUIData->AnchorX = AllParameters[ReadingLine][0];
+                    ElementUIData->AnchorY = AllParameters[ReadingLine][1];
+                    ElementUIData->LenX    = AllParameters[ReadingLine][2];
+                    ElementUIData->LenY    = AllParameters[ReadingLine][3]; 
+                }
+                ++ReadingLine;
+            }
+        }
+        catch(...) //Well aware this is bad practice, but this doesn't call for actual error handling, I just need it to reset the .conf
+        {
+            std::cout << "A problem occured reading the config file, resetting to defaults.\n";
+            DefaultFallback();
+        }
+    }
+    else
+    {
+        std::cout << "No config file found, loading defaults\n";
+    }
+}
+
+
+void ToolContainer::DefaultFallback()
+{
+    //If for whatever reason the .conf file cannot be read, just load up the default values
+
+    //Set the Layout to the Backup values
+    Layout = BackupLayout;
+
+    //Re-initialise all elements
+    InitialiseAllElements();
+
+    //Overwrite the .conf with the default values
+    Interactions.ExportElementPositions(ElementFrames, BinPath);
 }

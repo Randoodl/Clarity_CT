@@ -1,6 +1,8 @@
 #pragma once
 
 #include <functional>
+#include <fstream>
+#include <filesystem>
 
 #include "./ColourDial.h"
 #include "./ShadeSquare.h"
@@ -28,11 +30,13 @@ class ElementInteractions
         Vector2 PassedMouseXY;
 
         bool& R_FrameState;              //The toolbar changes the state of FrameIsMutable, hence we need to work with the actual value and not a copy
+        bool ResetFrames;                //If the layout of Elements needs to be reset, this will be set to true
+
         ColourFamily& R_ColourFamily;    //Ditto for the ColourCollection
         std::vector<Palette*>& R_AllPalettes;          //And all available Palettes - PERHAPS OBSOLETE BUT KEEPING IT AROUND FOR NOW IN CASE IT COMES IN HANDY LATER
         std::map<Palette*, std::vector<Color*>>& R_PaletteActions;
 
-        void InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Tools, Color& SetBackGroundColour, Color& SetToolBarBackgroundColour, Color& SetButtonColour, std::function<void (void)> Reset);
+        void InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, Color& SetBackGroundColour, Color& SetToolBarBackgroundColour, Color& SetButtonColour, std::function<void (void)> Reset, char*& PassedBinPath);
 
         void InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare);
 
@@ -42,4 +46,6 @@ class ElementInteractions
         void UpdatePaletteColours(std::map<Palette*, std::vector<Color*>>& PassedPaletteActions);
 
         void InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour);
+
+        void ExportElementPositions(std::vector<Frames*>& PassedFrames, char*& PassedBinPath);
 };

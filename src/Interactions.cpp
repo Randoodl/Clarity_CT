@@ -5,9 +5,10 @@ ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& P
                                          R_FrameState(PassedFrameState), R_ColourFamily(PassedColourFamily), R_AllPalettes(PassedPalettes), R_PaletteActions(PassedPaletteActions)
 {
     PassedMouseXY = {0, 0};
+    ResetFrames = false;
 }
 
-void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Tools, Color& SetBackGroundColour, Color& SetToolBarBackgroundColour, Color& SetButtonColour, std::function<void (void)> Reset)
+void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, Color& SetBackGroundColour, Color& SetToolBarBackgroundColour, Color& SetButtonColour, std::function<void (void)> Reset, char*& PassedBinPath)
 {
     //This is going to be a fun one, because both the Lock and Reset functions
     //need to be accessible irrespective of the FrameIsMutable state
@@ -16,7 +17,10 @@ void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Too
     {
         if(CheckCollisionPointRec(PassedMouseXY, Tools.SaveButton))
         {
-            std::cout << "Save\n";
+            //Seems like a long goddamn way to pass down main(argv), but alas, here we are
+            //I'm tired, Samwise
+            ExportElementPositions(PassedFrames, PassedBinPath);
+            std::cout << "Exported config file\n";
         }   
         if(CheckCollisionPointRec(PassedMouseXY, Tools.OptionsButton))
         {
@@ -37,15 +41,17 @@ void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Too
             }
         }
 
-        ToolBarFrame.ActiveFrame = false; //stops a held down click from spamming the button   
+        //Not best practice to access ToolBarFrame by indexing into the vector, but if we keep it locked at the front 
+        //of the vector (as well it should), eh? Maybe ok?
+        PassedFrames[0]->ActiveFrame = false; //stops a held down click from spamming the button   
     }
     else
     {   
-        ToolBarFrame.AdjustFrame(PassedMouseXY);
-        Tools.Update(ToolBarFrame.FrameArea);
+        PassedFrames[0]->AdjustFrame(PassedMouseXY);
+        Tools.Update(PassedFrames[0]->FrameArea);
     }
 
-    if(!ToolBarFrame.IsDragging && !ToolBarFrame.IsScaling) //This essentially stops a click-through when using the Adjustment buttons on the frame
+    if(!PassedFrames[0]->IsDragging && !PassedFrames[0]->IsScaling) //This essentially stops a click-through when using the Adjustment buttons on the frame
     {
         if(CheckCollisionPointRec(PassedMouseXY, Tools.LockButton))
         {
@@ -53,10 +59,10 @@ void ElementInteractions::InteractWithToolBar(Frames& ToolBarFrame, ToolBar& Too
         }
         if(CheckCollisionPointRec(PassedMouseXY, Tools.ResetButton))
         {
-            Reset();
+            ResetFrames = true;
+            std::cout << "Reset config file\n";
         }
-
-        ToolBarFrame.ActiveFrame = false; //stops a held down click from spamming the button
+        PassedFrames[0]->ActiveFrame = false; //stops a held down click from spamming the button
     }
 }
 
@@ -189,6 +195,29 @@ void ElementInteractions::InteractWithFloodFilledFrame(Frames& FloodedFrame, Col
 }
 
 
+void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFrames, char*& PassedBinPath)
+{
+    //Export the current Frames x, y, height and width to a local .conf file
 
+    //Get the parent directory of the Clarity_CT executable
+    std::filesystem::path ExportPath {PassedBinPath};
+    ExportPath = ExportPath.parent_path();
 
+    try
+    {
+        //Open (or create) the config file
+        std::ofstream ExportFile(ExportPath / "Clarity.conf");
 
+        //Store all Frames' positonal data in [x, y, width, height] format
+        for(auto Line : PassedFrames)
+        {
+            ExportFile << Line->FrameArea.x << "," << Line->FrameArea.y << "," << Line->FrameArea.width << "," << Line->FrameArea.height << "\n";
+        }
+
+        ExportFile.close();
+    }
+    catch(...) //Not doing any real error handling here, just if you canny do it, you canny
+    {
+        std::cout << "Cannot write to config file\n";
+    }
+}
