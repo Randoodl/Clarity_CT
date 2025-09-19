@@ -36,7 +36,7 @@ class ElementInteractions
         std::vector<Palette*>& R_AllPalettes;          //And all available Palettes - PERHAPS OBSOLETE BUT KEEPING IT AROUND FOR NOW IN CASE IT COMES IN HANDY LATER
         std::map<Palette*, std::vector<Color*>>& R_PaletteActions;
 
-        void InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, Color& SetBackGroundColour, Color& SetToolBarBackgroundColour, Color& SetButtonColour, std::function<void (void)> Reset, char*& PassedBinPath);
+        void InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, char*& PassedBinPath);
 
         void InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare);
 
@@ -47,5 +47,5 @@ class ElementInteractions
 
         void InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour);
 
-        void ExportElementPositions(std::vector<Frames*>& PassedFrames, char*& PassedBinPath);
+        void ExportElementPositions(std::vector<Frames*>& PassedFrames, bool PassedDarkMode, char*& PassedBinPath);
 };

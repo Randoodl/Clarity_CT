@@ -15,6 +15,7 @@ class ToolContainer
         Defaults Layout;
         Defaults BackupLayout; //This is what the Elements fall back to if reading the .conf fails
 
+        bool DarkModeEnabled;
         bool FrameIsMutable;  //This toggles whether or not you can move/scale frames
 
         void DrawElements();
@@ -33,6 +34,7 @@ class ToolContainer
 
         void SnapFrames();
         void UpdateWindowMinimumSize();
+        void SetUIColours(bool DarkModeEnabled);
 
         void InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, ElementPosition& SetLayout);
         void InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, ElementPosition& SetLayout);

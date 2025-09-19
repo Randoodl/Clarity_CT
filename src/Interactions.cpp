@@ -8,7 +8,7 @@ ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& P
     ResetFrames = false;
 }
 
-void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, Color& SetBackGroundColour, Color& SetToolBarBackgroundColour, Color& SetButtonColour, std::function<void (void)> Reset, char*& PassedBinPath)
+void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, char*& PassedBinPath)
 {
     //This is going to be a fun one, because both the Lock and Reset functions
     //need to be accessible irrespective of the FrameIsMutable state
@@ -19,26 +19,13 @@ void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames
         {
             //Seems like a long goddamn way to pass down main(argv), but alas, here we are
             //I'm tired, Samwise
-            ExportElementPositions(PassedFrames, PassedBinPath);
+            ExportElementPositions(PassedFrames, DarkModeEnabled, PassedBinPath);
             std::cout << "Exported config file\n";
         }   
         if(CheckCollisionPointRec(PassedMouseXY, Tools.OptionsButton))
         {
-            for(auto ChangeColour : {&SetBackGroundColour, &SetToolBarBackgroundColour, &SetButtonColour})
-            {
-                if(ChangeColour->r < RGBValMax/2)
-                {
-                    ChangeColour->r = ChangeColour->r + (0.6 * RGBValMax); 
-                    ChangeColour->g = ChangeColour->g + (0.6 * RGBValMax);
-                    ChangeColour->b = ChangeColour->b + (0.6 * RGBValMax); 
-                }
-                else
-                {
-                    ChangeColour->r = ChangeColour->r - (0.6 * RGBValMax); 
-                    ChangeColour->g = ChangeColour->g - (0.6 * RGBValMax);
-                    ChangeColour->b = ChangeColour->b - (0.6 * RGBValMax); 
-                }
-            }
+            //Toggle DarkMode from 0 to 1 or vice versa
+            if(DarkModeEnabled){DarkModeEnabled = false;}else{DarkModeEnabled = true;};
         }
 
         //Not best practice to access ToolBarFrame by indexing into the vector, but if we keep it locked at the front 
@@ -195,7 +182,7 @@ void ElementInteractions::InteractWithFloodFilledFrame(Frames& FloodedFrame, Col
 }
 
 
-void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFrames, char*& PassedBinPath)
+void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFrames, bool PassedDarkMode, char*& PassedBinPath)
 {
     //Export the current Frames x, y, height and width to a local .conf file
 
@@ -209,10 +196,14 @@ void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFra
         std::ofstream ExportFile(ExportPath / "Clarity.conf");
 
         //Store all Frames' positonal data in [x, y, width, height] format
-        for(auto Line : PassedFrames)
+        //It counts up to n of Frames, so the last line for DarkMode toggling does not get counted here
+        for(auto Line : PassedFrames) 
         {
             ExportFile << Line->FrameArea.x << "," << Line->FrameArea.y << "," << Line->FrameArea.width << "," << Line->FrameArea.height << "\n";
         }
+
+        //Tack on a DarkMode 0/1 at the end
+        ExportFile << PassedDarkMode;
 
         ExportFile.close();
     }

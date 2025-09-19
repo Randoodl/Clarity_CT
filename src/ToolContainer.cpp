@@ -31,11 +31,15 @@ ToolContainer::ToolContainer(char*& PassedBinPath)
                         {&LowerTriadShadesTints, {&ColourCollection.LowerTriadShade}},
                         {&UpperTriadShadesTints, {&ColourCollection.UpperTriadShade}}
                      };
+
+    //UI options
+    DarkModeEnabled = true;
     
     //Try and load in the config file
     //If it doesn't exist/is inccessible, it falls back on the values given in Defaults.h
     LoadCustomConfig(BinPath);
     InitialiseAllElements();
+    SetUIColours(DarkModeEnabled);
     UpdateWindowMinimumSize();
 }
 
@@ -79,7 +83,6 @@ void ToolContainer::SnapFrames()
     //Snap Frame to RGBDial
     RGBDialFrame.Update(RGBDial.DialOriginXY.x - RGBDial.DialOuterRadius, RGBDial.DialOriginXY.y - RGBDial.DialOuterRadius, 
                         RGBDial.DialOuterRadius * 2, RGBDial.DialOuterRadius * 2);
-
     UpdateWindowMinimumSize();
 }
 
@@ -122,18 +125,18 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
     switch(ActiveElementFrame)
     {
         case 0: 
-            Interactions.InteractWithToolBar(ElementFrames, Tools, ColourCollection.BackgroundColour,
-                                             ColourCollection.ToolBackgroundColour, ColourCollection.ToolButtonColour, 
-                                             [this](){this->InitialiseAllElements();}, //This is by far the weirdest shit you've duct taped together. what the fuck.
-                                             BinPath); 
-            
-            if(!FrameIsMutable){SnapFrames();} //This does get called every time a button is pressed, not terrible but not great?
+            Interactions.InteractWithToolBar(ElementFrames, Tools, DarkModeEnabled, BinPath); 
             
             if(Interactions.ResetFrames)
             {
                 DefaultFallback();
                 Interactions.ResetFrames = false; 
             }
+
+            //This does get called every time a button is pressed, not terrible but not great?
+            if(!FrameIsMutable){SnapFrames();} 
+            SetUIColours(DarkModeEnabled);
+
             break;
 
         case 1:  Interactions.InteractWithShadeSquare(RGBSquareFrame, RGBSquare); break;
@@ -295,6 +298,8 @@ void ToolContainer::InitialiseAllElements()
 void ToolContainer::LoadCustomConfig(char*& PassedBinPath)
 {
     //Attempts to load the custom .conf file of all Element position and dimension data
+    //Imagine if I implemented a proper way of loading custom UI settings
+    //I mean I'm not going to, but just imagine
 
     //Location of the Clarity executable
     std::filesystem::path ExportPath {PassedBinPath};
@@ -345,6 +350,10 @@ void ToolContainer::LoadCustomConfig(char*& PassedBinPath)
                 }
                 ++ReadingLine;
             }
+
+            //Lasty, toggle Darkmode
+            //It is still stored as a vector<vector<int>>, so it needs to be accessed though back >and< index
+            DarkModeEnabled = AllParameters.back()[0];
         }
         catch(...) //Well aware this is bad practice, but this doesn't call for actual error handling, I just need it to reset the .conf
         {
@@ -354,7 +363,8 @@ void ToolContainer::LoadCustomConfig(char*& PassedBinPath)
     }
     else
     {
-        std::cout << "No config file found, loading defaults\n";
+        Interactions.ExportElementPositions(ElementFrames, true, BinPath);
+        std::cout << "No config file found, setting defaults\n";
     }
 }
 
@@ -369,6 +379,25 @@ void ToolContainer::DefaultFallback()
     //Re-initialise all elements
     InitialiseAllElements();
 
-    //Overwrite the .conf with the default values
-    Interactions.ExportElementPositions(ElementFrames, BinPath);
+    //Overwrite the .conf with the default values, by default DarkMode is enabled because BLEGH white screen
+    Interactions.ExportElementPositions(ElementFrames, true, BinPath);
+}
+
+
+void ToolContainer::SetUIColours(bool DarkModeEnabled)
+{
+    //Hard coded colour values for the UI
+
+    if(DarkModeEnabled)
+    {
+        ColourCollection.BackgroundColour = (Color){25, 43, 62, 255};
+        ColourCollection.ToolBackgroundColour = (Color){50, 68, 72, 255};
+        ColourCollection.ToolButtonColour = (Color){62, 88, 92, 255};
+    }
+    else //...why would you ever WANT light mode....?
+    {
+        ColourCollection.BackgroundColour = (Color){210, 210, 210, 255};
+        ColourCollection.ToolBackgroundColour = (Color){180, 180, 180, 255};
+        ColourCollection.ToolButtonColour = (Color){150, 150, 150, 255};
+    }
 }
