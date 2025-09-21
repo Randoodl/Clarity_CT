@@ -10,7 +10,7 @@ ToolBar::ToolBar()
     ResetButton = {0, 0, 0, 0};
     SaveButton = {0, 0, 0, 0};
     OptionsButton = {0, 0, 0, 0};
-    ButtonMargin = 5;
+    ButtonMargin = 3;
     Buttons = {&LockButton, &ResetButton, &SaveButton, &OptionsButton};
     ButtonAmount = Buttons.size();
 }

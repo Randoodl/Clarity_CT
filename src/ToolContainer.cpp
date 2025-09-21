@@ -363,7 +363,6 @@ void ToolContainer::LoadCustomConfig(char*& PassedBinPath)
     }
     else
     {
-        Interactions.ExportElementPositions(ElementFrames, true, BinPath);
         std::cout << "No config file found, setting defaults\n";
     }
 }
@@ -390,14 +389,14 @@ void ToolContainer::SetUIColours(bool DarkModeEnabled)
 
     if(DarkModeEnabled)
     {
-        ColourCollection.BackgroundColour = (Color){25, 43, 62, 255};
-        ColourCollection.ToolBackgroundColour = (Color){50, 68, 72, 255};
-        ColourCollection.ToolButtonColour = (Color){62, 88, 92, 255};
+        ColourCollection.BackgroundColour = (Color){31, 31, 40, 255};
+        ColourCollection.ToolBackgroundColour = (Color){55, 55, 64, 255};
+        ColourCollection.ToolButtonColour = (Color){65, 65, 74, 255};
     }
     else //...why would you ever WANT light mode....?
     {
-        ColourCollection.BackgroundColour = (Color){210, 210, 210, 255};
-        ColourCollection.ToolBackgroundColour = (Color){180, 180, 180, 255};
-        ColourCollection.ToolButtonColour = (Color){150, 150, 150, 255};
+        ColourCollection.BackgroundColour = (Color){255, 245, 245, 255};
+        ColourCollection.ToolBackgroundColour = (Color){214, 208, 208, 255};
+        ColourCollection.ToolButtonColour = (Color){255, 245, 245, 255};
     }
 }

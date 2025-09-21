@@ -29,5 +29,6 @@ class Frames
         int MouseOffsetY; //when targetting the move button (Stops Frame's topleft snapping to cursor)
 
     private:
-        Rectangle MainWindow; //For bounds checking on the Frames      
+        Rectangle MainWindow; //For bounds checking on the Frames  
+        Color FrameBoxColour;    
 };      

@@ -7,6 +7,7 @@ Frames::Frames()
     MoveButton = {0, 0, 0, 0};
     ScaleButton = {0, 0, 0, 0};
     EdgeButtonSize = 20;
+    FrameBoxColour = {202, 202, 202, 255};
     ActiveFrame = false;
     IsDragging = false;
     IsScaling = false;
@@ -47,9 +48,9 @@ void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
 void Frames::DrawFrameBox()
 {
     //Draw the Frame surrounding the element, as well as the two corner button areas
-    DrawRectangleLines(FrameArea.x, FrameArea.y, FrameArea.width, FrameArea.height, RAYWHITE);
-    DrawRectangle(MoveButton.x, MoveButton.y, MoveButton.width, MoveButton.height, RAYWHITE);
-    DrawRectangle(ScaleButton.x, ScaleButton.y, ScaleButton.width, ScaleButton.height, RAYWHITE);
+    DrawRectangleLines(FrameArea.x, FrameArea.y, FrameArea.width, FrameArea.height, FrameBoxColour);
+    DrawRectangle(MoveButton.x, MoveButton.y, MoveButton.width, MoveButton.height, FrameBoxColour);
+    DrawRectangle(ScaleButton.x, ScaleButton.y, ScaleButton.width, ScaleButton.height, FrameBoxColour);
 } 
 
 

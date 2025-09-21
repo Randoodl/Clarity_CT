@@ -6,7 +6,7 @@ struct Defaults
 {
     //A struct of all default positions to be loaded if no other position data is found
     
-    ElementPosition TOOL   = ElementPosition(590, 310, 200, 50);
+    ElementPosition TOOL   = ElementPosition(590, 310, 320, 80);
     ElementPosition SQUARE = ElementPosition(0, 0, 0, 0);      //This is a dummy value in order to make the .conf file reading work
     ElementPosition DIAL   = ElementPosition(0, 0, 300, 300);
     ElementPosition HUE    = ElementPosition(0, 310, 70, 80);
