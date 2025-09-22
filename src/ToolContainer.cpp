@@ -290,8 +290,11 @@ void ToolContainer::InitialiseAllElements()
     SetVariationDelta = 20;
     InitialiseShadesTints(MainShadesTints, MainShadesTintsFrame, ColourCollection.ShadedColour, SetVariationAmount, SetVariationDelta, Layout.MAINST);
     InitialiseShadesTints(ComplementShadesTints, ComplementShadesTintsFrame, ColourCollection.ShadedComplementColour, SetVariationAmount, SetVariationDelta, Layout.COMPST);
-    InitialiseShadesTints(LowerTriadShadesTints, LowerTriadShadesTintsFrame, ColourCollection.LowerTriadColour, SetVariationAmount, SetVariationDelta, Layout.LTRIST);
-    InitialiseShadesTints(UpperTriadShadesTints, UpperTriadShadesTintsFrame, ColourCollection.UpperTriadColour, SetVariationAmount, SetVariationDelta, Layout.UTRIST);
+
+    //NOTE: I swapped out .LowerTriadColour and .UpperTriadColour for their respective shades here in order to fix a minor visual bug
+    //      when resetting the layout, however, it might be I used the base colours for good reason, so keep an eye on this
+    InitialiseShadesTints(LowerTriadShadesTints, LowerTriadShadesTintsFrame, ColourCollection.LowerTriadShade, SetVariationAmount, SetVariationDelta, Layout.LTRIST);
+    InitialiseShadesTints(UpperTriadShadesTints, UpperTriadShadesTintsFrame, ColourCollection.UpperTriadShade, SetVariationAmount, SetVariationDelta, Layout.UTRIST);
 }
 
 
