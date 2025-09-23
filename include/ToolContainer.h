@@ -16,6 +16,7 @@ class ToolContainer
         Defaults BackupLayout; //This is what the Elements fall back to if reading the .conf fails
 
         bool DarkModeEnabled;
+        bool HexModeEnabled;
         bool FrameIsMutable;  //This toggles whether or not you can move/scale frames
 
         void DrawElements();

@@ -11,7 +11,8 @@ class ToolBar
         Rectangle LockButton;
         Rectangle ResetButton;
         Rectangle SaveButton;
-        Rectangle OptionsButton; //Not at all the focus for now, but good to already set aside
+        Rectangle CodeModeButton;
+        Rectangle DarkModeButton; 
 
         void Update(Rectangle TotalFrameArea);
         void DrawToolBar(Color& SetBackGroundColour, Color& SetButtonColour);

@@ -34,6 +34,7 @@ ToolContainer::ToolContainer(char*& PassedBinPath)
 
     //UI options
     DarkModeEnabled = true;
+    HexModeEnabled = true;
     
     //Try and load in the config file
     //If it doesn't exist/is inccessible, it falls back on the values given in Defaults.h
@@ -125,7 +126,7 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
     switch(ActiveElementFrame)
     {
         case 0: 
-            Interactions.InteractWithToolBar(ElementFrames, Tools, DarkModeEnabled, BinPath); 
+            Interactions.InteractWithToolBar(ElementFrames, Tools, DarkModeEnabled, HexModeEnabled, BinPath); 
             
             if(Interactions.ResetFrames)
             {
@@ -149,7 +150,7 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
         case 8:  Interactions.InteractWithPalette(ComplementShadesTintsFrame, ComplementShadesTints); break;
         case 9:  Interactions.InteractWithPalette(LowerTriadShadesTintsFrame, LowerTriadShadesTints); break;
         case 10: Interactions.InteractWithPalette(UpperTriadShadesTintsFrame, UpperTriadShadesTints); break;
-        case 11: Interactions.InteractWithFloodFilledFrame(CurrentSelectedColourFrame, ColourCollection.CurrentSelectedColour); break;
+        case 11: Interactions.InteractWithFloodFilledFrame(CurrentSelectedColourFrame, ColourCollection.CurrentSelectedColour, HexModeEnabled); break;
         
         default: break;
     }
@@ -354,9 +355,10 @@ void ToolContainer::LoadCustomConfig(char*& PassedBinPath)
                 ++ReadingLine;
             }
 
-            //Lasty, toggle Darkmode
+            //Lasty, toggle Darkmode and HexMode
             //It is still stored as a vector<vector<int>>, so it needs to be accessed though back >and< index
-            DarkModeEnabled = AllParameters.back()[0];
+            HexModeEnabled  = AllParameters[AllParameters.size() - 2][0];
+            DarkModeEnabled = AllParameters[AllParameters.size() - 1][0];
         }
         catch(...) //Well aware this is bad practice, but this doesn't call for actual error handling, I just need it to reset the .conf
         {
@@ -381,8 +383,8 @@ void ToolContainer::DefaultFallback()
     //Re-initialise all elements
     InitialiseAllElements();
 
-    //Overwrite the .conf with the default values, by default DarkMode is enabled because BLEGH white screen
-    Interactions.ExportElementPositions(ElementFrames, true, BinPath);
+    //Overwrite the .conf with the default values, by default DarkMode is enabled because BLEGH white screen and Hexes over Deces
+    Interactions.ExportElementPositions(ElementFrames, true, true, BinPath);
 }
 
 

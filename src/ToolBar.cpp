@@ -9,9 +9,10 @@ ToolBar::ToolBar()
     LockButton = {0, 0, 0, 0};
     ResetButton = {0, 0, 0, 0};
     SaveButton = {0, 0, 0, 0};
-    OptionsButton = {0, 0, 0, 0};
+    CodeModeButton = {0, 0, 0, 0};
+    DarkModeButton = {0, 0, 0, 0};
     ButtonMargin = 3;
-    Buttons = {&LockButton, &ResetButton, &SaveButton, &OptionsButton};
+    Buttons = {&LockButton, &ResetButton, &SaveButton, &CodeModeButton, &DarkModeButton};
     ButtonAmount = Buttons.size();
 }
 

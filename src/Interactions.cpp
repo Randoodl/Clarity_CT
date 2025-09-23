@@ -8,7 +8,7 @@ ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& P
     ResetFrames = false;
 }
 
-void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, char*& PassedBinPath)
+void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, bool& HexModeEnabled, char*& PassedBinPath)
 {
     //This is going to be a fun one, because both the Lock and Reset functions
     //need to be accessible irrespective of the FrameIsMutable state
@@ -19,10 +19,15 @@ void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames
         {
             //Seems like a long goddamn way to pass down main(argv), but alas, here we are
             //I'm tired, Samwise
-            ExportElementPositions(PassedFrames, DarkModeEnabled, PassedBinPath);
+            ExportElementPositions(PassedFrames, DarkModeEnabled, HexModeEnabled,  PassedBinPath);
             std::cout << "Exported config file\n";
         }   
-        if(CheckCollisionPointRec(PassedMouseXY, Tools.OptionsButton))
+        if(CheckCollisionPointRec(PassedMouseXY, Tools.CodeModeButton))
+        {
+            //Toggle HexMode from 0 to 1 or vice versa
+            if(HexModeEnabled){HexModeEnabled = false;}else{HexModeEnabled = true;};
+        }
+        if(CheckCollisionPointRec(PassedMouseXY, Tools.DarkModeButton))
         {
             //Toggle DarkMode from 0 to 1 or vice versa
             if(DarkModeEnabled){DarkModeEnabled = false;}else{DarkModeEnabled = true;};
@@ -169,11 +174,11 @@ void ElementInteractions::UpdatePaletteColours(std::map<Palette*, std::vector<Co
 }
 
 
-void ElementInteractions::InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour)
+void ElementInteractions::InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour, bool& PassedCodeMode)
 {
     if(!R_FrameState)
     {
-        std::cout << "(" << int(FillColour.r) << ", " << int(FillColour.g) << ", " << int(FillColour.b) << ")\n"; 
+        GetRGBValuesToClipboard(int(FillColour.r), int(FillColour.g), int(FillColour.b), PassedCodeMode);  
     }
     else
     {
@@ -182,7 +187,7 @@ void ElementInteractions::InteractWithFloodFilledFrame(Frames& FloodedFrame, Col
 }
 
 
-void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFrames, bool PassedDarkMode, char*& PassedBinPath)
+void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFrames, bool PassedDarkMode, bool PassedHexMode, char*& PassedBinPath)
 {
     //Export the current Frames x, y, height and width to a local .conf file
 
@@ -202,7 +207,10 @@ void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFra
             ExportFile << Line->FrameArea.x << "," << Line->FrameArea.y << "," << Line->FrameArea.width << "," << Line->FrameArea.height << "\n";
         }
 
-        //Tack on a DarkMode 0/1 at the end
+        //Tack on a Dec/Hex mode at the almost end
+        ExportFile << PassedHexMode << "\n";
+
+        //Tack on a Light/Dark mode at the actual end
         ExportFile << PassedDarkMode;
 
         ExportFile.close();
@@ -211,4 +219,35 @@ void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFra
     {
         std::cout << "Cannot write to config file\n";
     }
+}
+
+
+void ElementInteractions::GetRGBValuesToClipboard(int ValueR, int ValueG, int ValueB, bool& PassedCodeMode)
+{
+    //Copy the RGB values to the clipboard, either as a (R,G,B) tuple or hexcode
+
+    std::string CopyString;
+
+    if(PassedCodeMode)
+    {
+        //Hex code
+
+        //Store pieces of 00-ff hex codes in here
+        std::stringstream HexValue;
+
+        for(int Value : {ValueR, ValueG, ValueB})
+        { 
+            if(Value < 16){HexValue << "0";} //Sloppy way to add trailing zeroes, but it works!
+            HexValue << std::hex << Value;
+        }
+        CopyString = HexValue.str();
+    }
+    else
+    {
+        //Decimal tuple
+        CopyString = std::to_string(ValueR) + "," + 
+                     std::to_string(ValueG) + "," + 
+                     std::to_string(ValueB);
+    }
+    SetClipboardText(CopyString.c_str());
 }
