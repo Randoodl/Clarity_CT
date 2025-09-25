@@ -1,6 +1,5 @@
 #include "../include/ToolBar.h"
 
-#include <iostream>
 
 ToolBar::ToolBar()
 {
@@ -94,8 +93,9 @@ void ToolBar::DrawToolBar(Color& SetBackGroundColour, Color& SetButtonColour, Co
 void ToolBar::GenerateIconTextures(std::vector<std::string*>& IconStrings, std::vector<Texture2D*>& IconTextures)
 {
     //Take in a string of ones and zeroes and turn it into a square texture
-    //Contain this t Gener
 
+    //There's more efficient ways to traverse two linked elements
+    //but it's worth the hassle to rewrite all of this
     for(int i_Button {0}; i_Button < ButtonAmount; ++i_Button)
     {
         std::string IconString = *IconStrings[i_Button];
@@ -137,6 +137,7 @@ void ToolBar::GenerateIconTextures(std::vector<std::string*>& IconStrings, std::
             .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
                               };
         *IconTexture = LoadTextureFromImage(ConvertedIcon);
+        UnloadImage(ConvertedIcon);
     }
 }
 

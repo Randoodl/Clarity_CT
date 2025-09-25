@@ -1,5 +1,5 @@
 #include "../include/Interactions.h"
-#include <iostream>
+
 
 ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& PassedColourFamily, std::vector<Palette*>& PassedPalettes, std::map<Palette*, std::vector<Color*>>& PassedPaletteActions) : 
                                          R_FrameState(PassedFrameState), R_ColourFamily(PassedColourFamily), R_AllPalettes(PassedPalettes), R_PaletteActions(PassedPaletteActions)

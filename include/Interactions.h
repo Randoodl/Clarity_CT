@@ -3,6 +3,7 @@
 #include <functional>
 #include <fstream>
 #include <filesystem>
+#include <iostream>
 
 #include "./ColourDial.h"
 #include "./ShadeSquare.h"

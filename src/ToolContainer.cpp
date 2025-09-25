@@ -1,5 +1,4 @@
 #include "../include/ToolContainer.h"
-#include <iostream>
 
 ToolContainer::ToolContainer(char*& PassedBinPath)
 {  
@@ -379,12 +378,14 @@ void ToolContainer::DefaultFallback()
 
     //Set the Layout to the Backup values
     Layout = BackupLayout;
+    DarkModeEnabled = true;
+    HexModeEnabled = true;
 
     //Re-initialise all elements
     InitialiseAllElements();
 
     //Overwrite the .conf with the default values, by default DarkMode is enabled because BLEGH white screen and Hexes over Deces
-    Interactions.ExportElementPositions(ElementFrames, true, true, BinPath);
+    Interactions.ExportElementPositions(ElementFrames, DarkModeEnabled, HexModeEnabled, BinPath);
 }
 
 
