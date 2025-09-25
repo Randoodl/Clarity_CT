@@ -5,6 +5,7 @@
 int main(int argc, char* argv[])
 {
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE);    
+    SetTraceLogLevel(7); //toggle Raylib output
 
     //The path of the running executable
     char* BinPath {argv[0]};

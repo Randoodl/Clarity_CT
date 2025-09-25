@@ -7,6 +7,8 @@ ColourFamily::ColourFamily()
     BackgroundColour = BLACK;
     ToolBackgroundColour = BLACK;
     ToolButtonColour = BLACK;
+    ToolIconColour = BLACK;
+    FrameBoxColour = BLACK;
 
     //Interactible colours
     BaseHueColour = {255, 0, 0, 255};

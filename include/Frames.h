@@ -15,7 +15,7 @@ class Frames
         Rectangle ScaleButton;
 
         void Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
-        void DrawFrameBox();
+        void DrawFrameBox(Color& FrameBoxColour);
         void AdjustFrame(Vector2 MouseXY);
         void DrawSingleColour(Color FillColour);
         int GetSmallestFrameSide(float SideX, float SideY);
@@ -30,5 +30,4 @@ class Frames
 
     private:
         Rectangle MainWindow; //For bounds checking on the Frames  
-        Color FrameBoxColour;    
 };      

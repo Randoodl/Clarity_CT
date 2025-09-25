@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-
 ToolBar::ToolBar()
 {
     ButtonContainer = {0, 0, 0, 0};
@@ -14,10 +13,16 @@ ToolBar::ToolBar()
     ButtonMargin = 3;
     Buttons = {&LockButton, &ResetButton, &SaveButton, &CodeModeButton, &DarkModeButton};
     ButtonAmount = Buttons.size();
+    Icons = {&LockIcon, &ResetIcon, &SaveIcon, &CodeModeIcon, &DarkModeIcon};
+    RawIconStrings = {&AllIconStrings.LockString, &AllIconStrings.ResetString, &AllIconStrings.SaveString, &AllIconStrings.CodeModeString, &AllIconStrings.DarkModeString};
+    IconPixelAmount = 256;
+    IconPixelDimension = sqrt(IconPixelAmount);
+
+    GenerateIconTextures(RawIconStrings, Icons);
 }
 
 
-void ToolBar::Update(Rectangle TotalFrameArea)
+void ToolBar::Update(Rectangle& TotalFrameArea)
 {
     //Set up the button container
     ButtonContainer.x = TotalFrameArea.x;
@@ -62,18 +67,91 @@ void ToolBar::Update(Rectangle TotalFrameArea)
             Buttons[IndexOfButton]->width = ButtonWidth;
             Buttons[IndexOfButton]->height = ButtonHeight;
         }
-    }    
+    }   
 }
 
 
-void ToolBar::DrawToolBar(Color& SetBackGroundColour, Color& SetButtonColour)
+void ToolBar::DrawToolBar(Color& SetBackGroundColour, Color& SetButtonColour, Color& SetIconColour)
 {
     //Draw container background
     DrawRectangle(ButtonContainer.x, ButtonContainer.y, ButtonContainer.width, ButtonContainer.height, SetBackGroundColour);
     
     //Draw Buttons
-    for(Rectangle* Button : Buttons)
+    for(int i_Button {0}; i_Button < int(Buttons.size()); ++i_Button)
     {
-        DrawRectangle(Button->x, Button->y, Button->width, Button->height, SetButtonColour);
+        //Draw the background of the button
+        DrawRectangle(Buttons[i_Button]->x, Buttons[i_Button]->y, Buttons[i_Button]->width, Buttons[i_Button]->height, SetButtonColour);
     }
+
+    //Draw Button Icons
+    for(int i_Icon {0}; i_Icon < ButtonAmount; ++i_Icon)
+    {
+        DrawIcon(*Buttons[i_Icon], Icons[i_Icon], SetIconColour);
+    }
+}
+
+
+void ToolBar::GenerateIconTextures(std::vector<std::string*>& IconStrings, std::vector<Texture2D*>& IconTextures)
+{
+    //Take in a string of ones and zeroes and turn it into a square texture
+    //Contain this t Gener
+
+    for(int i_Button {0}; i_Button < ButtonAmount; ++i_Button)
+    {
+        std::string IconString = *IconStrings[i_Button];
+        Texture2D* IconTexture = IconTextures[i_Button];
+
+        //Allocate 4 bytes of memory [RGBA] for each pixel
+        unsigned char* RawPixelData = (unsigned char*)RL_MALLOC(IconPixelAmount * 4);
+
+        //Iterate through each pixel
+        for(int i_IconString {0}; i_IconString < IconPixelAmount; ++i_IconString)
+        {   
+            //Get the index of the current 4 byte [RGBA] block
+            int i_PixelData = i_IconString * 4;
+
+            //RGB values can be bundled, only the Alpha is relevant
+            RawPixelData[i_PixelData]     = RGBValMax; //[R]
+            RawPixelData[i_PixelData + 1] = RGBValMax; //[G] 
+            RawPixelData[i_PixelData + 2] = RGBValMax; //[B] 
+
+            if(IconString[i_IconString] == '1')
+            {
+                //Store a visible pixel [A]
+                RawPixelData[i_PixelData + 3] = RGBValMax;
+            }
+            else
+            {
+                //Store an invisible pixel [A]
+                RawPixelData[i_PixelData + 3] = RGBValMin;
+            }
+        }
+
+        //The binary string has now been converted to a raw pixel data string
+        //Time to load it as a texture
+        Image ConvertedIcon = {
+            .data = RawPixelData,
+            .width = IconPixelDimension,
+            .height = IconPixelDimension,
+            .mipmaps = 1,
+            .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
+                              };
+        *IconTexture = LoadTextureFromImage(ConvertedIcon);
+    }
+}
+
+
+void ToolBar::DrawIcon(Rectangle& ButtonArea, Texture2D* IconImage, Color& IconColour)
+{
+    //Draw an icon on top of the toolbar button
+
+    //Scale the icon down to the smallest side
+    float SmallestSide = ((ButtonArea.width >= ButtonArea.height) * ButtonArea.height) + ((ButtonArea.width< ButtonArea.height) * ButtonArea.width);
+    float ScaleIcon = SmallestSide / (IconPixelDimension * 1.25); 
+
+    //Get offsets so the icon always sits in the center
+    float OffsetX = (ButtonArea.width  / 2) - ((IconImage->width  * ScaleIcon) / 2);
+    float OffsetY = (ButtonArea.height / 2) - ((IconImage->height * ScaleIcon) / 2);
+
+    DrawTextureEx(*IconImage, {ButtonArea.x + OffsetX, ButtonArea.y + OffsetY}, 0, ScaleIcon, IconColour);
 }

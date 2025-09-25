@@ -14,6 +14,8 @@ class ColourFamily
         Color BackgroundColour;
         Color ToolBackgroundColour;
         Color ToolButtonColour;
+        Color ToolIconColour;
+        Color FrameBoxColour;
 
         //Interactible colours
         Color CurrentSelectedColour;

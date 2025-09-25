@@ -58,7 +58,7 @@ void ToolContainer::DrawElements()
     }
 
 
-    Tools.DrawToolBar(ColourCollection.ToolBackgroundColour, ColourCollection.ToolButtonColour);  //This has to be the last draw call, it has to ALWAYS be accessible
+    Tools.DrawToolBar(ColourCollection.ToolBackgroundColour, ColourCollection.ToolButtonColour, ColourCollection.ToolIconColour);  //This has to be the last draw call, it has to ALWAYS be accessible
 
     if(FrameIsMutable)
     {
@@ -67,7 +67,7 @@ void ToolContainer::DrawElements()
             if(std::find(HiddenFrames.begin(), HiddenFrames.end(), ShowFrame) == HiddenFrames.end())
             {
                 //This is a laborious way of doing it, but it works. It beats having to keep two vectors updated relative to eachother
-                ShowFrame->DrawFrameBox();
+                ShowFrame->DrawFrameBox(ColourCollection.FrameBoxColour);
             }
         }
     }
@@ -397,11 +397,15 @@ void ToolContainer::SetUIColours(bool DarkModeEnabled)
         ColourCollection.BackgroundColour = (Color){31, 31, 40, 255};
         ColourCollection.ToolBackgroundColour = (Color){55, 55, 64, 255};
         ColourCollection.ToolButtonColour = (Color){65, 65, 74, 255};
+        ColourCollection.ToolIconColour = WHITE;
+        ColourCollection.FrameBoxColour = (Color){244, 244, 244, 255};
     }
     else //...why would you ever WANT light mode....?
     {
         ColourCollection.BackgroundColour = (Color){255, 245, 245, 255};
         ColourCollection.ToolBackgroundColour = (Color){214, 208, 208, 255};
         ColourCollection.ToolButtonColour = (Color){255, 245, 245, 255};
+        ColourCollection.ToolIconColour = BLACK;
+        ColourCollection.FrameBoxColour = (Color){72, 72, 72, 255};
     }
 }
