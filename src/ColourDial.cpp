@@ -3,17 +3,66 @@
 
 ColourDial::ColourDial() 
 {
-    CurrentSaturateColour = {255, 0, 0, 255};
-    DialBandThickness = 0;
+    //public
     DialOriginXY = {0, 0};
+    DialBandThickness = 0;
     DialInnerRadius = 0;
     DialOuterRadius = 0;
+    CurrentSaturateColour = {255, 0, 0, 255};
+   
+    //private
     Current_iRGB = 0;
     BandsAmount = 1530;  
     MapOFDialPositions = {};
     MapOfRGBSaturates = GenerateRGBTuples(); 
     BubbleOriginXY = {0, 0};
     BubbleRadius = 0;
+}
+
+
+Color ColourDial::GetSaturateColour(Vector2 MouseXY)
+{
+    //Set a base saturate colour if the dial is clicked, from which a shade and tint can be generated
+
+    //Using good ol' pythagoras we can calculate the distance from the centre of the dial to the mouseclick
+    float DistanceToClick = sqrt(pow(MouseXY.x - DialOriginXY.x, 2) + pow(MouseXY.y - DialOriginXY.y, 2));
+
+    //Using the remainder of GetRGBColour because the Map is created left-to-right, but the dial is created as a unit circle
+    //which increments to 2 PI in a counter-clockwise (right-to-left) fashion
+    //Using GetRGBColour directly would have colours and the bubble flipped along the Y-axis 
+    Current_iRGB = (BandsAmount - GetRGBColour(MouseXY, DistanceToClick)) % BandsAmount;
+        
+    CurrentSaturateColour.r = MapOfRGBSaturates[Current_iRGB][2];
+    CurrentSaturateColour.g = MapOfRGBSaturates[Current_iRGB][1];
+    CurrentSaturateColour.b = MapOfRGBSaturates[Current_iRGB][0];
+    
+    UpdateBubblePosition();
+
+    return CurrentSaturateColour;
+}
+
+
+Vector3 ColourDial::GetSquareInDialOffsets()
+{
+    //Essentially, from the centre off the RGB Dial, how much do we offset XY to get a corner coordinate that touches the circle of the inner dial.
+    //Think of it as drawing a triangle from the centre of the dial with InnerRadius as the hypo: the straight sides are then the length of half the square
+    //It's really just about fitting a square into a circle and approaching said square by turning it into triangles
+    //Somewhere out there, my Maths teacher must be chuffed I'm finally applying geometry 
+    
+    //Placeholder Vec3 to overwrite with actual values
+    Vector3 Offsets = {0, 0, 0};
+
+    //We have C in A^2*B^2 = C^2, but we need A or B (they are equivalent)
+    double AnchorPointOffset = sqrt(0.5 * pow(DialInnerRadius, 2));
+    
+    //The length of the square is twice the straight side of the triangle drawn within the dial
+    Offsets.z = 2 * AnchorPointOffset;  
+
+    //The offset from the centre of the square to the topleft corner touching the inner dial
+    Offsets.x = DialOriginXY.x - AnchorPointOffset;
+    Offsets.y = DialOriginXY.y - AnchorPointOffset;
+
+    return Offsets;
 }
 
 
@@ -26,9 +75,36 @@ void ColourDial::Update(int SetOriginX, int SetOriginY, int SetOuterRadius)
     DialBandThickness = (DialOuterRadius - DialInnerRadius) * 0.05; //5% of the Dial's thickness is a wild guess, might update later
 
     UpdateBubblePosition();
-
     MapOFDialPositions = CalculateDialPositions();  
 }
+
+
+void ColourDial::DrawRGBDial(Color& BackgroundColour)
+{
+    //Draw a colour dial based on the data calculated in the MapOfDialPositions
+
+    Color BaseColour {BLACK}; //Placeholder colour to update and draw to screen
+
+    //Draw the circular spectrum
+    for(int LineSegment {0}; LineSegment < BandsAmount; ++LineSegment)
+    {
+        BaseColour.r = MapOfRGBSaturates[LineSegment][2];
+        BaseColour.g = MapOfRGBSaturates[LineSegment][1];
+        BaseColour.b = MapOfRGBSaturates[LineSegment][0];
+
+        DrawLineEx
+        (
+            {MapOFDialPositions[LineSegment][0], MapOFDialPositions[LineSegment][2]}, 
+            {MapOFDialPositions[LineSegment][1], MapOFDialPositions[LineSegment][3]}, 
+            DialBandThickness, BaseColour
+        );
+    }
+
+    //Draw the colour preview bubble
+    DrawCircle(BubbleOriginXY.x, BubbleOriginXY.y, (DialOuterRadius - DialInnerRadius)/2, BackgroundColour);
+    DrawCircle(BubbleOriginXY.x, BubbleOriginXY.y, BubbleRadius * 0.8 , CurrentSaturateColour); //The colour preview is 80% of the bubble, the rest is outline
+}
+
 
 
 std::map<int, std::vector<int>> ColourDial::GenerateRGBTuples()
@@ -82,55 +158,6 @@ std::map<int, std::vector<float>> ColourDial::CalculateDialPositions()
 }
 
 
-void ColourDial::DrawRGBDial(Color& BackgroundColour)
-{
-    //Draw a colour dial based on the data calculated in the MapOfDialPositions
-
-    Color BaseColour {0, 0, 0, 255}; //Placeholder colour to update and draw to screen]
-
-    //Draw the circular spectrum
-    for(int LineSegment {0}; LineSegment < BandsAmount; ++LineSegment)
-    {
-        BaseColour.r = MapOfRGBSaturates[LineSegment][2];
-        BaseColour.g = MapOfRGBSaturates[LineSegment][1];
-        BaseColour.b = MapOfRGBSaturates[LineSegment][0];
-
-        DrawLineEx
-        (
-            {MapOFDialPositions[LineSegment][0], MapOFDialPositions[LineSegment][2]}, 
-            {MapOFDialPositions[LineSegment][1], MapOFDialPositions[LineSegment][3]}, 
-            DialBandThickness, BaseColour
-        );
-    }
-
-    //Draw the colour preview bubble
-    DrawCircle(BubbleOriginXY.x, BubbleOriginXY.y, (DialOuterRadius - DialInnerRadius)/2, BackgroundColour);
-    DrawCircle(BubbleOriginXY.x, BubbleOriginXY.y, BubbleRadius * 0.8 , CurrentSaturateColour);
-}
-
-
-Color ColourDial::GetSaturateColour(Vector2 MouseXY)
-{
-    //Set a base saturate colour if the dial is clicked, from which a shade and tint can be generated
-
-    //Using good ol' pythagoras we can calculate the distance from the centre of the dial to the mouseclick
-    float DistanceToClick = sqrt(pow(MouseXY.x - DialOriginXY.x, 2) + pow(MouseXY.y - DialOriginXY.y, 2));
-
-    //Using the remainder of GetRGBColour because the Map is created left-to-right, but the dial is created as a unit circle
-    //which increments to 2 PI in a counter-clockwise (right-to-left) fashion
-    //Using GetRGBColour directly would have colours and the bubble flipped along the Y-axis 
-    Current_iRGB = (BandsAmount - GetRGBColour(MouseXY, DistanceToClick)) % BandsAmount;
-        
-    CurrentSaturateColour.r = MapOfRGBSaturates[Current_iRGB][2];
-    CurrentSaturateColour.g = MapOfRGBSaturates[Current_iRGB][1];
-    CurrentSaturateColour.b = MapOfRGBSaturates[Current_iRGB][0];
-    
-    UpdateBubblePosition();
-
-    return CurrentSaturateColour;
-}
-
-
 int ColourDial::GetRGBColour(Vector2 MouseXY, float DistanceToClick)
 {
     //Get the precise RGB colour value when the colour dial is clicked
@@ -150,23 +177,6 @@ int ColourDial::GetRGBColour(Vector2 MouseXY, float DistanceToClick)
         i_RGBSaturatesMap = int((((PI - acos((MouseXY.x - DialOriginXY.x) / DistanceToClick)) + PI) / (2 * PI)) * BandsAmount);
     }
     return i_RGBSaturatesMap;
-}
-
-
-Vector3 ColourDial::GetSquareInDialOffsets()
-{
-    //Essentially, from the centre off the RGB Dial, how much do we offset XY
-    //To get a corner coordinate that touches the circle of the inner dial.
-    //Think of it as drawing a triangle from the centre of the dial with InnerRadius as the hypo
-    //the straight sides are then the length of half the square
-    
-    Vector3 Offsets = {};
-    double AnchorPointOffset = sqrt(0.5 * pow(DialInnerRadius, 2));
-    Offsets.z = 2 * AnchorPointOffset;  
-    Offsets.x = DialOriginXY.x - AnchorPointOffset;
-    Offsets.y = DialOriginXY.y - AnchorPointOffset;
-
-    return Offsets;
 }
 
 

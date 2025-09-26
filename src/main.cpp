@@ -10,8 +10,9 @@ int main(int argc, char* argv[])
     //The path of the running executable
     char* BinPath {argv[0]};
     
-    InitWindow(100, 100, "Clarity Colour Tool"); //Starting with a small window and updating the minimum size at runtime
-    SetTargetFPS(60); //Perhaps not super relevant
+    //Starting with a small window and updating the minimum size at runtime
+    InitWindow(100, 100, "Clarity Colour Tool"); 
+    SetTargetFPS(60);
 
     ToolContainer ToolInstance = ToolContainer(BinPath);
     

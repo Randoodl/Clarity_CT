@@ -8,4 +8,3 @@ ElementPosition::ElementPosition(int SetAnchorX, int SetAnchorY, int SetLenX, in
     LenX = SetLenX;
     LenY = SetLenY;
 }
-

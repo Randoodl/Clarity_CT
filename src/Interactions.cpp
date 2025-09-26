@@ -1,18 +1,16 @@
 #include "../include/Interactions.h"
 
 
-ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& PassedColourFamily, std::vector<Palette*>& PassedPalettes, std::map<Palette*, std::vector<Color*>>& PassedPaletteActions) : 
-                                         R_FrameState(PassedFrameState), R_ColourFamily(PassedColourFamily), R_AllPalettes(PassedPalettes), R_PaletteActions(PassedPaletteActions)
+ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& PassedColourFamily, std::map<Palette*, std::vector<Color*>>& PassedPaletteActions) : 
+                                         R_FrameState(PassedFrameState), R_ColourFamily(PassedColourFamily), R_PaletteActions(PassedPaletteActions)
 {
     PassedMouseXY = {0, 0};
     ResetFrames = false;
 }
 
+
 void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, bool& HexModeEnabled, char*& PassedBinPath)
 {
-    //This is going to be a fun one, because both the Lock and Reset functions
-    //need to be accessible irrespective of the FrameIsMutable state
-
     if(!R_FrameState)
     {
         if(CheckCollisionPointRec(PassedMouseXY, Tools.SaveButton))
@@ -127,7 +125,7 @@ void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RG
         DialOffsets = RGBDial.GetSquareInDialOffsets();
         RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z);
 
-        //Preserve the realtive locations between the ShadeSquare and ShadeViewBox
+        //Preserve the relative locations between the ShadeSquare and ShadeViewBox
         RGBSquare.CurrentShadeMouseLocation.x = RGBSquareFrame.FrameArea.x + float(RGBSquareFrame.FrameArea.width * RelativeDistanceX);
         RGBSquare.CurrentShadeMouseLocation.y = RGBSquareFrame.FrameArea.y + float(RGBSquareFrame.FrameArea.height * RelativeDistanceY);
         RGBSquare.Update(RGBSquareFrame.FrameArea);
@@ -140,7 +138,7 @@ void ElementInteractions::InteractWithPalette(Frames& PaletteFrame, Palette& Pal
     if(!R_FrameState)
     {
         Color ChosenColour = PaletteColours.GetVariationColour(PassedMouseXY);
-        if(ChosenColour.a != 0) //Don't update if the alpha value is zero, which only happens if MouseXY is outside of the coloured Palette rects
+        if(ChosenColour.a != RGBValMin) //Don't update if the alpha value is zero, which only happens if MouseXY is outside of the coloured Palette rects
         {
             R_ColourFamily.CurrentSelectedColour = ChosenColour;
         } 
@@ -150,26 +148,6 @@ void ElementInteractions::InteractWithPalette(Frames& PaletteFrame, Palette& Pal
         PaletteFrame.AdjustFrame(PassedMouseXY);
         PaletteColours.Update(PaletteFrame.FrameArea, PaletteColours.VariationAmount, PaletteColours.VariationDelta);
         PaletteColours.GeneratePaletteRectangles();
-    }
-}
-
-
-void ElementInteractions::UpdatePaletteColours(std::map<Palette*, std::vector<Color*>>& PassedPaletteActions)
-{
-    //This method simplifies the updating of Palette colours when RGBDial or ShadeSquare is interacted with
-
-    for(auto const& [PaletteKey, ColourVector] : PassedPaletteActions)
-    {
-        //Go through all entries of the Palette-ColourVector map
-        
-        if(ColourVector.size() == 2) //These are colour previews
-        {
-            PaletteKey->SetHueShadePair(*ColourVector[0], *ColourVector[1]);
-        }
-        else //These are ShadesTints
-        {
-            PaletteKey->GenerateShadesTints(*ColourVector[0]);
-        }
     }
 }
 
@@ -189,7 +167,7 @@ void ElementInteractions::InteractWithFloodFilledFrame(Frames& FloodedFrame, Col
 
 void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFrames, bool PassedDarkMode, bool PassedHexMode, char*& PassedBinPath)
 {
-    //Export the current Frames x, y, height and width to a local .conf file
+    //Export the current Frames [x, y, width, height] , DarkMode and CodeMode to a local .conf file
 
     //Get the parent directory of the Clarity_CT executable
     std::filesystem::path ExportPath {PassedBinPath};
@@ -224,8 +202,9 @@ void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFra
 
 void ElementInteractions::GetRGBValuesToClipboard(int ValueR, int ValueG, int ValueB, bool& PassedCodeMode)
 {
-    //Copy the RGB values to the clipboard, either as a (R,G,B) tuple or hexcode
+    //Copy the RGB values to the clipboard, either as a decimal or hexedecimal values, based on CodeMode
 
+    //Build the string to copy to the clipboard in here
     std::string CopyString;
 
     if(PassedCodeMode)
@@ -251,3 +230,29 @@ void ElementInteractions::GetRGBValuesToClipboard(int ValueR, int ValueG, int Va
     }
     SetClipboardText(CopyString.c_str());
 }
+
+
+void ElementInteractions::UpdatePaletteColours(std::map<Palette*, std::vector<Color*>>& PassedPaletteActions)
+{
+    //This method simplifies the updating of Palette colours when RGBDial or ShadeSquare is interacted with
+
+    for(auto const& [PaletteKey, ColourVector] : PassedPaletteActions)
+    {
+        //Go through all entries of the Palette-ColourVector map
+        
+        if(ColourVector.size() == 2) //These are colour previews
+        {
+            PaletteKey->SetHueShadePair(*ColourVector[0], *ColourVector[1]);
+        }
+        else //These are ShadesTints
+        {
+            PaletteKey->GenerateShadesTints(*ColourVector[0]);
+        }
+    }
+}
+
+
+
+
+
+

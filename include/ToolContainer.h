@@ -5,6 +5,7 @@
 #include "./Interactions.h"
 #include "./Defaults.h"
 
+
 class ToolContainer
 {
     //This class is meant to hold all of the program's "moving parts"
@@ -12,43 +13,53 @@ class ToolContainer
     
     public:
         ToolContainer(char*& PassedBinPath);
-        Defaults Layout;
-        Defaults BackupLayout; //This is what the Elements fall back to if reading the .conf fails
-
-        bool DarkModeEnabled;
-        bool HexModeEnabled;
-        bool FrameIsMutable;  //This toggles whether or not you can move/scale frames
 
         void DrawElements();
         void MouseClickHandler();
 
-        void InitialiseAllElements();
-        
-        //The collection of relevant colours
+        //The collection of UI colours
         ColourFamily ColourCollection;
 
-    private:  
-        void SetElementInteraction(Vector2 MouseXY);
-        void SetAllInterActionsToFalse();
+    private:
 
-        void DecideElementInteraction(int ActiveElementFrame);
-
+        //UI related attributes and methods 
+        char* BinPath;
+        bool FrameIsMutable;  
+        bool DarkModeEnabled;
+        bool HexModeEnabled;
+        void InitialiseAllElements();
         void SnapFrames();
         void UpdateWindowMinimumSize();
         void SetUIColours(bool DarkModeEnabled);
+        
+        //Two copies of the layout struct, one to overwrite with values from a possible .conf, one to keep as a backup if all else fails
+        Defaults Layout;
+        const Defaults BackupLayout; 
 
-        void InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, ElementPosition& SetLayout);
-        void InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, ElementPosition& SetLayout);
-
-        char* BinPath;
+        //Custom layout methods
         void LoadCustomConfig(char*& PassedBinPath);
-
         void DefaultFallback();
-  
-        //Interactions of elements with the Mouse
-        ElementInteractions Interactions = ElementInteractions(FrameIsMutable, ColourCollection, AllPalettes, PaletteActions);
 
-        //Previews of colours
+        //Interactions of elements with the Mouse
+        ElementInteractions Interactions = ElementInteractions(FrameIsMutable, ColourCollection, PaletteActions);
+        void SetElementInteraction(Vector2 MouseXY);
+        void SetAllInterActionsToFalse();
+        void DecideElementInteraction(int ActiveElementFrame);
+
+        //Toolbar - button based functionality
+        Frames ToolBarFrame;
+        ToolBar Tools;
+
+        //RGBSquare - adjust the shade/tint of a selected hue
+        Frames RGBSquareFrame;
+        Vector3 DialOffsets;
+        ShadeSquare RGBSquare;
+
+        //RGBDial - select a hue
+        Frames RGBDialFrame;
+        ColourDial RGBDial; 
+
+        //Single colour frames - shows related colours and their shade/tint
         Frames BaseHueFrame;
         Palette Hue;
         Frames ComplementFrame;
@@ -57,19 +68,9 @@ class ToolContainer
         Palette LowerTriad;
         Frames UpperTriadFrame;
         Palette UpperTriad;
+        void InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, ElementPosition& SetLayout);
 
-        Frames CurrentSelectedColourFrame;
-
-        //Colour picker
-        Frames RGBDialFrame;
-        ColourDial RGBDial; 
-
-        //The Shade square within the RGBDial
-        Vector3 DialOffsets;
-        Frames RGBSquareFrame;
-        ShadeSquare RGBSquare;
-
-        //Shades and tints
+        //ShadesTints - generate a whole spectrum of shades and tints, centered on the current colour shade/tint
         int SetVariationAmount;
         int SetVariationDelta;
 
@@ -81,17 +82,15 @@ class ToolContainer
         Palette LowerTriadShadesTints;
         Frames UpperTriadShadesTintsFrame;
         Palette UpperTriadShadesTints;
-        
-        //A vector of pointers to all frames so we can for-loop through 'em
+        void InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, ElementPosition& SetLayout);
+
+        //CurrentSelectedColour - show currently narrowed-down colour and retrieve RGB/Hex value f
+        Frames CurrentSelectedColourFrame;
+ 
+        //Collections of objects for for loop functionality
         std::vector<Frames*> ElementFrames;
         std::vector<Frames*> HiddenFrames;
         std::vector<ElementPosition*> LayoutPositions;
-
-        //A vector of all Palettes and Map of Palettes for specific interactions
         std::vector<Palette*> AllPalettes;
         std::map<Palette*, std::vector<Color*>> PaletteActions;
-
-        //Toolbar
-        Frames ToolBarFrame;
-        ToolBar Tools;
 };

@@ -2,6 +2,7 @@
 
 #include <string>
 
+
 struct IconString
 {
     //Hard coded strings of length 256 to translate into an icon texture

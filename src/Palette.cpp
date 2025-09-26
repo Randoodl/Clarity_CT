@@ -3,11 +3,30 @@
 
 Palette::Palette()
 {
+    //public
     BasePaletteColour = {0, 0, 0, 255};
+    VariationAmount = 0; 
+    VariationDelta = 0;
+
+    //private
     PaletteRectangles = {};
     PaletteColours = {};
     PaletteArea = {0, 0, 0, 0};
-    VariationAmount = 0; 
+}
+
+
+Color Palette::GetVariationColour(Vector2 MouseXY)
+{
+    //Return the RGB values from a clicked-on Palette square
+    for(int Variation {0}; Variation < int(PaletteColours.size()); ++Variation)
+    {
+        if(CheckCollisionPointRec(MouseXY, PaletteRectangles[Variation]))
+        {
+            return PaletteColours[Variation];
+        }
+    }
+    //Alpha value 0 for sentinel purposes
+    return {0, 0, 0, 0}; 
 }
 
 
@@ -16,6 +35,20 @@ void::Palette::Update(Rectangle SetPaletteArea, int SetVariationAmount, int SetV
     PaletteArea = SetPaletteArea;
     VariationAmount = SetVariationAmount;
     VariationDelta = SetVariationDelta;
+}
+
+
+void Palette::SetHueShadePair(Color Hue, Color Shade)
+{
+    //Generates a small two-colour palette to display a Hue and its Shade/Tint
+
+    //Reset vector
+    PaletteColours.clear();
+    PaletteColours.reserve(2);
+
+    //This should be one call maybe
+    PaletteColours.emplace_back(Hue);
+    PaletteColours.emplace_back(Shade);  
 }
 
 
@@ -114,19 +147,6 @@ void Palette::GenerateShadesTints(Color SeedColour)
 }
 
 
-void Palette::SetHueShadePair(Color Hue, Color Shade)
-{
-    //Generates a small tw-colour palette to display a Hue and its Shade/Tint
-
-    //Reset vector
-    PaletteColours.clear();
-    PaletteColours.reserve(2);
-
-    //This should be one call
-    PaletteColours.emplace_back(Hue);
-    PaletteColours.emplace_back(Shade);  
-}
-
 void Palette::GeneratePaletteRectangles()
 {
     //Divide the total Palette area into smaller rectangles that each represent one colour
@@ -180,18 +200,4 @@ void Palette::DrawPalette()
         Rectangle GetRectangle = PaletteRectangles[Variation];
         DrawRectangle(GetRectangle.x, GetRectangle.y, GetRectangle.width, GetRectangle.height, PaletteColours[Variation]);
     }
-}
-
-
-Color Palette::GetVariationColour(Vector2 MouseXY)
-{
-    //Return the RGB values from a clicked-on Palette square
-    for(int Variation {0}; Variation < int(PaletteColours.size()); ++Variation)
-    {
-        if(CheckCollisionPointRec(MouseXY, PaletteRectangles[Variation]))
-        {
-            return PaletteColours[Variation];
-        }
-    }
-    return {0, 0, 0, 0}; //Alpha value 0 for sentinel purposes
 }

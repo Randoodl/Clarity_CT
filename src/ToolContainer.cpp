@@ -1,5 +1,6 @@
 #include "../include/ToolContainer.h"
 
+
 ToolContainer::ToolContainer(char*& PassedBinPath)
 {  
     //Grab executable path
@@ -12,6 +13,14 @@ ToolContainer::ToolContainer(char*& PassedBinPath)
     FrameIsMutable = false;
     Interactions.R_FrameState = FrameIsMutable;
 
+    //Set UI options (might be overwritten by loading the .conf)
+    DarkModeEnabled = true;
+    HexModeEnabled = true;
+
+    //Set aside all the memory addresses of the Frames object etc. to refer to throughout the program
+    //    NOTE: MouseClickHandler interacts with the first Frame it can find in ElementFrames, this means: 
+    //    -ToolBar has to come first as to always be accessible
+    //    -RGBSquareFrame has to come before RGBDial, otherwise clicks within RGBSquareFrame interact with RGBDial instead
     ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &LowerTriadFrame, &UpperTriadFrame,
                       &MainShadesTintsFrame, &ComplementShadesTintsFrame, &LowerTriadShadesTintsFrame, &UpperTriadShadesTintsFrame, &CurrentSelectedColourFrame};
     HiddenFrames   = {&RGBSquareFrame};
@@ -30,10 +39,6 @@ ToolContainer::ToolContainer(char*& PassedBinPath)
                         {&LowerTriadShadesTints, {&ColourCollection.LowerTriadShade}},
                         {&UpperTriadShadesTints, {&ColourCollection.UpperTriadShade}}
                      };
-
-    //UI options
-    DarkModeEnabled = true;
-    HexModeEnabled = true;
     
     //Try and load in the config file
     //If it doesn't exist/is inccessible, it falls back on the values given in Defaults.h
@@ -46,19 +51,23 @@ ToolContainer::ToolContainer(char*& PassedBinPath)
 
 void ToolContainer::DrawElements()
 {
-    //Simply combining all drawing calls
+    //Simply combining all drawing calls, the order of which determines visibility on screen
+
+    //Draw the single instance elements, ShadeSquare after Dial so the ShadePreviewSquare doesn't hide behind the Dial
     RGBDial.DrawRGBDial(ColourCollection.BackgroundColour);
     RGBSquare.DrawShadeSquare();
     CurrentSelectedColourFrame.DrawSingleColour(ColourCollection.CurrentSelectedColour);
     
+    //Draw all Palettes
     for(Palette* EachPalette : AllPalettes)
     {
         EachPalette->DrawPalette();
     }
 
+    //Toolbar has to be the last draw call, it has to ALWAYS be visible
+    Tools.DrawToolBar(ColourCollection.ToolBackgroundColour, ColourCollection.ToolButtonColour, ColourCollection.ToolIconColour);  
 
-    Tools.DrawToolBar(ColourCollection.ToolBackgroundColour, ColourCollection.ToolButtonColour, ColourCollection.ToolIconColour);  //This has to be the last draw call, it has to ALWAYS be accessible
-
+    //Draw the FrameBoxes around elements when unlocked
     if(FrameIsMutable)
     {
         for(Frames* ShowFrame : ElementFrames)
@@ -73,40 +82,28 @@ void ToolContainer::DrawElements()
 }
 
 
-void ToolContainer::SnapFrames()
-{
-    //Size all frames down to snugly wrap the element they contain after frame mutability is toggled
-
-    //Snap Frame to ToolBar
-    ToolBarFrame.Update(ToolBarFrame.FrameArea.x, ToolBarFrame.FrameArea.y, Tools.ButtonContainer.width, Tools.ButtonContainer.height);
-
-    //Snap Frame to RGBDial
-    RGBDialFrame.Update(RGBDial.DialOriginXY.x - RGBDial.DialOuterRadius, RGBDial.DialOriginXY.y - RGBDial.DialOuterRadius, 
-                        RGBDial.DialOuterRadius * 2, RGBDial.DialOuterRadius * 2);
-    UpdateWindowMinimumSize();
-}
-
-
 void ToolContainer::MouseClickHandler()
 {
+    //Determine what to interact with once the mouse is clicked
+
     Vector2 MouseXY = GetMousePosition();
 
-    //Each frame checks if a mouse button is pressed, on the frame that it does, it might set an interactible bool to true
-    //While the mouse is held down, this IsMousePressed evaluates to false, but the interactible bool remains true until the mouse button is released
+    //When the mouse is clicked, each Frames object is checked to see if the MouseXY falls within its area
+    //If this is a case, the ActiveFrame bool is set to true for this Frame
+    //While the mouse is held down, this IsMousePressed evaluates to false, but the ActiveFrame bool remains true until the mouse button is released
+    //Only one Element can be true at a time, since SetElementInteraction exits as soon as a Frames' ActiveFrame is set to true
     if(IsMouseButtonPressed(0))
     {
         SetElementInteraction(MouseXY);
     }
     
-    //As soon as a frame passes wherein the mouse button is released, all interactible bools are set to false
+    //As soon as a frame passes wherein the mouse button is released, all ActiveFrame bools are set to false
     if(IsMouseButtonReleased(0))
     {
         SetAllInterActionsToFalse();
     }
-    //I believe only one Element can be true at a time, unless elements are stacked on top of each other and multiple point-rec checks evaluate to true
-    //Since IsMousePressed should only evaluate true for one frame
-
-    //This keeps looping every frame, but essentially snags the first and ONLY true active frame
+    
+    //This keeps looping every Frame until it hits the first and ONLY active Frame
     for(int IndexOfFrame {0}; IndexOfFrame < int(ElementFrames.size()); ++IndexOfFrame)
     {
         if(ElementFrames[IndexOfFrame]->ActiveFrame)
@@ -117,140 +114,6 @@ void ToolContainer::MouseClickHandler()
             break;
         }
     }
-}
-
-
-void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
-{
-    switch(ActiveElementFrame)
-    {
-        case 0: 
-            Interactions.InteractWithToolBar(ElementFrames, Tools, DarkModeEnabled, HexModeEnabled, BinPath); 
-            
-            if(Interactions.ResetFrames)
-            {
-                DefaultFallback();
-                Interactions.ResetFrames = false; 
-            }
-
-            //This does get called every time a button is pressed, not terrible but not great?
-            if(!FrameIsMutable){SnapFrames();} 
-            SetUIColours(DarkModeEnabled);
-
-            break;
-
-        case 1:  Interactions.InteractWithShadeSquare(RGBSquareFrame, RGBSquare); break;
-        case 2:  Interactions.InteractwithRGBDial(RGBSquareFrame, RGBDialFrame, RGBSquare, RGBDial, DialOffsets); break;
-        case 3:  Interactions.InteractWithPalette(BaseHueFrame, Hue); break;
-        case 4:  Interactions.InteractWithPalette(ComplementFrame, Complement); break;
-        case 5:  Interactions.InteractWithPalette(LowerTriadFrame, LowerTriad); break;
-        case 6:  Interactions.InteractWithPalette(UpperTriadFrame, UpperTriad); break;
-        case 7:  Interactions.InteractWithPalette(MainShadesTintsFrame, MainShadesTints); break;
-        case 8:  Interactions.InteractWithPalette(ComplementShadesTintsFrame, ComplementShadesTints); break;
-        case 9:  Interactions.InteractWithPalette(LowerTriadShadesTintsFrame, LowerTriadShadesTints); break;
-        case 10: Interactions.InteractWithPalette(UpperTriadShadesTintsFrame, UpperTriadShadesTints); break;
-        case 11: Interactions.InteractWithFloodFilledFrame(CurrentSelectedColourFrame, ColourCollection.CurrentSelectedColour, HexModeEnabled); break;
-        
-        default: break;
-    }
-}
-
-
-void ToolContainer::SetElementInteraction(Vector2 MouseXY)
-{
-    //Cycle through each element currently loaded and compare its Frame area to the CLICKED cursor, sets the Frame of the clicked element to true
-
-    for(Frames* Frame: ElementFrames)
-    {
-        if(CheckCollisionPointRec(MouseXY, Frame->FrameArea))
-        {
-            Frame->ActiveFrame = true;
-
-            Frame->MouseOffsetX = Frame->FrameArea.x - MouseXY.x;
-            Frame->MouseOffsetY = Frame->FrameArea.y - MouseXY.y;
-
-            if(FrameIsMutable) //Perhaps we're supposed to interact with the frame and not the element itself
-            {
-                if(CheckCollisionPointRec(MouseXY, Frame->MoveButton))
-                {
-                    Frame->IsDragging = true;
-                }
-                if(CheckCollisionPointRec(MouseXY, Frame->ScaleButton))
-                {
-                    Frame->IsScaling = true;
-                }
-            }
-            break;
-        }
-    }
-}
-
-
-void ToolContainer::SetAllInterActionsToFalse()
-{
-    //Reset all frame interactions as soon as a mouse-up is detected
-    for(Frames* Frame: ElementFrames)
-    {
-        Frame->ActiveFrame = false;
-        Frame->IsDragging = false;
-        Frame->IsScaling = false;
-        Frame->MouseOffsetX = 0;        
-        Frame->MouseOffsetY = 0;        
-    }
-}
-
-
-void ToolContainer::UpdateWindowMinimumSize()
-{
-    //Make sure the window can't size down to exclude parts of, or entire Frames
-    int MinWidth {0};
-    int MinHeight  {0};
-
-    //Keep trawling through Frames' bottomright points and retain the largest coordinate point
-    for(Frames* Frame : ElementFrames)
-    {
-        if((Frame->FrameArea.x + Frame->FrameArea.width) > MinWidth)
-        {
-            MinWidth = (Frame->FrameArea.x + Frame->FrameArea.width);
-        }
-        if((Frame->FrameArea.y + Frame->FrameArea.height) > MinHeight)
-        {
-            MinHeight = (Frame->FrameArea.y + Frame->FrameArea.height);
-        }
-    }
-
-    //Then set the max coordinate point as the min window size
-    SetWindowMinSize(MinWidth, MinHeight);
-}
-
-
-void ToolContainer::InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, ElementPosition& SetLayout)
-{
-    //Method to combine all colour preview Frame initialisation
-
-    //Set the Frame
-    PreviewFrame.Update(SetLayout.AnchorX, SetLayout.AnchorY, SetLayout.LenX, SetLayout.LenY);
-
-    //Set the Palette contained within the Frame
-    PreviewPalette.Update(PreviewFrame.FrameArea, 0, 0); //Not using the Variation properties here, so those are set to 0
-    PreviewPalette.SetHueShadePair(Base, Shade);
-    PreviewPalette.GeneratePaletteRectangles();
-}
-
-
-void ToolContainer::InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, ElementPosition& SetLayout)
-{
-    //Method to combine all ShadesTints Frames intialisation
-
-    //Set the Frame
-    ViewFrame.Update(SetLayout.AnchorX, SetLayout.AnchorY, SetLayout.LenX, SetLayout.LenY);
-
-    //Set Frame subdivide parameters
-    ViewPalette.Update(ViewFrame.FrameArea, VariationAmount, VariationDelta);
-
-    //Generate Palette colours and subdivide into rectangles
-    ViewPalette.GenerateShadesTints(PassColour);
-    ViewPalette.GeneratePaletteRectangles();
 }
 
 
@@ -292,9 +155,73 @@ void ToolContainer::InitialiseAllElements()
     InitialiseShadesTints(ComplementShadesTints, ComplementShadesTintsFrame, ColourCollection.ShadedComplementColour, SetVariationAmount, SetVariationDelta, Layout.COMPST);
 
     //NOTE: I swapped out .LowerTriadColour and .UpperTriadColour for their respective shades here in order to fix a minor visual bug
-    //      when resetting the layout, however, it might be I used the base colours for good reason, so keep an eye on this
+    //      when resetting the layout. However, it might be I used the base colours for good reason, so keep an eye on this
     InitialiseShadesTints(LowerTriadShadesTints, LowerTriadShadesTintsFrame, ColourCollection.LowerTriadShade, SetVariationAmount, SetVariationDelta, Layout.LTRIST);
     InitialiseShadesTints(UpperTriadShadesTints, UpperTriadShadesTintsFrame, ColourCollection.UpperTriadShade, SetVariationAmount, SetVariationDelta, Layout.UTRIST);
+}
+
+
+void ToolContainer::SnapFrames()
+{
+    //Size Frames down to the few elements that have a set relative dimension (i.e. RGBDial cannot be "squished down", but always has to be square)
+
+    //Snap Frame to ToolBar
+    ToolBarFrame.Update(ToolBarFrame.FrameArea.x, ToolBarFrame.FrameArea.y, Tools.ButtonContainer.width, Tools.ButtonContainer.height);
+
+    //Snap Frame to RGBDial
+    RGBDialFrame.Update(RGBDial.DialOriginXY.x - RGBDial.DialOuterRadius, RGBDial.DialOriginXY.y - RGBDial.DialOuterRadius, 
+                        RGBDial.DialOuterRadius * 2, RGBDial.DialOuterRadius * 2);
+    UpdateWindowMinimumSize();
+}
+
+
+void ToolContainer::UpdateWindowMinimumSize()
+{
+    //Make sure the window can't size down to exclude parts of, or entire, Frames
+    //NOTE: this will only size-up the window, not size-down
+
+    //Minumum values to update as each Frames object is considered
+    int MinWidth {0};
+    int MinHeight  {0};
+
+    //Keep trawling through Frames' bottomright points and retain the largest coordinate point
+    for(Frames* Frame : ElementFrames)
+    {
+        if((Frame->FrameArea.x + Frame->FrameArea.width) > MinWidth)
+        {
+            MinWidth = (Frame->FrameArea.x + Frame->FrameArea.width);
+        }
+        if((Frame->FrameArea.y + Frame->FrameArea.height) > MinHeight)
+        {
+            MinHeight = (Frame->FrameArea.y + Frame->FrameArea.height);
+        }
+    }
+    //Then set the max coordinate point as the min window size
+    SetWindowMinSize(MinWidth, MinHeight);
+}
+
+
+void ToolContainer::SetUIColours(bool DarkModeEnabled)
+{
+    //Hard coded colour values for the UI
+    //Maybe in the future this can also be chucked in the .conf
+
+    if(DarkModeEnabled)
+    {
+        ColourCollection.BackgroundColour = (Color){31, 31, 40, 255};
+        ColourCollection.ToolBackgroundColour = (Color){55, 55, 64, 255};
+        ColourCollection.ToolButtonColour = (Color){65, 65, 74, 255};
+        ColourCollection.ToolIconColour = WHITE;
+        ColourCollection.FrameBoxColour = (Color){244, 244, 244, 255};
+    }
+    else //...why would you ever WANT light mode....?
+    {
+        ColourCollection.BackgroundColour = (Color){255, 245, 245, 255};
+        ColourCollection.ToolBackgroundColour = (Color){214, 208, 208, 255};
+        ColourCollection.ToolButtonColour = (Color){255, 245, 245, 255};
+        ColourCollection.ToolIconColour = BLACK;
+        ColourCollection.FrameBoxColour = (Color){72, 72, 72, 255};
+    }
 }
 
 
@@ -389,24 +316,116 @@ void ToolContainer::DefaultFallback()
 }
 
 
-void ToolContainer::SetUIColours(bool DarkModeEnabled)
+void ToolContainer::SetElementInteraction(Vector2 MouseXY)
 {
-    //Hard coded colour values for the UI
+    //Cycle through each element currently loaded and compare its Frame area to the CLICKED cursor, sets the Frame of the clicked element to true
 
-    if(DarkModeEnabled)
+    for(Frames* Frame: ElementFrames)
     {
-        ColourCollection.BackgroundColour = (Color){31, 31, 40, 255};
-        ColourCollection.ToolBackgroundColour = (Color){55, 55, 64, 255};
-        ColourCollection.ToolButtonColour = (Color){65, 65, 74, 255};
-        ColourCollection.ToolIconColour = WHITE;
-        ColourCollection.FrameBoxColour = (Color){244, 244, 244, 255};
+        if(CheckCollisionPointRec(MouseXY, Frame->FrameArea))
+        {
+            Frame->ActiveFrame = true;
+
+            Frame->MouseOffsetX = Frame->FrameArea.x - MouseXY.x;
+            Frame->MouseOffsetY = Frame->FrameArea.y - MouseXY.y;
+
+            //Perhaps we're supposed to interact with the Frame and not the element itself
+            if(FrameIsMutable) 
+            {
+                if(CheckCollisionPointRec(MouseXY, Frame->MoveButton))
+                {
+                    Frame->IsDragging = true;
+                }
+                if(CheckCollisionPointRec(MouseXY, Frame->ScaleButton))
+                {
+                    Frame->IsScaling = true;
+                }
+            }
+            break;
+        }
     }
-    else //...why would you ever WANT light mode....?
+}
+
+
+void ToolContainer::SetAllInterActionsToFalse()
+{
+    //Reset all Frames interactions as soon as a mouse-up is detected
+    for(Frames* Frame: ElementFrames)
     {
-        ColourCollection.BackgroundColour = (Color){255, 245, 245, 255};
-        ColourCollection.ToolBackgroundColour = (Color){214, 208, 208, 255};
-        ColourCollection.ToolButtonColour = (Color){255, 245, 245, 255};
-        ColourCollection.ToolIconColour = BLACK;
-        ColourCollection.FrameBoxColour = (Color){72, 72, 72, 255};
+        Frame->ActiveFrame = false;
+        Frame->IsDragging = false;
+        Frame->IsScaling = false;
+        Frame->MouseOffsetX = 0;        
+        Frame->MouseOffsetY = 0;        
     }
+}
+
+
+void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
+{
+    //Use the index of the Frame in ElementFrames to determine what Frame needs to be interacted with
+    //NOTE: this means the order of Elements in ElementFrames is linked to the order of cases below
+    //      not entirely optimal, but whattayagonnadoboutit, eh?
+
+    switch(ActiveElementFrame)
+    {
+        case 0: 
+            Interactions.InteractWithToolBar(ElementFrames, Tools, DarkModeEnabled, HexModeEnabled, BinPath); 
+            
+            //Reads the ResetFrame state every time the Toolbar is interacted with, kind of eh.......
+            if(Interactions.ResetFrames)
+            {
+                DefaultFallback();
+                Interactions.ResetFrames = false; 
+            }
+
+            //This does get called every time a button is pressed, not terrible but not great?
+            if(!FrameIsMutable){SnapFrames();} 
+            SetUIColours(DarkModeEnabled);
+            break;
+
+        case 1:  Interactions.InteractWithShadeSquare(RGBSquareFrame, RGBSquare); break;
+        case 2:  Interactions.InteractwithRGBDial(RGBSquareFrame, RGBDialFrame, RGBSquare, RGBDial, DialOffsets); break;
+        case 3:  Interactions.InteractWithPalette(BaseHueFrame, Hue); break;
+        case 4:  Interactions.InteractWithPalette(ComplementFrame, Complement); break;
+        case 5:  Interactions.InteractWithPalette(LowerTriadFrame, LowerTriad); break;
+        case 6:  Interactions.InteractWithPalette(UpperTriadFrame, UpperTriad); break;
+        case 7:  Interactions.InteractWithPalette(MainShadesTintsFrame, MainShadesTints); break;
+        case 8:  Interactions.InteractWithPalette(ComplementShadesTintsFrame, ComplementShadesTints); break;
+        case 9:  Interactions.InteractWithPalette(LowerTriadShadesTintsFrame, LowerTriadShadesTints); break;
+        case 10: Interactions.InteractWithPalette(UpperTriadShadesTintsFrame, UpperTriadShadesTints); break;
+        case 11: Interactions.InteractWithFloodFilledFrame(CurrentSelectedColourFrame, ColourCollection.CurrentSelectedColour, HexModeEnabled); break;
+        
+        default: break;
+    }
+}
+
+
+void ToolContainer::InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, ElementPosition& SetLayout)
+{
+    //Method to combine all colour preview Frame initialisation
+
+    //Set the Frame
+    PreviewFrame.Update(SetLayout.AnchorX, SetLayout.AnchorY, SetLayout.LenX, SetLayout.LenY);
+
+    //Set the Palette contained within the Frame
+    PreviewPalette.Update(PreviewFrame.FrameArea, 0, 0); //Not using the Variation properties here, so those are set to 0
+    PreviewPalette.SetHueShadePair(Base, Shade);
+    PreviewPalette.GeneratePaletteRectangles();
+}
+
+
+void ToolContainer::InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, ElementPosition& SetLayout)
+{
+    //Method to combine all ShadesTints Frames intialisation
+
+    //Set the Frame
+    ViewFrame.Update(SetLayout.AnchorX, SetLayout.AnchorY, SetLayout.LenX, SetLayout.LenY);
+
+    //Set Frame subdivide parameters
+    ViewPalette.Update(ViewFrame.FrameArea, VariationAmount, VariationDelta);
+
+    //Generate Palette colours and subdivide into rectangles
+    ViewPalette.GenerateShadesTints(PassColour);
+    ViewPalette.GeneratePaletteRectangles();
 }

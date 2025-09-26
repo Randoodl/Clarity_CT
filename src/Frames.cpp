@@ -3,15 +3,18 @@
 
 Frames::Frames()
 {
+    //public
     FrameArea = {0, 0, 0, 0};
+    EdgeButtonSize = 20;
     MoveButton = {0, 0, 0, 0};
     ScaleButton = {0, 0, 0, 0};
-    EdgeButtonSize = 20;
     ActiveFrame = false;
     IsDragging = false;
     IsScaling = false;
     MouseOffsetX = 0;
     MouseOffsetY = 0;
+    
+    //private
     MainWindow = {0, 0, float(GetScreenWidth()), float(GetScreenHeight())};
 }
 
@@ -55,7 +58,7 @@ void Frames::DrawFrameBox(Color& FrameBoxColour)
 
 void Frames::AdjustFrame(Vector2 MouseXY)
 {
-    //Each cycle while interactible bool is true:
+    //Each cycle while ActiveFrame is true:
     //    Move or Scale frame
     //    Check for out-of-bounds condition
     //      >Snap frame back to Window
@@ -70,17 +73,21 @@ void Frames::AdjustFrame(Vector2 MouseXY)
     {
         Update(MouseXY.x, MouseXY.y, FrameArea.width, FrameArea.height);
 
-        if(!CheckCollisionPointRec({FrameArea.x, FrameArea.y}, MainWindow))  //TopLeft is out of bounds
+        if(!CheckCollisionPointRec({FrameArea.x, FrameArea.y}, MainWindow))  
         {
+            //TopLeft is out of bounds
             Update((MouseXY.x > 0) * MouseXY.x, (MouseXY.y > 0) * MouseXY.y, FrameArea.width, FrameArea.height); //Your dumbest idea yet, but it works
         }
-        if(!CheckCollisionPointRec({FrameArea.x + FrameArea.width, FrameArea.y + FrameArea.height}, MainWindow)) //BottomRight is out of bounds
+        if(!CheckCollisionPointRec({FrameArea.x + FrameArea.width, FrameArea.y + FrameArea.height}, MainWindow)) 
         {
+            //BottomRight is out of bounds
+
             //I take it back, THIS is your dumbest idea yet, but it somehow ALSO works
             //It combines the three possibilities of out-of-bounds (x; y; x&y) into one Update call
             //  IF a point is out of bounds, the left side of the calculation will trigger, calling Update with:   (1 * max position) + (0 * current position)
             //  IF a point is within bounds, the right side of the calculation will trigger, calling Update with:  (0 * max position) + (1 * current position)
             //notice that this calculation is mutually exclusive
+            
             Update(
             (((FrameArea.x + FrameArea.width) > MainWindow.width) * (MainWindow.width - FrameArea.width)) + (((FrameArea.x + FrameArea.width) <= MainWindow.width) * FrameArea.x), 
             (((FrameArea.y + FrameArea.height) > MainWindow.height) * (MainWindow.height - FrameArea.height)) + (((FrameArea.y + FrameArea.height) <= MainWindow.height) * FrameArea.y),  
@@ -92,8 +99,10 @@ void Frames::AdjustFrame(Vector2 MouseXY)
     {
         Update(FrameArea.x, FrameArea.y, FrameArea.width + MouseXYDelta.x, FrameArea.height + MouseXYDelta.y);
 
-        if(!CheckCollisionPointRec({FrameArea.x + FrameArea.width, FrameArea.y + FrameArea.height}, MainWindow)) //BottomRight is out of bounds
+        if(!CheckCollisionPointRec({FrameArea.x + FrameArea.width, FrameArea.y + FrameArea.height}, MainWindow)) 
         {
+            //BottomRight is out of bounds
+
             //Similar logic to the BottomRight bounds correction above, just adapted for the width/height instead of the X/Y anchor coordinate
             Update(FrameArea.x, FrameArea.y, 
             (((FrameArea.x + FrameArea.width) > MainWindow.width) * (MainWindow.width - FrameArea.x) + ((FrameArea.x + FrameArea.width) <= MainWindow.width) * FrameArea.width),
@@ -112,6 +121,6 @@ void Frames::DrawSingleColour(Color FillColour)
 
 int Frames::GetSmallestFrameSide(float SideX, float SideY)
 {
-    //For making sure an element can't scale outside of its Frame
+    //For making sure an element can't scale outside of its Frame, relevant for RGBDial and ToolBar
     return std::min(SideX, SideY);
 }
