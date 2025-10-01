@@ -3,20 +3,24 @@
 
 ToolBar::ToolBar()
 {
+    //public
     ButtonContainer = {0, 0, 0, 0};
     LockButton = {0, 0, 0, 0};
-    ResetButton = {0, 0, 0, 0};
     SaveButton = {0, 0, 0, 0};
+    ResetButton = {0, 0, 0, 0};
     CodeModeButton = {0, 0, 0, 0};
     DarkModeButton = {0, 0, 0, 0};
+
+    //private
     ButtonMargin = 3;
-    Buttons = {&LockButton, &ResetButton, &SaveButton, &CodeModeButton, &DarkModeButton};
-    ButtonAmount = Buttons.size();
-    Icons = {&LockIcon, &ResetIcon, &SaveIcon, &CodeModeIcon, &DarkModeIcon};
-    RawIconStrings = {&AllIconStrings.LockString, &AllIconStrings.ResetString, &AllIconStrings.SaveString, &AllIconStrings.CodeModeString, &AllIconStrings.DarkModeString};
     IconPixelAmount = 256;
     IconPixelDimension = sqrt(IconPixelAmount);
+    Buttons = {&LockButton, &SaveButton, &ResetButton, &CodeModeButton, &DarkModeButton};
+    ButtonAmount = Buttons.size();
+    RawIconStrings = {&AllIconStrings.LockString, &AllIconStrings.SaveString, &AllIconStrings.ResetString, &AllIconStrings.CodeModeString, &AllIconStrings.DarkModeString};
+    Icons = {&LockIcon, &SaveIcon, &ResetIcon, &CodeModeIcon, &DarkModeIcon};
 
+    //This sets all Texture2Ds
     GenerateIconTextures(RawIconStrings, Icons);
 }
 
@@ -27,7 +31,8 @@ void ToolBar::Update(Rectangle& TotalFrameArea)
     ButtonContainer.x = TotalFrameArea.x;
     ButtonContainer.y  = TotalFrameArea.y;
 
-    if(TotalFrameArea.width >= TotalFrameArea.height) //Sort the bar horizontally
+    //Sort the bar horizontally
+    if(TotalFrameArea.width >= TotalFrameArea.height) 
     {
         ButtonContainer.width = TotalFrameArea.width;
         ButtonContainer.height = ButtonContainer.width/ButtonAmount;
@@ -45,7 +50,6 @@ void ToolBar::Update(Rectangle& TotalFrameArea)
             Buttons[IndexOfButton]->width = ButtonWidth;
             Buttons[IndexOfButton]->height = ButtonHeight;
         }
-        
     }
     else //sort the bar vertically
     {
@@ -57,7 +61,6 @@ void ToolBar::Update(Rectangle& TotalFrameArea)
         int ButtonWidth = (ButtonContainer.width) - ButtonMargin * 2;
         int ButtonHeight = ((ButtonContainer.height - ButtonMargin)/ButtonAmount) - ButtonMargin;
         
-
         //Cycle through all Button references and update their members respectively
         for (int IndexOfButton {0}; IndexOfButton < ButtonAmount; ++IndexOfButton)
         {
@@ -75,10 +78,9 @@ void ToolBar::DrawToolBar(Color& SetBackGroundColour, Color& SetButtonColour, Co
     //Draw container background
     DrawRectangle(ButtonContainer.x, ButtonContainer.y, ButtonContainer.width, ButtonContainer.height, SetBackGroundColour);
     
-    //Draw Buttons
+    //Draw the background of the button
     for(int i_Button {0}; i_Button < int(Buttons.size()); ++i_Button)
     {
-        //Draw the background of the button
         DrawRectangle(Buttons[i_Button]->x, Buttons[i_Button]->y, Buttons[i_Button]->width, Buttons[i_Button]->height, SetButtonColour);
     }
 
@@ -95,7 +97,7 @@ void ToolBar::GenerateIconTextures(std::vector<std::string*>& IconStrings, std::
     //Take in a string of ones and zeroes and turn it into a square texture
 
     //There's more efficient ways to traverse two linked elements
-    //but it's worth the hassle to rewrite all of this
+    //but it's not worth the hassle to rewrite all of this
     for(int i_Button {0}; i_Button < ButtonAmount; ++i_Button)
     {
         std::string IconString = *IconStrings[i_Button];

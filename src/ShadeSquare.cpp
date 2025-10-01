@@ -3,27 +3,18 @@
 
 ShadeSquare::ShadeSquare()
 {
+    //public
     ShadeSquareRectangle = {0, 0, 0, 0};
     SquareBaseColour = {255, 0, 0, 255};
     ShadedColour = SquareBaseColour;
-    ShadedImage = {};
     ShadedImageIsLoaded = false;   
+    ShadedImage = {};
     CurrentShadeMouseLocation = {0, 0};
-    ShadeViewBoxXY = {0, 0};
+
+    //private
     ShadeViewBoxDimensions = 0;
+    ShadeViewBoxXY = {0, 0};
     ShadeViewBoxOutline = BLACK;
-}
-
-
-void ShadeSquare::Update(Rectangle TotalFrameArea)
-{
-    //RGBSquare will always take up the whole of RGBSquareFrame
-    //The frame itself is relative to RGBColourDial
-    ShadeSquareRectangle.x = TotalFrameArea.x;
-    ShadeSquareRectangle.y  = TotalFrameArea.y;
-    ShadeSquareRectangle.width = ShadeSquareRectangle.height = TotalFrameArea.height;
-    UpdateShadeViewBoxPosition(CurrentShadeMouseLocation);
-    ConvertVectorToTexture(GetVectorOfPixels());
 }
 
 
@@ -81,7 +72,6 @@ std::vector<std::vector<Color>> ShadeSquare::GetVectorOfPixels()
 void ShadeSquare::ConvertVectorToTexture(const std::vector<std::vector<Color>>& VectorOfPixels)
 {
     //Turn the vector of pixel colours into a texture
-    //This is some voodoo that I need to delve into deeper to fully understand
 
     int Height = VectorOfPixels.size();
     int Width  = VectorOfPixels[0].size();
@@ -131,54 +121,12 @@ void ShadeSquare::ConvertVectorToTexture(const std::vector<std::vector<Color>>& 
 }
 
 
-void ShadeSquare::DrawShadeSquare()
-{
-    DrawTexture(ShadedImage, ShadeSquareRectangle.x, ShadeSquareRectangle.y, WHITE);
-
-    //Draw the ShadeBox to preview the selected shade
-    int OutLineOffset = ShadeViewBoxDimensions * 0.1; 
-    if(OutLineOffset < 1){OutLineOffset = 1;} //Stops it from disappearing if scaled down to miniscule size, why would anyone do this? I have no idea. But let's handle it anyway
-    DrawRectangle(ShadeViewBoxXY.x, ShadeViewBoxXY.y, ShadeViewBoxDimensions, ShadeViewBoxDimensions , ShadeViewBoxOutline);
-    DrawRectangle(ShadeViewBoxXY.x + OutLineOffset, ShadeViewBoxXY.y + OutLineOffset, 
-                  ShadeViewBoxDimensions - OutLineOffset * 2, ShadeViewBoxDimensions - OutLineOffset * 2, GetSquareRGB(CurrentShadeMouseLocation, SquareBaseColour));
-}
-
-
-Vector2 ShadeSquare::GetCorrectedMouseXY(Vector2 MouseXY)
-{
-    //This restricts the cursor's movement to the ShadeSquare
-    //MouseXY cannot be corrected independently since ToolContainer.InteractWithRGBDial() calls this as well,
-    //it needs to be called with GetSquareRGB
-
-    //Honestly, this is just me having dumb fun. Will it come back to bite me in the ass? Oh definitely, but that is for future me to deal with
-    //This could all be done with a bunch of if statements, but where is the fun in that? It is essentially just one sum per coordinate where:
-    //
-    //  "Is too low"     *   minimum value     
-    //  "Is too high"    *   maximum value
-    //  "Is just right"  *   current value
-    //
-    //Since only one of these conditionials can be right at one time, only the minimum, maximum or current value is set
-    //Yes, it is needless and dumb, but it was fun rigging it up like this
-
-    MouseXY.x = (
-        ((MouseXY.x < ShadeSquareRectangle.x) * ShadeSquareRectangle.x) +                                                               
-        ((MouseXY.x > (ShadeSquareRectangle.x + ShadeSquareRectangle.width)) * (ShadeSquareRectangle.x + ShadeSquareRectangle.width)) +
-        (((MouseXY.x >= ShadeSquareRectangle.x) && (MouseXY.x <= (ShadeSquareRectangle.x + ShadeSquareRectangle.width))) * MouseXY.x));
-
-    MouseXY.y = (
-        ((MouseXY.y < ShadeSquareRectangle.y) * ShadeSquareRectangle.y) +                                                               
-        ((MouseXY.y > (ShadeSquareRectangle.y + ShadeSquareRectangle.height)) * (ShadeSquareRectangle.y + ShadeSquareRectangle.height)) +
-        (((MouseXY.y >= ShadeSquareRectangle.y) && (MouseXY.y <= (ShadeSquareRectangle.y + ShadeSquareRectangle.height))) * MouseXY.y));
-    
-    return MouseXY;
-}
-
-
 Color ShadeSquare::GetSquareRGB(Vector2 MouseXY, Color SeedColour)
 {
     //Turn the mouse's XY coordinates back into a colour doing a bunch of math translations
     //Essentially the inverse of DrawShadeSquare()
 
+    //Make sure MouseXY cannot be set to a value outside of the actual square are
     if(!CheckCollisionPointRec(MouseXY, ShadeSquareRectangle))
     {
         MouseXY = GetCorrectedMouseXY(MouseXY);
@@ -218,6 +166,36 @@ Color ShadeSquare::GetSquareRGB(Vector2 MouseXY, Color SeedColour)
 }
 
 
+void ShadeSquare::Update(Rectangle TotalFrameArea)
+{
+    //ShadeSquare will always take up its whole Frame
+    //The Frame is relative to RGBDial and will be updated alongside
+    ShadeSquareRectangle.x = TotalFrameArea.x;
+    ShadeSquareRectangle.y  = TotalFrameArea.y;
+    ShadeSquareRectangle.width = ShadeSquareRectangle.height = TotalFrameArea.height;
+
+    UpdateShadeViewBoxPosition(CurrentShadeMouseLocation);
+    ConvertVectorToTexture(GetVectorOfPixels());
+}
+
+
+void ShadeSquare::DrawShadeSquare()
+{
+    //Draw a stored texture instead of recalculating the whole square each time you truffle
+    DrawTexture(ShadedImage, ShadeSquareRectangle.x, ShadeSquareRectangle.y, WHITE);
+
+    //Make the outline relative to the dimensions of the complete preview box
+    int OutLineOffset = ShadeViewBoxDimensions * 0.1; 
+
+    if(OutLineOffset < 1){OutLineOffset = 1;} //Stops it from disappearing if scaled down to miniscule size, why would anyone do this? I have no idea. But let's handle it anyway
+    
+    //Draw the ShadeBox to preview the selected shade
+    DrawRectangle(ShadeViewBoxXY.x, ShadeViewBoxXY.y, ShadeViewBoxDimensions, ShadeViewBoxDimensions , ShadeViewBoxOutline);
+    DrawRectangle(ShadeViewBoxXY.x + OutLineOffset, ShadeViewBoxXY.y + OutLineOffset, 
+                  ShadeViewBoxDimensions - OutLineOffset * 2, ShadeViewBoxDimensions - OutLineOffset * 2, GetSquareRGB(CurrentShadeMouseLocation, SquareBaseColour));
+}
+
+
 void ShadeSquare::UpdateShadeViewBoxPosition(Vector2 MouseXY)
 {
     //Moves the Shade Preview Box around the Shade Square when clicked and dragged
@@ -231,4 +209,33 @@ void ShadeSquare::UpdateShadeViewBoxPosition(Vector2 MouseXY)
     ShadeViewBoxOutline.r += ShadeFactor;
     ShadeViewBoxOutline.g += ShadeFactor;
     ShadeViewBoxOutline.b += ShadeFactor;
+}
+
+Vector2 ShadeSquare::GetCorrectedMouseXY(Vector2 MouseXY)
+{
+    //This restricts the cursor's movement to the ShadeSquare
+    //MouseXY cannot be corrected independently since ToolContainer.InteractWithRGBDial() calls this as well,
+    //it needs to be called with GetSquareRGB
+
+    //Honestly, this is just me having dumb fun. Will it come back to bite me in the ass? Oh definitely, but that is for future me to deal with
+    //This could all be done with a bunch of if statements, but where is the fun in that? It is essentially just one sum per coordinate where:
+    //
+    //  "Is too low"     *   minimum value     
+    //  "Is too high"    *   maximum value
+    //  "Is just right"  *   current value
+    //
+    //Since only one of these conditionials can be right at one time, only the minimum, maximum or current value is set
+    //Yes, it is needless and dumb, but it was fun rigging it up like this
+
+    MouseXY.x = (
+        ((MouseXY.x < ShadeSquareRectangle.x) * ShadeSquareRectangle.x) +                                                               
+        ((MouseXY.x > (ShadeSquareRectangle.x + ShadeSquareRectangle.width)) * (ShadeSquareRectangle.x + ShadeSquareRectangle.width)) +
+        (((MouseXY.x >= ShadeSquareRectangle.x) && (MouseXY.x <= (ShadeSquareRectangle.x + ShadeSquareRectangle.width))) * MouseXY.x));
+
+    MouseXY.y = (
+        ((MouseXY.y < ShadeSquareRectangle.y) * ShadeSquareRectangle.y) +                                                               
+        ((MouseXY.y > (ShadeSquareRectangle.y + ShadeSquareRectangle.height)) * (ShadeSquareRectangle.y + ShadeSquareRectangle.height)) +
+        (((MouseXY.y >= ShadeSquareRectangle.y) && (MouseXY.y <= (ShadeSquareRectangle.y + ShadeSquareRectangle.height))) * MouseXY.y));
+    
+    return MouseXY;
 }
