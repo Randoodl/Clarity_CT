@@ -15,6 +15,7 @@ int main(int argc, char* argv[])
     SetTargetFPS(60);
 
     ToolContainer ToolInstance = ToolContainer(BinPath);
+    ToolInstance.BoxFont = LoadFont("./assets/VCR_OSD_MONO.ttf"); //Font VCR_OSD_MONO, courtesy of Riciery Santos Leal
     
     while(!WindowShouldClose())
     {
@@ -25,6 +26,7 @@ int main(int argc, char* argv[])
 
         ToolInstance.MouseClickHandler();
     }
+    UnloadFont(ToolInstance.BoxFont);
     CloseWindow();
 
     return 0;

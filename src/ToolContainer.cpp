@@ -9,6 +9,9 @@ ToolContainer::ToolContainer(char*& PassedBinPath)
     //Initialise all colours in the collection.
     ColourCollection.Update();
 
+    //Default fallback Font
+    BoxFont = GetFontDefault();
+
     //Initialise Frame related data
     FrameIsMutable = false;
     Interactions.R_FrameState = FrameIsMutable;
@@ -63,6 +66,9 @@ void ToolContainer::DrawElements()
     {
         EachPalette->DrawPalette();
     }
+
+    //Show the current colour value in the CurrentColourFrame in either RGB Decimal or Hex notation
+    ShowCurrentValue(HexModeEnabled);
 
     //Toolbar has to be the last draw call, it has to ALWAYS be visible
     Tools.DrawToolBar(ColourCollection.ToolBackgroundColour, ColourCollection.ToolButtonColour, ColourCollection.ToolIconColour);  
@@ -149,8 +155,8 @@ void ToolContainer::InitialiseAllElements()
 
     //Initialise the ShadesTints
     //As above, so below, bundle this
-    SetVariationAmount = 9;
-    SetVariationDelta = 20;
+    SetVariationAmount = 13;
+    SetVariationDelta = 11;
     InitialiseShadesTints(MainShadesTints, MainShadesTintsFrame, ColourCollection.ShadedColour, SetVariationAmount, SetVariationDelta, Layout.MAINST);
     InitialiseShadesTints(ComplementShadesTints, ComplementShadesTintsFrame, ColourCollection.ShadedComplementColour, SetVariationAmount, SetVariationDelta, Layout.COMPST);
 
@@ -428,4 +434,79 @@ void ToolContainer::InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFram
     //Generate Palette colours and subdivide into rectangles
     ViewPalette.GenerateShadesTints(PassColour);
     ViewPalette.GeneratePaletteRectangles();
+}
+
+
+void ToolContainer::ShowCurrentValue(bool PassedCodeMode)
+{
+    //Display the current colour's RGB values numerically, either in (R,G,B) or #Hex format
+    
+    //Build the string to display here
+    std::string ShowString;
+
+    //Retrieve the current colour channels
+    int RedValue   = ColourCollection.CurrentSelectedColour.r;
+    int GreenValue = ColourCollection.CurrentSelectedColour.g;
+    int BlueValue  = ColourCollection.CurrentSelectedColour.b;
+
+    //Figure out how to display the text, anchor it about 5% from the top left corner of the frame
+    Vector2 AnchorXY = {float(CurrentSelectedColourFrame.FrameArea.x),
+                        float(CurrentSelectedColourFrame.FrameArea.y)};
+
+    //If the Frame is higher than it is wide, the text needs to be rotated
+    float RotateText = (((CurrentSelectedColourFrame.FrameArea.width >= CurrentSelectedColourFrame.FrameArea.height) * 0) +
+                        ((CurrentSelectedColourFrame.FrameArea.width < CurrentSelectedColourFrame.FrameArea.height)  * 90));
+
+    //FontSize is being set here since it might be sized down later in this method, depending on if it fits in the Frame or not
+    int FontSize = 20;
+    
+    if(PassedCodeMode) //Hexadecimal
+    {
+        //This is blatantly copied from Interactions::GetRGBValuesToClipboard()
+
+        //Store pieces of 00-ff hex codes in here
+        std::stringstream HexValue;
+
+        for(int Value : {RedValue, GreenValue, BlueValue})
+        { 
+            if(Value < 16){HexValue << "0";} //Sloppy way to add trailing zeroes, but it works!
+            HexValue << std::hex << Value;
+        }
+        ShowString ="#" + HexValue.str();
+    }
+    else //Decimal
+    {
+        ShowString = 
+            "R:" + std::to_string(RedValue) + 
+            " G:" + std::to_string(GreenValue) + 
+            " B:" + std::to_string(BlueValue); 
+    }
+
+    //The string to be displayed is ready to appear on screen, time to set the positional data
+
+    //The pixel length of the string, note how we only use the .x attribute
+    float StringPixelLength = MeasureTextEx(BoxFont, ShowString.c_str(), FontSize, 0).x;
+    
+    //Size down the Font to fit within the Frame, depending on if the text is rotated or not
+    //If the font is downsized the string pixel length needs to be recalculated
+    //It's not very elegant, but only executes on small sizes of the CurrentSelectedColourFrame
+    if(RotateText == 0)
+    {
+        while(StringPixelLength >= CurrentSelectedColourFrame.FrameArea.width)
+        {
+            --FontSize;
+            StringPixelLength = MeasureTextEx(BoxFont, ShowString.c_str(), FontSize, 0).x;
+        }
+    }
+    else
+    {
+        while(StringPixelLength >= CurrentSelectedColourFrame.FrameArea.height)
+        {
+            --FontSize;
+            StringPixelLength = MeasureTextEx(BoxFont, ShowString.c_str(), FontSize, 0).x;
+        }
+    }
+
+    //Draw the text, conditionally shifting it downwards by the length of the string from the top left YX coordinate >IF< it has been rotated
+    DrawTextPro(BoxFont, ShowString.c_str(), {AnchorXY.x, AnchorXY.y + ((RotateText != 0) * StringPixelLength)}, {0, 0}, -RotateText, FontSize, 0, ColourCollection.BackgroundColour);  
 }

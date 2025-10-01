@@ -20,6 +20,9 @@ class ToolContainer
         //The collection of UI colours
         ColourFamily ColourCollection;
 
+        //Font VCR_OSD_MONO, courtesy of Riciery Santos Leal
+        Font BoxFont;
+
     private:
 
         //UI related attributes and methods 
@@ -84,8 +87,9 @@ class ToolContainer
         Palette UpperTriadShadesTints;
         void InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, ElementPosition& SetLayout);
 
-        //CurrentSelectedColour - show currently narrowed-down colour and retrieve RGB/Hex value f
+        //CurrentSelectedColour - show currently narrowed-down colour and retrieve RGB/Hex value 
         Frames CurrentSelectedColourFrame;
+        void ShowCurrentValue(bool PassedCodeMode);
  
         //Collections of objects for for loop functionality
         std::vector<Frames*> ElementFrames;
