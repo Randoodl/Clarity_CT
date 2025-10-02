@@ -1,4 +1,5 @@
 .vscode
+*.fla
 *.png
 build/
 test/

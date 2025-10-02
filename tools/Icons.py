@@ -2,7 +2,9 @@ from PIL import Image
 import os
 
 """
-Just a quick and dirty script to turn .pngs into icon strings
+Just a quick and dirty script to turn square .pngs into icon strings
+I decided to include it in case you're partial to editing the icons in the ToolBar
+But let's face it: if you're looking here, you probably already know of a more efficent way
 """
 
 if __name__ == '__main__':
