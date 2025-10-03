@@ -470,12 +470,12 @@ void ToolContainer::ShowCurrentValue(bool PassedCodeMode)
     Vector2 AnchorXY = {float(CurrentSelectedColourFrame.FrameArea.x),
                         float(CurrentSelectedColourFrame.FrameArea.y)};
 
-    //If the Frame is higher than it is wide, the text needs to be rotated
-    float RotateText = (((CurrentSelectedColourFrame.FrameArea.width >= CurrentSelectedColourFrame.FrameArea.height) * 0) +
-                        ((CurrentSelectedColourFrame.FrameArea.width < CurrentSelectedColourFrame.FrameArea.height)  * 90));
+    //If the Frame is considerably higher than it is wide, the text needs to be rotated
+    float RotateText = (((CurrentSelectedColourFrame.FrameArea.width >= CurrentSelectedColourFrame.FrameArea.height/2) * 0) +
+                        ((CurrentSelectedColourFrame.FrameArea.width < CurrentSelectedColourFrame.FrameArea.height/2)  * 90));
 
     //FontSize is being set here since it might be sized down later in this method, depending on if it fits in the Frame or not
-    int FontSize = 20;
+    int FontSize = 30;
     
     if(PassedCodeMode) //Hexadecimal
     {
@@ -489,14 +489,15 @@ void ToolContainer::ShowCurrentValue(bool PassedCodeMode)
             if(Value < 16){HexValue << "0";} //Sloppy way to add trailing zeroes, but it works!
             HexValue << std::hex << Value;
         }
-        ShowString ="#" + HexValue.str();
+        ShowString =" #" + HexValue.str() + " ";
     }
     else //Decimal
     {
         ShowString = 
-            "R:" + std::to_string(RedValue) + 
+            "R:"  + std::to_string(RedValue)   + 
             " G:" + std::to_string(GreenValue) + 
-            " B:" + std::to_string(BlueValue); 
+            " B:" + std::to_string(BlueValue)  +
+            " ";
     }
 
     //The string to be displayed is ready to appear on screen, time to set the positional data

@@ -16,6 +16,7 @@
 */
 
 #include "../include/ToolContainer.h"
+#include "../include/EmbeddedFont.h"
 
 //RGB Colour picker tool using raylib v5.6 (www.raylib.com)
 
@@ -32,7 +33,7 @@ int main(int argc, char* argv[])
     SetTargetFPS(60);
 
     ToolContainer ToolInstance = ToolContainer(BinPath);
-    ToolInstance.BoxFont = LoadFont("./assets/VCR_OSD_MONO.ttf"); //Font VCR_OSD_MONO, courtesy of Riciery Santos Leal
+    ToolInstance.BoxFont = LoadFont_EmbeddedFont();   //Font: ari-w9500-display.ttf courtesy of Catterio Sylt
     
     while(!WindowShouldClose())
     {
@@ -43,7 +44,6 @@ int main(int argc, char* argv[])
 
         ToolInstance.MouseClickHandler();
     }
-    UnloadFont(ToolInstance.BoxFont);
     CloseWindow();
 
     return 0;

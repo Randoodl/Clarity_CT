@@ -1,6 +1,7 @@
 .vscode
 *.fla
 *.png
+*.txt
+*.ttf
 build/
 test/
-*.txt

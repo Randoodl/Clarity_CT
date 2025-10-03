@@ -37,7 +37,7 @@ class ToolContainer
         //The collection of UI colours
         ColourFamily ColourCollection;
 
-        //Font VCR_OSD_MONO, courtesy of Riciery Santos Leal
+        //Font Ari-W9500-Display, courtesy of Catterio Sylt
         Font BoxFont;
 
     private:
