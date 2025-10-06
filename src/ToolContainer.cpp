@@ -525,6 +525,15 @@ void ToolContainer::ShowCurrentValue(bool PassedCodeMode)
         }
     }
 
+    //If the colour becomes too light, a white font might become invisible, so let's hacksaw in a way for the text to remain visible
+    Color FontColour {WHITE};
+    int FontCutoff  {180};
+    if(ColourCollection.CurrentSelectedColour.r >= FontCutoff && ColourCollection.CurrentSelectedColour.g >= FontCutoff && ColourCollection.CurrentSelectedColour.b >= FontCutoff)
+    {
+        //All colour channels are too "bright"
+        FontColour = BLACK;
+    }
+
     //Draw the text, conditionally shifting it downwards by the length of the string from the top left YX coordinate >IF< it has been rotated
-    DrawTextPro(BoxFont, ShowString.c_str(), {AnchorXY.x, AnchorXY.y + ((RotateText != 0) * StringPixelLength)}, {0, 0}, -RotateText, FontSize, 0, ColourCollection.BackgroundColour);  
+    DrawTextPro(BoxFont, ShowString.c_str(), {AnchorXY.x, AnchorXY.y + ((RotateText != 0) * StringPixelLength)}, {0, 0}, -RotateText, FontSize, 0, FontColour);  
 }
