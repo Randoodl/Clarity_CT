@@ -1,26 +1,19 @@
-#Currently broken for Windows 
+#General variables
+CXX = g++
+SOURCE_DIR = ./src
+BUILD_DIR  = ./build
+SOURCE_DIR = ./src
+BUILD_DIR  = ./build
+OBJ_DIR    = $(BUILD_DIR)/obj
+OUTPUT = $(BUILD_DIR)/Clarity_CT
 
-#OS checks for Windows or otherwise Linux
+#OS checks for Windows or otherwise Linux and set libraries correctly
 ifeq ($(OS), Windows_NT)
-  CXX = g++
-  LIBS = -lraylib -lgd32 -lwinmm
-  SOURCE_DIR = .\src
-  BUILD_DIR  = .\build
-  OBJ_DIR    = $(BUILD_DIR)\obj
-  OUTPUT = $(BUILD_DIR)\Clarity_CT.exe
-  RM = rmdir -r
-  MKDIR = @if not exist "$(OBJ_DIR)" mkdir "$(OBJ_DIR)"
   PLATFORM = WINDOWS
+  LIBS = -lraylib -lopengl32 -lgdi32 -lwinmm -static
 else
-  CXX = g++
-  LIBS = -lraylib 
-  SOURCE_DIR = ./src
-  BUILD_DIR  = ./build
-  OBJ_DIR    = $(BUILD_DIR)/obj
-  OUTPUT = $(BUILD_DIR)/Clarity_CT
-  RM = rm -rf
-  MKDIR = mkdir -p
   PLATFORM = LINUX
+  LIBS = -lraylib 
 endif
 
 #Compiler flags
@@ -38,7 +31,7 @@ $(OUTPUT): $(OBJECTNAMES)
 
 #Object file generation
 $(OBJ_DIR)/%.o: $(SOURCE_DIR)/%.cpp
-	@$(MKDIR) $(OBJ_DIR)
+	@mkdir -p $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 run: $(OUTPUT)
@@ -48,11 +41,17 @@ else
 	./$<
 endif
 
-#For debugging purposes only
+clean:
+	@rm -rf $(BUILD_DIR)
+
+#For linux debugging purposes only
 check: $(OUTPUT)
 	valgrind -s --log-file=./build/log_"`date +%Y-%m-%d-%T`".txt --leak-check=full ./$<
 
-clean:
-	@$(RM) $(BUILD_DIR)
 
 .PHONY: run check clean
+
+
+
+
+	

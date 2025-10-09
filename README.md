@@ -17,20 +17,20 @@ It started as a small, fun foray into raylib and turned into the behemoth it is 
 >`"This code is not written very well"`  
 >*-Someone who has actually programmed before, presumably*
 
-It is not, and it is not meant to be. This is quite literally just a pet project duct taped together by a hobbyist that grew way beyond the scope it was supposed to have. If you want to have a peek under the hood, that's on you.
+It is not, and it is not meant to be. This is quite literally just a pet project duct taped together by a hobbyist that grew way beyond the scope it was supposed to have. If you want to have a peek under the hood, then that's on you.
 
 
 ### 🛠️ Features <a name = "features"></a>
-- **Interactive Colour Picker:** - Select a specific hue using the colour dial and narrow down its shade using the shader square.
+- **Interactive Colour Picker:** - Select a specific hue using the colour dial and narrow down its shade or tint.
 - **Display related colours:** - Automatically generate complement and triadic colours, alongside shades and tints thereof.
-- **Copyable HEX and RGB values:** - Easily copy colour values for use in other applications with but a single click.
+- **Copyable HEX and RGB values:** - Easily copy colour values for use in other applications with a single click.
 - **Custom UI:** - Scale and move elements to create a comfortable layout in an optional Dark Mode.
 
 ### 🗹 Prerequisites <a name = "prerequisites"></a>
 - **raylib** (www.raylib.com)
 
 ### 🏗️ Building from source <a name = "build"></a>
-Compilation is currently only tested with C++20 on GCC 13.3 and raylib v5.6
+Compilation is currently only tested with C++20 on GCC 13.3 and raylib v5.5
 #### Using Make:
 Clone the repository and compile using Make
 ```sh
