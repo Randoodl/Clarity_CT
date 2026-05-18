@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2025, Dylan Ooijevaar
+ * Copyright (c) 2026, Dylan Ooijevaar
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,6 +66,9 @@ class ToolContainer
         void SetAllInterActionsToFalse();
         void DecideElementInteraction(int ActiveElementFrame);
 
+        //Settings - configure the UI
+        SettingsScreen Configuration;
+
         //Toolbar - button based functionality
         Frames ToolBarFrame;
         ToolBar Tools;
@@ -110,7 +113,6 @@ class ToolContainer
  
         //Collections of objects for for loop functionality
         std::vector<Frames*> ElementFrames;
-        std::vector<Frames*> HiddenFrames;
         std::vector<ElementPosition*> LayoutPositions;
         std::vector<Palette*> AllPalettes;
         std::map<Palette*, std::vector<Color*>> PaletteActions;

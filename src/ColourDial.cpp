@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2025, Dylan Ooijevaar
+ * Copyright (c) 2026, Dylan Ooijevaar
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,19 +21,19 @@
 ColourDial::ColourDial() 
 {
     //public
-    DialOriginXY = {0, 0};
-    DialBandThickness = 0;
-    DialInnerRadius = 0;
-    DialOuterRadius = 0;
+    DialOriginXY = {};
+    DialBandThickness = {};
+    DialInnerRadius = {};
+    DialOuterRadius = {};
     CurrentSaturateColour = {255, 0, 0, 255};
    
     //private
-    Current_iRGB = 0;
+    Current_iRGB = {};
     BandsAmount = 1530;  
     MapOFDialPositions = {};
     MapOfRGBSaturates = GenerateRGBTuples(); 
-    BubbleOriginXY = {0, 0};
-    BubbleRadius = 0;
+    BubbleOriginXY = {};
+    BubbleRadius = {};
 }
 
 

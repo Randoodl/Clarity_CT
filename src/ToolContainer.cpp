@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2025, Dylan Ooijevaar
+ * Copyright (c) 2026, Dylan Ooijevaar
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,6 @@ ToolContainer::ToolContainer(char*& PassedBinPath)
     //    -RGBSquareFrame has to come before RGBDial, otherwise clicks within RGBSquareFrame interact with RGBDial instead
     ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &LowerTriadFrame, &UpperTriadFrame,
                       &MainShadesTintsFrame, &ComplementShadesTintsFrame, &LowerTriadShadesTintsFrame, &UpperTriadShadesTintsFrame, &CurrentSelectedColourFrame};
-    HiddenFrames   = {&RGBSquareFrame};
 
     LayoutPositions = {&Layout.TOOL, &Layout.SQUARE, &Layout.DIAL, &Layout.HUE, &Layout.COMP, &Layout.LTRIAD, &Layout.UTRIAD,
                        &Layout.MAINST, &Layout.COMPST, &Layout.LTRIST, &Layout.UTRIST, &Layout.SELECT};
@@ -59,7 +58,7 @@ ToolContainer::ToolContainer(char*& PassedBinPath)
                         {&LowerTriadShadesTints, {&ColourCollection.LowerTriadShade}},
                         {&UpperTriadShadesTints, {&ColourCollection.UpperTriadShade}}
                      };
-    
+
     //Try and load in the config file
     //If it doesn't exist/is inccessible, it falls back on the values given in Defaults.h
     LoadCustomConfig(BinPath);
@@ -73,6 +72,13 @@ void ToolContainer::DrawElements()
 {
     //Simply combining all drawing calls, the order of which determines visibility on screen
 
+    //If the configuration flag is active, disregard all other drawing calls
+    if(Configuration.ConfigureSettings)
+    {
+        Configuration.ShowSettingsScreen(GetScreenWidth(), GetScreenHeight(), ColourCollection.BackgroundColour, ColourCollection.ToolIconColour);
+        return;
+    }
+    
     //Draw the single instance elements, ShadeSquare after Dial so the ShadePreviewSquare doesn't hide behind the Dial
     RGBDial.DrawRGBDial(ColourCollection.BackgroundColour);
     RGBSquare.DrawShadeSquare();
@@ -95,9 +101,8 @@ void ToolContainer::DrawElements()
     {
         for(Frames* ShowFrame : ElementFrames)
         {
-            if(std::find(HiddenFrames.begin(), HiddenFrames.end(), ShowFrame) == HiddenFrames.end())
+            if(ShowFrame->IsVisible)
             {
-                //This is a laborious way of doing it, but it works. It beats having to keep two vectors updated relative to eachother
                 ShowFrame->DrawFrameBox(ColourCollection.FrameBoxColour);
             }
         }
@@ -117,7 +122,16 @@ void ToolContainer::MouseClickHandler()
     //Only one Element can be true at a time, since SetElementInteraction exits as soon as a Frames' ActiveFrame is set to true
     if(IsMouseButtonPressed(0))
     {
-        SetElementInteraction(MouseXY);
+        //Determine if the click is meant for the RGB tool or its settings
+        if(Configuration.ConfigureSettings)
+        {
+            //Dummy rule to ALWAYS leave settings screen (prevents lockout)
+            Configuration.ConfigureSettings = false;
+        }
+        else
+        {
+            SetElementInteraction(MouseXY);
+        }
     }
     
     //As soon as a frame passes wherein the mouse button is released, all ActiveFrame bools are set to false
@@ -125,7 +139,7 @@ void ToolContainer::MouseClickHandler()
     {
         SetAllInterActionsToFalse();
     }
-    
+
     //This keeps looping every Frame until it hits the first and ONLY active Frame
     for(int IndexOfFrame {0}; IndexOfFrame < int(ElementFrames.size()); ++IndexOfFrame)
     {
@@ -159,6 +173,7 @@ void ToolContainer::InitialiseAllElements()
 
     //Initialise the Square's Frame and Element
     DialOffsets = RGBDial.GetSquareInDialOffsets();
+    RGBSquareFrame.IsVisible = false;
     RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z);
     RGBSquare.Update(RGBSquareFrame.FrameArea);
 
@@ -393,7 +408,7 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
     switch(ActiveElementFrame)
     {
         case 0: 
-            Interactions.InteractWithToolBar(ElementFrames, Tools, DarkModeEnabled, HexModeEnabled, BinPath); 
+            Interactions.InteractWithToolBar(ElementFrames, Tools, DarkModeEnabled, HexModeEnabled, BinPath, Configuration.ConfigureSettings); 
             
             //Reads the ResetFrame state every time the Toolbar is interacted with, kind of eh.......
             if(Interactions.ResetFrames)

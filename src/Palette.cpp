@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2025, Dylan Ooijevaar
+ * Copyright (c) 2026, Dylan Ooijevaar
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,14 +21,14 @@
 Palette::Palette()
 {
     //public
-    BasePaletteColour = {0, 0, 0, 255};
-    VariationAmount = 0; 
-    VariationDelta = 0;
+    BasePaletteColour = {};
+    VariationAmount = {}; 
+    VariationDelta = {};
 
     //private
     PaletteRectangles = {};
     PaletteColours = {};
-    PaletteArea = {0, 0, 0, 0};
+    PaletteArea = {};
 }
 
 

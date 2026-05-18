@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2025, Dylan Ooijevaar
+ * Copyright (c) 2026, Dylan Ooijevaar
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,15 +21,16 @@
 Frames::Frames()
 {
     //public
-    FrameArea = {0, 0, 0, 0};
+    FrameArea = {};
     EdgeButtonSize = 20;
-    MoveButton = {0, 0, 0, 0};
-    ScaleButton = {0, 0, 0, 0};
+    MoveButton = {};
+    ScaleButton = {};
     ActiveFrame = false;
     IsDragging = false;
     IsScaling = false;
-    MouseOffsetX = 0;
-    MouseOffsetY = 0;
+    IsVisible = true;
+    MouseOffsetX = {};
+    MouseOffsetY = {};
     
     //private
     MainWindow = {0, 0, float(GetScreenWidth()), float(GetScreenHeight())};

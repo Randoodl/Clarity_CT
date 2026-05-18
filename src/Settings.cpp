@@ -15,18 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "../include/Settings.h"
 
 
-class ElementPosition
+SettingsScreen::SettingsScreen()
 {
-    //This class holds all the information related to a Frames' position
+    ConfigureSettings = false;
+}
 
-    public:
-        ElementPosition(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
-    
-        int AnchorX;
-        int AnchorY;
-        int LenX;
-        int LenY;
-};
+void SettingsScreen::ShowSettingsScreen(int ScreenWidth, int ScreenHeight, Color BackDropColour, Color ElementColour)
+{
+    //Create the backdrop for the settings splash
+    DrawRectangle(0, 0, ScreenWidth, ScreenHeight, BackDropColour);
+
+    PopulateSettingsScreen(ElementColour);
+
+}
+
+
+void SettingsScreen::PopulateSettingsScreen(Color ElementColour)
+{
+    ExitButton.Update(0, 0, 10, 10);
+    DrawRectangle(0, 0, ExitButton.EdgeButtonSize, ExitButton.EdgeButtonSize, ElementColour);
+}

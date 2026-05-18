@@ -17,16 +17,17 @@
 
 #pragma once
 
+#include "./Frames.h"
 
-class ElementPosition
+
+class SettingsScreen
 {
-    //This class holds all the information related to a Frames' position
+    //This class is meant to handle everything related to visually managing settings
 
     public:
-        ElementPosition(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
-    
-        int AnchorX;
-        int AnchorY;
-        int LenX;
-        int LenY;
+        SettingsScreen();
+        bool ConfigureSettings;
+        void ShowSettingsScreen(int ScreenWidth, int ScreenHeight, Color BackDropColour, Color ElementColour);
+        Frames ExitButton;
+        void PopulateSettingsScreen(Color ElementColour);
 };

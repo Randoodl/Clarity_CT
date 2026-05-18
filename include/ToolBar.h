@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2025, Dylan Ooijevaar
+ * Copyright (c) 2026, Dylan Ooijevaar
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ class ToolBar
 
         //Everything needed to calculate and keep track of buttons
         Rectangle LockButton;
+        Rectangle SettingsButton;
         Rectangle SaveButton;
         Rectangle ResetButton;
         Rectangle CodeModeButton;
@@ -54,6 +55,7 @@ class ToolBar
 
         //All Icon textures
         Texture2D LockIcon;
+        Texture2D SettingsIcon;
         Texture2D SaveIcon;
         Texture2D ResetIcon;
         Texture2D CodeModeIcon;

@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2025, Dylan Ooijevaar
+ * Copyright (c) 2026, Dylan Ooijevaar
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@
 
 #include "./ColourDial.h"
 #include "./ShadeSquare.h"
-#include "./Frames.h"
 #include "./Palette.h"
 #include "./ToolBar.h"
 #include "./ColourFamily.h"
+#include "./Settings.h"
 
 
 class ElementInteractions
@@ -59,7 +59,7 @@ class ElementInteractions
         std::map<Palette*, std::vector<Color*>>& R_PaletteActions;
         
         //All interactions as listed in ToolContainer::DecideElementInteraction
-        void InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, bool& HexModeEnabled, char*& PassedBinPath);
+        void InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, bool& HexModeEnabled, char*& PassedBinPath, bool& ConfigureSettings);
         void InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare);
         void InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare, ColourDial& RGBDial, Vector3& DialOffsets);
         void InteractWithPalette(Frames& PaletteFrame, Palette& PaletteColours);

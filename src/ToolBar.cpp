@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2025, Dylan Ooijevaar
+ * Copyright (c) 2026, Dylan Ooijevaar
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,21 +21,21 @@
 ToolBar::ToolBar()
 {
     //public
-    ButtonContainer = {0, 0, 0, 0};
-    LockButton = {0, 0, 0, 0};
-    SaveButton = {0, 0, 0, 0};
-    ResetButton = {0, 0, 0, 0};
-    CodeModeButton = {0, 0, 0, 0};
-    DarkModeButton = {0, 0, 0, 0};
+    ButtonContainer = {};
+    LockButton = {};
+    SaveButton = {};
+    ResetButton = {};
+    CodeModeButton = {};
+    DarkModeButton = {};
 
     //private
     ButtonMargin = 3;
     IconPixelAmount = 256;
     IconPixelDimension = sqrt(IconPixelAmount);
-    Buttons = {&LockButton, &SaveButton, &ResetButton, &CodeModeButton, &DarkModeButton};
+    Buttons = {&LockButton, &SettingsButton, &SaveButton, &ResetButton, &CodeModeButton, &DarkModeButton};
     ButtonAmount = Buttons.size();
-    RawIconStrings = {&AllIconStrings.LockString, &AllIconStrings.SaveString, &AllIconStrings.ResetString, &AllIconStrings.CodeModeString, &AllIconStrings.DarkModeString};
-    Icons = {&LockIcon, &SaveIcon, &ResetIcon, &CodeModeIcon, &DarkModeIcon};
+    RawIconStrings = {&AllIconStrings.LockString, &AllIconStrings.SettingsString, &AllIconStrings.SaveString, &AllIconStrings.ResetString, &AllIconStrings.CodeModeString, &AllIconStrings.DarkModeString};
+    Icons = {&LockIcon, &SettingsIcon, &SaveIcon, &ResetIcon, &CodeModeIcon, &DarkModeIcon};
 
     //This sets all Texture2Ds
     GenerateIconTextures(RawIconStrings, Icons);

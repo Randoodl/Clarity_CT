@@ -14,10 +14,10 @@ Clarity CT is a simple, customisable RGB colour picker and palette tool intended
 Its whole purpose is to provide you with an easily copyable colour value in either RGB or HEX notation.  
 It started as a small, fun foray into raylib and turned into the behemoth it is now.
 
->`"This code is not written very well"`  
->*-Someone who has actually programmed before, presumably*
+>`"Oh. That's gross. That is, in fact, heinous."`  
+>*-Someone I showed the code to*
 
-It is not, and it is not meant to be. This is quite literally just a pet project duct taped together by a hobbyist that grew way beyond the scope it was supposed to have. If you want to have a peek under the hood, then that's on you.
+It is not a well written program, and it is not meant to be. This is quite literally just a pet project duct taped together by a hobbyist that grew way beyond the scope it was supposed to have. If you want to have a peek under the hood, then that's on you.
 
 
 ### 🛠️ Features <a name = "features"></a>
@@ -41,7 +41,7 @@ make
 
 ### ❓ Answers to questions nobody asked <a name = "faq"></a>
 * `Why?`  
-    * Because, while messing around with RGB channels in python, I came up with what has got to be the worst way to whip up 1530 different RGB hue tuples.  
+    * Because, while messing around with RGB channels in python, I came up with what has got to be [the worst way to whip up 1530 different RGB hue tuples](./src/ColourDial.cpp#L144).  
     I decided to try and do the same in C++, but while I was at it I figured I might as well add some extra nonsense, you know, for a laugh.  
     Somewhere along the way it went from 'a laugh' to an actual program (*though this statement is still up for debate*).
 

@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2025, Dylan Ooijevaar
+ * Copyright (c) 2026, Dylan Ooijevaar
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,16 +21,16 @@
 ShadeSquare::ShadeSquare()
 {
     //public
-    ShadeSquareRectangle = {0, 0, 0, 0};
+    ShadeSquareRectangle = {};
     SquareBaseColour = {255, 0, 0, 255};
     ShadedColour = SquareBaseColour;
     ShadedImageIsLoaded = false;   
     ShadedImage = {};
-    CurrentShadeMouseLocation = {0, 0};
+    CurrentShadeMouseLocation = {};
 
     //private
-    ShadeViewBoxDimensions = 0;
-    ShadeViewBoxXY = {0, 0};
+    ShadeViewBoxDimensions = {};
+    ShadeViewBoxXY = {};
     ShadeViewBoxOutline = BLACK;
 }
 

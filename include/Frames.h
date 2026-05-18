@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2025, Dylan Ooijevaar
+ * Copyright (c) 2026, Dylan Ooijevaar
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ class Frames
         bool ActiveFrame;
         bool IsDragging;
         bool IsScaling;
+        bool IsVisible;
 
         //These are used to account for the offset of the mouse click when targetting the move button (Stops Frame's topleft snapping to cursor)
         int MouseOffsetX; 

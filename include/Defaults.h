@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2025, Dylan Ooijevaar
+ * Copyright (c) 2026, Dylan Ooijevaar
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ struct Defaults
 {
     //A struct of all default positions to be loaded if no other position data is found
     
-    ElementPosition TOOL   = ElementPosition(920, 0, 78, 390);
+    ElementPosition TOOL   = ElementPosition(920, 0, 65, 390);
     ElementPosition SQUARE = ElementPosition(0, 0, 0, 0);      //This is a dummy value in order to make the .conf file reading work
     ElementPosition DIAL   = ElementPosition(0, 0, 300, 300);
     ElementPosition HUE    = ElementPosition(0, 310, 70, 80);

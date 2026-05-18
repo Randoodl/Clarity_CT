@@ -1,5 +1,5 @@
 /* 
- * Copyright (c) 2025, Dylan Ooijevaar
+ * Copyright (c) 2026, Dylan Ooijevaar
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,28 +21,40 @@
 ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& PassedColourFamily, std::map<Palette*, std::vector<Color*>>& PassedPaletteActions) : 
                                          R_FrameState(PassedFrameState), R_ColourFamily(PassedColourFamily), R_PaletteActions(PassedPaletteActions)
 {
-    PassedMouseXY = {0, 0};
+    PassedMouseXY = {};
     ResetFrames = false;
 }
 
 
-void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, bool& HexModeEnabled, char*& PassedBinPath)
+void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, bool& HexModeEnabled, char*& PassedBinPath, bool& ConfigureSettings)
 {
     if(!R_FrameState)
     {
-        if(CheckCollisionPointRec(PassedMouseXY, Tools.SaveButton))
+        if(CheckCollisionPointRec(PassedMouseXY, Tools.SettingsButton))
+        {
+            //Set the Setting screen flag
+            if(!ConfigureSettings)
+            {
+                ConfigureSettings = true;
+            }
+            else
+            {
+                ConfigureSettings = false;
+            }
+        }
+        else if(CheckCollisionPointRec(PassedMouseXY, Tools.SaveButton))
         {
             //Seems like a long goddamn way to pass down main(argv), but alas, here we are
             //I'm tired, Samwise
             ExportElementPositions(PassedFrames, DarkModeEnabled, HexModeEnabled,  PassedBinPath);
             std::cout << "Exported config file\n";
-        }   
-        if(CheckCollisionPointRec(PassedMouseXY, Tools.CodeModeButton))
+        } 
+        else if(CheckCollisionPointRec(PassedMouseXY, Tools.CodeModeButton))
         {
             //Toggle HexMode from 0 to 1 or vice versa
             if(HexModeEnabled){HexModeEnabled = false;}else{HexModeEnabled = true;};
         }
-        if(CheckCollisionPointRec(PassedMouseXY, Tools.DarkModeButton))
+        else if(CheckCollisionPointRec(PassedMouseXY, Tools.DarkModeButton))
         {
             //Toggle DarkMode from 0 to 1 or vice versa
             if(DarkModeEnabled){DarkModeEnabled = false;}else{DarkModeEnabled = true;};
