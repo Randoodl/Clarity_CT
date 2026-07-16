@@ -67,7 +67,7 @@ void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames
         if(CheckCollisionPointRec(PassedMouseXY, Tools.ResetButton))
         {
             ResetFrames = true;
-            std::cout << "Reset config file\n";
+            std::cout << "Reset UI to default values\n";
         }
         PassedFrames[0]->ActiveFrame = false; //stops a held down click from spamming the button
     }

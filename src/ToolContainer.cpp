@@ -332,9 +332,6 @@ void ToolContainer::DefaultFallback()
 
     //Re-initialise all elements
     InitialiseAllElements();
-
-    //Overwrite the .conf with the default values, by default DarkMode is enabled because BLEGH white screen and Hexes over Deces
-    Interactions.ExportElementPositions(ElementFrames, DarkModeEnabled, HexModeEnabled, BinPath);
 }
 
 
