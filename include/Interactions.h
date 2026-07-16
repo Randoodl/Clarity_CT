@@ -27,7 +27,7 @@
 #include "./Palette.h"
 #include "./ToolBar.h"
 #include "./ColourFamily.h"
-#include "./Settings.h"
+#include "./Frames.h"
 
 
 class ElementInteractions
@@ -59,7 +59,7 @@ class ElementInteractions
         std::map<Palette*, std::vector<Color*>>& R_PaletteActions;
         
         //All interactions as listed in ToolContainer::DecideElementInteraction
-        void InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, bool& HexModeEnabled, char*& PassedBinPath, bool& ConfigureSettings);
+        void InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, bool& HexModeEnabled, char*& PassedBinPath);
         void InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare);
         void InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare, ColourDial& RGBDial, Vector3& DialOffsets);
         void InteractWithPalette(Frames& PaletteFrame, Palette& PaletteColours);

@@ -26,23 +26,11 @@ ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& P
 }
 
 
-void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, bool& HexModeEnabled, char*& PassedBinPath, bool& ConfigureSettings)
+void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, bool& HexModeEnabled, char*& PassedBinPath)
 {
     if(!R_FrameState)
     {
-        if(CheckCollisionPointRec(PassedMouseXY, Tools.SettingsButton))
-        {
-            //Set the Setting screen flag
-            if(!ConfigureSettings)
-            {
-                ConfigureSettings = true;
-            }
-            else
-            {
-                ConfigureSettings = false;
-            }
-        }
-        else if(CheckCollisionPointRec(PassedMouseXY, Tools.SaveButton))
+        if(CheckCollisionPointRec(PassedMouseXY, Tools.SaveButton))
         {
             //Seems like a long goddamn way to pass down main(argv), but alas, here we are
             //I'm tired, Samwise

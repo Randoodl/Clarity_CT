@@ -66,9 +66,6 @@ class ToolContainer
         void SetAllInterActionsToFalse();
         void DecideElementInteraction(int ActiveElementFrame);
 
-        //Settings - configure the UI
-        SettingsScreen Configuration;
-
         //Toolbar - button based functionality
         Frames ToolBarFrame;
         ToolBar Tools;

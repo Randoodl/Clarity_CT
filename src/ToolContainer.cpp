@@ -71,13 +71,6 @@ ToolContainer::ToolContainer(char*& PassedBinPath)
 void ToolContainer::DrawElements()
 {
     //Simply combining all drawing calls, the order of which determines visibility on screen
-
-    //If the configuration flag is active, disregard all other drawing calls
-    if(Configuration.ConfigureSettings)
-    {
-        Configuration.ShowSettingsScreen(GetScreenWidth(), GetScreenHeight(), ColourCollection.BackgroundColour, ColourCollection.ToolIconColour);
-        return;
-    }
     
     //Draw the single instance elements, ShadeSquare after Dial so the ShadePreviewSquare doesn't hide behind the Dial
     RGBDial.DrawRGBDial(ColourCollection.BackgroundColour);
@@ -122,16 +115,7 @@ void ToolContainer::MouseClickHandler()
     //Only one Element can be true at a time, since SetElementInteraction exits as soon as a Frames' ActiveFrame is set to true
     if(IsMouseButtonPressed(0))
     {
-        //Determine if the click is meant for the RGB tool or its settings
-        if(Configuration.ConfigureSettings)
-        {
-            //Dummy rule to ALWAYS leave settings screen (prevents lockout)
-            Configuration.ConfigureSettings = false;
-        }
-        else
-        {
-            SetElementInteraction(MouseXY);
-        }
+        SetElementInteraction(MouseXY);
     }
     
     //As soon as a frame passes wherein the mouse button is released, all ActiveFrame bools are set to false
@@ -408,7 +392,7 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
     switch(ActiveElementFrame)
     {
         case 0: 
-            Interactions.InteractWithToolBar(ElementFrames, Tools, DarkModeEnabled, HexModeEnabled, BinPath, Configuration.ConfigureSettings); 
+            Interactions.InteractWithToolBar(ElementFrames, Tools, DarkModeEnabled, HexModeEnabled, BinPath); 
             
             //Reads the ResetFrame state every time the Toolbar is interacted with, kind of eh.......
             if(Interactions.ResetFrames)
