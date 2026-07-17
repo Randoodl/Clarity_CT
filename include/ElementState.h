@@ -22,14 +22,15 @@
 
 class ElementState
 {
-    //This class holds all the information related to a Frames' position as well as its identifier
+    //This class holds all the information related to a Frames' position as well as its identifier and the visibility of its contents
 
     public:
-        ElementState(std::string SetElementTag, int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
+        ElementState(std::string SetElementTag, int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY, bool SetVisibility);
     
         std::string ElementTag;
         int AnchorX;
         int AnchorY;
         int LenX;
         int LenY;
+        bool Visibility;
 };

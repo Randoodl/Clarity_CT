@@ -39,8 +39,9 @@ Frames::Frames()
 }
 
 
-void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
+void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY, bool SetShowContent)
 {
+    ShowContent = SetShowContent;
     //Update all position and size data when frame is moved or scaled
     FrameArea.width = SetLenX;
     FrameArea.height = SetLenY;
@@ -98,12 +99,12 @@ void Frames::AdjustFrame(Vector2 MouseXY)
 
     if(IsDragging)
     {
-        Update(MouseXY.x, MouseXY.y, FrameArea.width, FrameArea.height);
+        Update(MouseXY.x, MouseXY.y, FrameArea.width, FrameArea.height, ShowContent);
 
         if(!CheckCollisionPointRec({FrameArea.x, FrameArea.y}, MainWindow))  
         {
             //TopLeft is out of bounds
-            Update((MouseXY.x > 0) * MouseXY.x, (MouseXY.y > 0) * MouseXY.y, FrameArea.width, FrameArea.height); //Your dumbest idea yet, but it works
+            Update((MouseXY.x > 0) * MouseXY.x, (MouseXY.y > 0) * MouseXY.y, FrameArea.width, FrameArea.height, ShowContent); //Your dumbest idea yet, but it works
         }
         if(!CheckCollisionPointRec({FrameArea.x + FrameArea.width, FrameArea.y + FrameArea.height}, MainWindow)) 
         {
@@ -119,12 +120,12 @@ void Frames::AdjustFrame(Vector2 MouseXY)
             (((FrameArea.x + FrameArea.width) > MainWindow.width) * (MainWindow.width - FrameArea.width)) + (((FrameArea.x + FrameArea.width) <= MainWindow.width) * FrameArea.x), 
             (((FrameArea.y + FrameArea.height) > MainWindow.height) * (MainWindow.height - FrameArea.height)) + (((FrameArea.y + FrameArea.height) <= MainWindow.height) * FrameArea.y),  
             FrameArea.width,
-            FrameArea.height);    
+            FrameArea.height, ShowContent);    
         }
     }
     if(IsScaling)
     {
-        Update(FrameArea.x, FrameArea.y, FrameArea.width + MouseXYDelta.x, FrameArea.height + MouseXYDelta.y);
+        Update(FrameArea.x, FrameArea.y, FrameArea.width + MouseXYDelta.x, FrameArea.height + MouseXYDelta.y, ShowContent);
 
         if(!CheckCollisionPointRec({FrameArea.x + FrameArea.width, FrameArea.y + FrameArea.height}, MainWindow)) 
         {
@@ -133,8 +134,8 @@ void Frames::AdjustFrame(Vector2 MouseXY)
             //Similar logic to the BottomRight bounds correction above, just adapted for the width/height instead of the X/Y anchor coordinate
             Update(FrameArea.x, FrameArea.y, 
             (((FrameArea.x + FrameArea.width) > MainWindow.width) * (MainWindow.width - FrameArea.x) + ((FrameArea.x + FrameArea.width) <= MainWindow.width) * FrameArea.width),
-            (((FrameArea.y + FrameArea.height) > MainWindow.height) * (MainWindow.height - FrameArea.y) + ((FrameArea.y + FrameArea.height) <= MainWindow.height) * FrameArea.height)
-            );
+            (((FrameArea.y + FrameArea.height) > MainWindow.height) * (MainWindow.height - FrameArea.y) + ((FrameArea.y + FrameArea.height) <= MainWindow.height) * FrameArea.height),
+            ShowContent);
         }
     }
 }

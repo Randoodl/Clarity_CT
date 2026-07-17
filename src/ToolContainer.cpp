@@ -151,14 +151,14 @@ void ToolContainer::InitialiseAllElements()
     //Combining all initialisations under one method
 
     //Toolbar for various utilities
-    ToolBarFrame.Update(Layout.TOOL.AnchorX, Layout.TOOL.AnchorY, Layout.TOOL.LenX, Layout.TOOL.LenY);
+    ToolBarFrame.Update(Layout.TOOL.AnchorX, Layout.TOOL.AnchorY, Layout.TOOL.LenX, Layout.TOOL.LenY, Layout.TOOL.Visibility);
     Tools.Update(ToolBarFrame.FrameArea);
     SetAllInterActionsToFalse();
     UpdateWindowMinimumSize();
 
     //Initialise the Colour Dial's Frame and Element
     DialOffsets = {0, 0, 0};
-    RGBDialFrame.Update(Layout.DIAL.AnchorX, Layout.DIAL.AnchorY, Layout.DIAL.LenX, Layout.DIAL.LenY);
+    RGBDialFrame.Update(Layout.DIAL.AnchorX, Layout.DIAL.AnchorY, Layout.DIAL.LenX, Layout.DIAL.LenY, Layout.DIAL.Visibility);
     RGBDial.Update(RGBDialFrame.FrameArea.x + RGBDialFrame.FrameArea.width/2, 
                    RGBDialFrame.FrameArea.y + RGBDialFrame.FrameArea.height/2, 
                    RGBDialFrame.FrameArea.width/2);
@@ -166,12 +166,12 @@ void ToolContainer::InitialiseAllElements()
     //Initialise the Square's Frame and Element
     DialOffsets = RGBDial.GetSquareInDialOffsets();
     RGBSquareFrame.IsVisible = false;
-    RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z);
+    RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z, RGBDialFrame.ShowContent);
     RGBSquare.Update(RGBSquareFrame.FrameArea);
 
     //Initialise the colour previews
     //What a goddamn mess, I need to bundle this somehow
-    CurrentSelectedColourFrame.Update(Layout.SELECT.AnchorX, Layout.SELECT.AnchorY, Layout.SELECT.LenX, Layout.SELECT.LenY);
+    CurrentSelectedColourFrame.Update(Layout.SELECT.AnchorX, Layout.SELECT.AnchorY, Layout.SELECT.LenX, Layout.SELECT.LenY, Layout.SELECT.Visibility);
     InitialiseColourPreview(Hue, BaseHueFrame, ColourCollection.BaseHueColour, ColourCollection.ShadedColour, Layout.HUE);
     InitialiseColourPreview(Complement, ComplementFrame, ColourCollection.ComplementColour, ColourCollection.ShadedComplementColour, Layout.COMP);
     InitialiseColourPreview(LowerTriad, LowerTriadFrame, ColourCollection.LowerTriadColour, ColourCollection.LowerTriadShade, Layout.LTRIAD);
@@ -196,11 +196,11 @@ void ToolContainer::SnapFrames()
     //Size Frames down to the few elements that have a set relative dimension (i.e. RGBDial cannot be "squished down", but always has to be square)
 
     //Snap Frame to ToolBar
-    ToolBarFrame.Update(ToolBarFrame.FrameArea.x, ToolBarFrame.FrameArea.y, Tools.ButtonContainer.width, Tools.ButtonContainer.height);
+    ToolBarFrame.Update(ToolBarFrame.FrameArea.x, ToolBarFrame.FrameArea.y, Tools.ButtonContainer.width, Tools.ButtonContainer.height, ToolBarFrame.ShowContent);
 
     //Snap Frame to RGBDial
     RGBDialFrame.Update(RGBDial.DialOriginXY.x - RGBDial.DialOuterRadius, RGBDial.DialOriginXY.y - RGBDial.DialOuterRadius, 
-                        RGBDial.DialOuterRadius * 2, RGBDial.DialOuterRadius * 2);
+                        RGBDial.DialOuterRadius * 2, RGBDial.DialOuterRadius * 2, RGBDialFrame.ShowContent);
     UpdateWindowMinimumSize();
 }
 
@@ -307,10 +307,11 @@ void ToolContainer::LoadCustomConfig(char*& PassedBinPath)
             {   
                 //Overwrite the default values for all Elements with loaded .conf values
                 {
-                    ElementUIData->AnchorX = AllParameters[ReadingLine][0];
-                    ElementUIData->AnchorY = AllParameters[ReadingLine][1];
-                    ElementUIData->LenX    = AllParameters[ReadingLine][2];
-                    ElementUIData->LenY    = AllParameters[ReadingLine][3]; 
+                    ElementUIData->AnchorX    = AllParameters[ReadingLine][0];
+                    ElementUIData->AnchorY    = AllParameters[ReadingLine][1];
+                    ElementUIData->LenX       = AllParameters[ReadingLine][2];
+                    ElementUIData->LenY       = AllParameters[ReadingLine][3]; 
+                    ElementUIData->Visibility = AllParameters[ReadingLine][4];
                 }
                 ++ReadingLine;
             }
@@ -449,7 +450,7 @@ void ToolContainer::InitialiseColourPreview(Palette& PreviewPalette, Frames& Pre
     //Method to combine all colour preview Frame initialisation
 
     //Set the Frame
-    PreviewFrame.Update(SetState.AnchorX, SetState.AnchorY, SetState.LenX, SetState.LenY);
+    PreviewFrame.Update(SetState.AnchorX, SetState.AnchorY, SetState.LenX, SetState.LenY, SetState.Visibility);
 
     //Set the Palette contained within the Frame
     PreviewPalette.Update(PreviewFrame.FrameArea, 0, 0, true); //Not using the Variation properties here, so those are set to 0
@@ -463,10 +464,10 @@ void ToolContainer::InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFram
     //Method to combine all ShadesTints Frames intialisation
 
     //Set the Frame
-    ViewFrame.Update(SetState.AnchorX, SetState.AnchorY, SetState.LenX, SetState.LenY);
+    ViewFrame.Update(SetState.AnchorX, SetState.AnchorY, SetState.LenX, SetState.LenY, SetState.Visibility);
 
     //Set Frame subdivide parameters
-    ViewPalette.Update(ViewFrame.FrameArea, VariationAmount, VariationDelta, true);
+    ViewPalette.Update(ViewFrame.FrameArea, VariationAmount, VariationDelta, ViewFrame.ShowContent);
 
     //Generate Palette colours and subdivide into rectangles
     ViewPalette.GenerateShadesTints(PassColour);

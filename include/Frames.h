@@ -52,7 +52,7 @@ class Frames
         int MouseOffsetY; 
 
         //Everything needed to draw all Frame information to the screen
-        void Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
+        void Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY, bool SetShowContent);
         void DrawFrameBox(Color& FrameBoxColour);
         void AdjustFrame(Vector2 MouseXY);
         void DrawSingleColour(Color FillColour);

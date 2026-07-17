@@ -24,16 +24,16 @@ struct Defaults
 {
     //A struct of all default positions to be loaded if no other position data is found
     
-    ElementState TOOL   = ElementState("TOOL", 920, 0, 65, 390);
-    ElementState SQUARE = ElementState("SQUARE", 0, 0, 0, 0);      //This is a dummy value in order to make the .conf file reading work
-    ElementState DIAL   = ElementState("DIAL", 0, 0, 300, 300);
-    ElementState HUE    = ElementState("HUE", 0, 310, 70, 80);
-    ElementState COMP   = ElementState("COMP", 80, 310, 70, 80);
-    ElementState LTRIAD = ElementState("LTRIAD", 160, 310, 70, 80);
-    ElementState UTRIAD = ElementState("UTRIAD", 230, 310, 70, 80);
-    ElementState MAINST = ElementState("MAINST", 310, 0, 600, 70);
-    ElementState COMPST = ElementState("COMPST", 310, 80, 600, 70);
-    ElementState LTRIST = ElementState("LTRIST", 310, 160, 600, 70);
-    ElementState UTRIST = ElementState("UTRIST", 310, 230, 600, 70);
-    ElementState SELECT = ElementState("SELECT", 310, 310, 600, 80);
+    ElementState TOOL   = ElementState("TOOL", 920, 0, 65, 390, true);
+    ElementState SQUARE = ElementState("SQUARE", 0, 0, 0, 0, true);      //This is a dummy value in order to make the .conf file reading work
+    ElementState DIAL   = ElementState("DIAL", 0, 0, 300, 300, true);
+    ElementState HUE    = ElementState("HUE", 0, 310, 70, 80, true);
+    ElementState COMP   = ElementState("COMP", 80, 310, 70, 80, true);
+    ElementState LTRIAD = ElementState("LTRIAD", 160, 310, 70, 80, true);
+    ElementState UTRIAD = ElementState("UTRIAD", 230, 310, 70, 80, true);
+    ElementState MAINST = ElementState("MAINST", 310, 0, 600, 70, true);
+    ElementState COMPST = ElementState("COMPST", 310, 80, 600, 70, true);
+    ElementState LTRIST = ElementState("LTRIST", 310, 160, 600, 70, true);
+    ElementState UTRIST = ElementState("UTRIST", 310, 230, 600, 70, true);
+    ElementState SELECT = ElementState("SELECT", 310, 310, 600, 80, true);
 };

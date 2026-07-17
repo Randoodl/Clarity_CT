@@ -45,6 +45,9 @@ make
     I decided to try and do the same in C++, but while I was at it I figured I might as well add some extra nonsense, you know, for a laugh.  
     Somewhere along the way it went from 'a laugh' to an actual program (*though this statement is still up for debate*).
 
+* `Was AI used in this?`
+    * My guy, I invite you to look at the source code. There isn't a model lobotomised enough to come up with the duct taped together fustercluck that is Clarity CT. All of this code is a nightmarish fever dream cooked up by yours truly.
+
 * `No HSL?`  
     * Nope.  
     This project grew way beyond the joke it was supposed to be. RGB and HEX is all you get.

@@ -140,7 +140,7 @@ void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RG
 
         //Lastly, the RGBSquareFrame is relative to the dial, update that one too
         DialOffsets = RGBDial.GetSquareInDialOffsets();
-        RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z);
+        RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z, RGBSquareFrame.ShowContent);
 
         //Preserve the relative locations between the ShadeSquare and ShadeViewBox
         RGBSquare.CurrentShadeMouseLocation.x = RGBSquareFrame.FrameArea.x + float(RGBSquareFrame.FrameArea.width * RelativeDistanceX);
@@ -199,7 +199,7 @@ void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFra
         //It counts up to n of Frames, so the last line for DarkMode toggling does not get counted here
         for(auto Line : PassedFrames) 
         {
-            ExportFile << Line->FrameArea.x << "," << Line->FrameArea.y << "," << Line->FrameArea.width << "," << Line->FrameArea.height << "\n";
+            ExportFile << Line->FrameArea.x << "," << Line->FrameArea.y << "," << Line->FrameArea.width << "," << Line->FrameArea.height << "," << Line->ShowContent <<"\n";
         }
 
         //Tack on a Dec/Hex mode at the almost end

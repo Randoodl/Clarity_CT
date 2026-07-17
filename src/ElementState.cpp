@@ -18,11 +18,12 @@
 #include "../include/ElementState.h"
 
 
-ElementState::ElementState(std::string SetElementTag, int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
+ElementState::ElementState(std::string SetElementTag, int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY, bool SetVisibility)
 {
     ElementTag = SetElementTag;
     AnchorX = SetAnchorX;
     AnchorY = SetAnchorY;
     LenX = SetLenX;
     LenY = SetLenY;
+    Visibility = SetVisibility;
 }
