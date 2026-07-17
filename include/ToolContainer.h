@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <string>
-
 #include "./Interactions.h"
 #include "./Defaults.h"
 
@@ -88,7 +86,7 @@ class ToolContainer
         Palette LowerTriad;
         Frames UpperTriadFrame;
         Palette UpperTriad;
-        void InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, ElementPosition& SetLayout);
+        void InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, ElementState& SetState);
 
         //ShadesTints - generate a whole spectrum of shades and tints, centered on the current colour shade/tint
         int SetVariationAmount;
@@ -102,7 +100,7 @@ class ToolContainer
         Palette LowerTriadShadesTints;
         Frames UpperTriadShadesTintsFrame;
         Palette UpperTriadShadesTints;
-        void InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, ElementPosition& SetLayout);
+        void InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, ElementState& SetState);
 
         //CurrentSelectedColour - show currently narrowed-down colour and retrieve RGB/Hex value 
         Frames CurrentSelectedColourFrame;
@@ -110,7 +108,7 @@ class ToolContainer
  
         //Collections of objects for for loop functionality
         std::vector<Frames*> ElementFrames;
-        std::vector<ElementPosition*> LayoutPositions;
+        std::vector<ElementState*> LayoutStates;
         std::vector<Palette*> AllPalettes;
         std::map<Palette*, std::vector<Color*>> PaletteActions;
 };

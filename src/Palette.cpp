@@ -24,6 +24,7 @@ Palette::Palette()
     BasePaletteColour = {};
     VariationAmount = {}; 
     VariationDelta = {};
+    Visibility = true;
 
     //private
     PaletteRectangles = {};
@@ -47,11 +48,12 @@ Color Palette::GetVariationColour(Vector2 MouseXY)
 }
 
 
-void::Palette::Update(Rectangle SetPaletteArea, int SetVariationAmount, int SetVariationDelta)
+void::Palette::Update(Rectangle SetPaletteArea, int SetVariationAmount, int SetVariationDelta, bool SetVisibility)
 {
     PaletteArea = SetPaletteArea;
     VariationAmount = SetVariationAmount;
     VariationDelta = SetVariationDelta;
+    Visibility = SetVisibility;
 }
 
 

@@ -15,11 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "../include/ElementPosition.h"
+#include "../include/ElementState.h"
 
 
-ElementPosition::ElementPosition(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
+ElementState::ElementState(std::string SetElementTag, int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
 {
+    ElementTag = SetElementTag;
     AnchorX = SetAnchorX;
     AnchorY = SetAnchorY;
     LenX = SetLenX;

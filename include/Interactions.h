@@ -23,7 +23,6 @@
 #include <iostream>
 
 #include "./ColourDial.h"
-#include "./ShadeSquare.h"
 #include "./Palette.h"
 #include "./ToolBar.h"
 #include "./ColourFamily.h"

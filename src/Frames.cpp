@@ -21,6 +21,7 @@
 Frames::Frames()
 {
     //public
+    FrameTag = {};
     FrameArea = {};
     EdgeButtonSize = 20;
     MoveButton = {};
@@ -29,6 +30,7 @@ Frames::Frames()
     IsDragging = false;
     IsScaling = false;
     IsVisible = true;
+    ShowContent = true;
     MouseOffsetX = {};
     MouseOffsetY = {};
     
@@ -55,6 +57,11 @@ void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
     MoveButton.x = FrameArea.x;
     MoveButton.y = FrameArea.y;
 
+    //Generate a square button at the bottom left for showing Frame content
+    ShowButton.height = ShowButton.width = EdgeButtonSize;
+    ShowButton.x = FrameArea.x;
+    ShowButton.y = FrameArea.height + FrameArea.y - EdgeButtonSize;
+
     //Generate a square button at the bottom right for scaling
     ScaleButton.height = ScaleButton.width = EdgeButtonSize;
     ScaleButton.x = FrameArea.width + FrameArea.x - EdgeButtonSize;
@@ -67,10 +74,12 @@ void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY)
 
 void Frames::DrawFrameBox(Color& FrameBoxColour)
 {
-    //Draw the Frame surrounding the element, as well as the two corner button areas
+    //Draw the Frame surrounding the element, as well as the button areas
     DrawRectangleLines(FrameArea.x, FrameArea.y, FrameArea.width, FrameArea.height, FrameBoxColour);
-    DrawRectangle(MoveButton.x, MoveButton.y, MoveButton.width, MoveButton.height, FrameBoxColour);
-    DrawRectangle(ScaleButton.x, ScaleButton.y, ScaleButton.width, ScaleButton.height, FrameBoxColour);
+    for(Rectangle Button : {MoveButton, ScaleButton, ShowButton})
+    {
+        DrawRectangle(Button.x, Button.y, Button.width, Button.height, FrameBoxColour);
+    }
 } 
 
 

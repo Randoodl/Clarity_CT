@@ -19,7 +19,7 @@
 
 #include <raylib.h>
 #include <vector> 
-
+#include <string>
 
 class Frames
 {
@@ -28,10 +28,14 @@ class Frames
     public:
         Frames();
 
+        //Tag for housekeeping
+        std::string FrameTag;
+
         //Positional attributes for the whole Frame
         Rectangle FrameArea;  //XY absolute in relation to MainWindowXY
         int EdgeButtonSize;
         Rectangle MoveButton;
+        Rectangle ShowButton;
         Rectangle ScaleButton;
 
         //Frame states
@@ -39,6 +43,9 @@ class Frames
         bool IsDragging;
         bool IsScaling;
         bool IsVisible;
+
+        //This is to control whether or not the content of the Frame is visible
+        bool ShowContent;
 
         //These are used to account for the offset of the mouse click when targetting the move button (Stops Frame's topleft snapping to cursor)
         int MouseOffsetX; 

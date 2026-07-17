@@ -44,7 +44,7 @@ ToolContainer::ToolContainer(char*& PassedBinPath)
     ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &LowerTriadFrame, &UpperTriadFrame,
                       &MainShadesTintsFrame, &ComplementShadesTintsFrame, &LowerTriadShadesTintsFrame, &UpperTriadShadesTintsFrame, &CurrentSelectedColourFrame};
 
-    LayoutPositions = {&Layout.TOOL, &Layout.SQUARE, &Layout.DIAL, &Layout.HUE, &Layout.COMP, &Layout.LTRIAD, &Layout.UTRIAD,
+    LayoutStates   = {&Layout.TOOL, &Layout.SQUARE, &Layout.DIAL, &Layout.HUE, &Layout.COMP, &Layout.LTRIAD, &Layout.UTRIAD,
                        &Layout.MAINST, &Layout.COMPST, &Layout.LTRIST, &Layout.UTRIST, &Layout.SELECT};
 
     AllPalettes    = {&Hue, &Complement, &LowerTriad, &UpperTriad, &MainShadesTints, &ComplementShadesTints, &LowerTriadShadesTints, &UpperTriadShadesTints};
@@ -75,16 +75,24 @@ void ToolContainer::DrawElements()
     //Draw the single instance elements, ShadeSquare after Dial so the ShadePreviewSquare doesn't hide behind the Dial
     RGBDial.DrawRGBDial(ColourCollection.BackgroundColour);
     RGBSquare.DrawShadeSquare();
-    CurrentSelectedColourFrame.DrawSingleColour(ColourCollection.CurrentSelectedColour);
+
+    //Control whether or not the currently selected colour is shown
+    if(CurrentSelectedColourFrame.ShowContent)
+    {
+        CurrentSelectedColourFrame.DrawSingleColour(ColourCollection.CurrentSelectedColour);
+
+        //Show the current colour value in the CurrentColourFrame in either RGB Decimal or Hex notation
+        ShowCurrentValue(HexModeEnabled);
+    }
     
-    //Draw all Palettes
+    //Draw all visible Palettes
     for(Palette* EachPalette : AllPalettes)
     {
-        EachPalette->DrawPalette();
+        if(EachPalette->Visibility)
+        {
+            EachPalette->DrawPalette();
+        }
     }
-
-    //Show the current colour value in the CurrentColourFrame in either RGB Decimal or Hex notation
-    ShowCurrentValue(HexModeEnabled);
 
     //Toolbar has to be the last draw call, it has to ALWAYS be visible
     Tools.DrawToolBar(ColourCollection.ToolBackgroundColour, ColourCollection.ToolButtonColour, ColourCollection.ToolIconColour);  
@@ -209,13 +217,17 @@ void ToolContainer::UpdateWindowMinimumSize()
     //Keep trawling through Frames' bottomright points and retain the largest coordinate point
     for(Frames* Frame : ElementFrames)
     {
-        if((Frame->FrameArea.x + Frame->FrameArea.width) > MinWidth)
+        //Allow empty, non-showing, Frames to be off-screen
+        if(Frame->ShowContent)
         {
-            MinWidth = (Frame->FrameArea.x + Frame->FrameArea.width);
-        }
-        if((Frame->FrameArea.y + Frame->FrameArea.height) > MinHeight)
-        {
-            MinHeight = (Frame->FrameArea.y + Frame->FrameArea.height);
+            if((Frame->FrameArea.x + Frame->FrameArea.width) > MinWidth)
+            {
+                MinWidth = (Frame->FrameArea.x + Frame->FrameArea.width);
+            }
+            if((Frame->FrameArea.y + Frame->FrameArea.height) > MinHeight)
+            {
+                MinHeight = (Frame->FrameArea.y + Frame->FrameArea.height);
+            }
         }
     }
     //Then set the max coordinate point as the min window size
@@ -291,7 +303,7 @@ void ToolContainer::LoadCustomConfig(char*& PassedBinPath)
             int ReadingLine {0};
 
             //Iterate through each Frame (even the hidden ones)
-            for(ElementPosition* ElementUIData: LayoutPositions)
+            for(ElementState* ElementUIData: LayoutStates)
             {   
                 //Overwrite the default values for all Elements with loaded .conf values
                 {
@@ -355,9 +367,21 @@ void ToolContainer::SetElementInteraction(Vector2 MouseXY)
                 {
                     Frame->IsDragging = true;
                 }
-                if(CheckCollisionPointRec(MouseXY, Frame->ScaleButton))
+                else if(CheckCollisionPointRec(MouseXY, Frame->ScaleButton))
                 {
                     Frame->IsScaling = true;
+                }
+                else if(CheckCollisionPointRec(MouseXY, Frame->ShowButton))
+                {
+                    std::cout << "Pressing!" << std::endl;
+                    if(Frame->ShowContent)
+                    {
+                        Frame->ShowContent = false;
+                    } 
+                    else
+                    {
+                        Frame->ShowContent = true;
+                    }
                 }
             }
             break;
@@ -420,29 +444,29 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
 }
 
 
-void ToolContainer::InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, ElementPosition& SetLayout)
+void ToolContainer::InitialiseColourPreview(Palette& PreviewPalette, Frames& PreviewFrame, Color& Base, Color& Shade, ElementState& SetState)
 {
     //Method to combine all colour preview Frame initialisation
 
     //Set the Frame
-    PreviewFrame.Update(SetLayout.AnchorX, SetLayout.AnchorY, SetLayout.LenX, SetLayout.LenY);
+    PreviewFrame.Update(SetState.AnchorX, SetState.AnchorY, SetState.LenX, SetState.LenY);
 
     //Set the Palette contained within the Frame
-    PreviewPalette.Update(PreviewFrame.FrameArea, 0, 0); //Not using the Variation properties here, so those are set to 0
+    PreviewPalette.Update(PreviewFrame.FrameArea, 0, 0, true); //Not using the Variation properties here, so those are set to 0
     PreviewPalette.SetHueShadePair(Base, Shade);
     PreviewPalette.GeneratePaletteRectangles();
 }
 
 
-void ToolContainer::InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, ElementPosition& SetLayout)
+void ToolContainer::InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFrame, Color& PassColour, int VariationAmount, int VariationDelta, ElementState& SetState)
 {
     //Method to combine all ShadesTints Frames intialisation
 
     //Set the Frame
-    ViewFrame.Update(SetLayout.AnchorX, SetLayout.AnchorY, SetLayout.LenX, SetLayout.LenY);
+    ViewFrame.Update(SetState.AnchorX, SetState.AnchorY, SetState.LenX, SetState.LenY);
 
     //Set Frame subdivide parameters
-    ViewPalette.Update(ViewFrame.FrameArea, VariationAmount, VariationDelta);
+    ViewPalette.Update(ViewFrame.FrameArea, VariationAmount, VariationDelta, true);
 
     //Generate Palette colours and subdivide into rectangles
     ViewPalette.GenerateShadesTints(PassColour);

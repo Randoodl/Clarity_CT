@@ -17,14 +17,17 @@
 
 #pragma once
 
+#include <string>
 
-class ElementPosition
+
+class ElementState
 {
-    //This class holds all the information related to a Frames' position
+    //This class holds all the information related to a Frames' position as well as its identifier
 
     public:
-        ElementPosition(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
+        ElementState(std::string SetElementTag, int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY);
     
+        std::string ElementTag;
         int AnchorX;
         int AnchorY;
         int LenX;

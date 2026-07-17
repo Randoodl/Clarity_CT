@@ -163,7 +163,7 @@ void ElementInteractions::InteractWithPalette(Frames& PaletteFrame, Palette& Pal
     else
     {
         PaletteFrame.AdjustFrame(PassedMouseXY);
-        PaletteColours.Update(PaletteFrame.FrameArea, PaletteColours.VariationAmount, PaletteColours.VariationDelta);
+        PaletteColours.Update(PaletteFrame.FrameArea, PaletteColours.VariationAmount, PaletteColours.VariationDelta, PaletteFrame.ShowContent);
         PaletteColours.GeneratePaletteRectangles();
     }
 }
