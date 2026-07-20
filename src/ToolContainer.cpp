@@ -152,7 +152,7 @@ void ToolContainer::InitialiseAllElements()
 
     //Toolbar for various utilities - explicitly set AllowShowButton to false, we never want to hide this element
     ToolBarFrame.AllowShowButton = false;
-    ToolBarFrame.Update(Layout.TOOL.AnchorX, Layout.TOOL.AnchorY, Layout.TOOL.LenX, Layout.TOOL.LenY, Layout.TOOL.Visibility);
+    ToolBarFrame.Update(Layout.TOOL.AnchorX, Layout.TOOL.AnchorY, Layout.TOOL.LenX, Layout.TOOL.LenY, Layout.TOOL.Visibility, Layout.TOOL.ElementTag);
     Tools.Update(ToolBarFrame.FrameArea);
     SetAllInterActionsToFalse();
     UpdateWindowMinimumSize();
@@ -160,7 +160,7 @@ void ToolContainer::InitialiseAllElements()
     //Initialise the Colour Dial's Frame and Element - as above, explicitly set AllowShowButton to false, why would you want to hide the CORE functionality?
     DialOffsets = {0, 0, 0};
     RGBDialFrame.AllowShowButton =false;
-    RGBDialFrame.Update(Layout.DIAL.AnchorX, Layout.DIAL.AnchorY, Layout.DIAL.LenX, Layout.DIAL.LenY, Layout.DIAL.Visibility);
+    RGBDialFrame.Update(Layout.DIAL.AnchorX, Layout.DIAL.AnchorY, Layout.DIAL.LenX, Layout.DIAL.LenY, Layout.DIAL.Visibility, Layout.DIAL.ElementTag);
     RGBDial.Update(RGBDialFrame.FrameArea.x + RGBDialFrame.FrameArea.width/2, 
                    RGBDialFrame.FrameArea.y + RGBDialFrame.FrameArea.height/2, 
                    RGBDialFrame.FrameArea.width/2);
@@ -168,12 +168,12 @@ void ToolContainer::InitialiseAllElements()
     //Initialise the Square's Frame and Element
     DialOffsets = RGBDial.GetSquareInDialOffsets();
     RGBSquareFrame.IsVisible = false;
-    RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z, RGBDialFrame.ShowContent);
+    RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z, RGBDialFrame.ShowContent, Layout.SQUARE.ElementTag);
     RGBSquare.Update(RGBSquareFrame.FrameArea);
 
     //Initialise the colour previews
     //What a goddamn mess, I need to bundle this somehow
-    CurrentSelectedColourFrame.Update(Layout.SELECT.AnchorX, Layout.SELECT.AnchorY, Layout.SELECT.LenX, Layout.SELECT.LenY, Layout.SELECT.Visibility);
+    CurrentSelectedColourFrame.Update(Layout.SELECT.AnchorX, Layout.SELECT.AnchorY, Layout.SELECT.LenX, Layout.SELECT.LenY, Layout.SELECT.Visibility, Layout.SELECT.ElementTag);
     InitialiseColourPreview(Hue, BaseHueFrame, ColourCollection.BaseHueColour, ColourCollection.ShadedColour, Layout.HUE);
     InitialiseColourPreview(Complement, ComplementFrame, ColourCollection.ComplementColour, ColourCollection.ShadedComplementColour, Layout.COMP);
     InitialiseColourPreview(LowerTriad, LowerTriadFrame, ColourCollection.LowerTriadColour, ColourCollection.LowerTriadShade, Layout.LTRIAD);
@@ -181,7 +181,7 @@ void ToolContainer::InitialiseAllElements()
 
     //Initialise the ShadesTints
     //As above, so below, bundle this
-    SetVariationAmount = 13;
+    SetVariationAmount = 10;
     SetVariationDelta = 11;
     InitialiseShadesTints(MainShadesTints, MainShadesTintsFrame, ColourCollection.ShadedColour, SetVariationAmount, SetVariationDelta, Layout.MAINST);
     InitialiseShadesTints(ComplementShadesTints, ComplementShadesTintsFrame, ColourCollection.ShadedComplementColour, SetVariationAmount, SetVariationDelta, Layout.COMPST);
@@ -198,11 +198,11 @@ void ToolContainer::SnapFrames()
     //Size Frames down to the few elements that have a set relative dimension (i.e. RGBDial cannot be "squished down", but always has to be square)
 
     //Snap Frame to ToolBar
-    ToolBarFrame.Update(ToolBarFrame.FrameArea.x, ToolBarFrame.FrameArea.y, Tools.ButtonContainer.width, Tools.ButtonContainer.height, ToolBarFrame.ShowContent);
+    ToolBarFrame.Update(ToolBarFrame.FrameArea.x, ToolBarFrame.FrameArea.y, Tools.ButtonContainer.width, Tools.ButtonContainer.height, ToolBarFrame.ShowContent, ToolBarFrame.FrameTag);
 
     //Snap Frame to RGBDial
     RGBDialFrame.Update(RGBDial.DialOriginXY.x - RGBDial.DialOuterRadius, RGBDial.DialOriginXY.y - RGBDial.DialOuterRadius, 
-                        RGBDial.DialOuterRadius * 2, RGBDial.DialOuterRadius * 2, RGBDialFrame.ShowContent);
+                        RGBDial.DialOuterRadius * 2, RGBDial.DialOuterRadius * 2, RGBDialFrame.ShowContent, RGBDialFrame.FrameTag);
     UpdateWindowMinimumSize();
 }
 
@@ -451,7 +451,7 @@ void ToolContainer::InitialiseColourPreview(Palette& PreviewPalette, Frames& Pre
     //Method to combine all colour preview Frame initialisation
 
     //Set the Frame
-    PreviewFrame.Update(SetState.AnchorX, SetState.AnchorY, SetState.LenX, SetState.LenY, SetState.Visibility);
+    PreviewFrame.Update(SetState.AnchorX, SetState.AnchorY, SetState.LenX, SetState.LenY, SetState.Visibility, SetState.ElementTag);
 
     //Set the Palette contained within the Frame
     PreviewPalette.Update(PreviewFrame.FrameArea, 0, 0, SetState.Visibility); //Not using the Variation properties here, so those are set to 0
@@ -465,7 +465,7 @@ void ToolContainer::InitialiseShadesTints(Palette& ViewPalette, Frames& ViewFram
     //Method to combine all ShadesTints Frames intialisation
 
     //Set the Frame
-    ViewFrame.Update(SetState.AnchorX, SetState.AnchorY, SetState.LenX, SetState.LenY, SetState.Visibility);
+    ViewFrame.Update(SetState.AnchorX, SetState.AnchorY, SetState.LenX, SetState.LenY, SetState.Visibility, SetState.ElementTag);
 
     //Set Frame subdivide parameters
     ViewPalette.Update(ViewFrame.FrameArea, VariationAmount, VariationDelta, ViewFrame.ShowContent);
@@ -511,15 +511,15 @@ void ToolContainer::ShowCurrentValue(bool PassedCodeMode)
             if(Value < 16){HexValue << "0";} //Sloppy way to add trailing zeroes, but it works!
             HexValue << std::hex << Value;
         }
-        ShowString =" #" + HexValue.str() + " ";
+        ShowString =" #" + HexValue.str() + "  ";
     }
     else //Decimal
     {
         ShowString = 
-            "R:"  + std::to_string(RedValue)   + 
+            " R:"  + std::to_string(RedValue)   + 
             " G:" + std::to_string(GreenValue) + 
             " B:" + std::to_string(BlueValue)  +
-            " ";
+            "  ";
     }
 
     //The string to be displayed is ready to appear on screen, time to set the positional data

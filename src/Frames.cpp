@@ -22,10 +22,12 @@ Frames::Frames()
 {
     //public
     FrameTag = {};
+    FrameTagFontSize = 20;
     FrameArea = {};
     EdgeButtonSize = 20;
     MoveButton = {};
     ScaleButton = {};
+    ShowButton = {};
     ActiveFrame = false;
     IsDragging = false;
     IsScaling = false;
@@ -40,7 +42,7 @@ Frames::Frames()
 }
 
 
-void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY, bool SetShowContent)
+void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY, bool SetShowContent, std::string& SetFrameTag)
 {
     ShowContent = SetShowContent;
     //Update all position and size data when frame is moved or scaled
@@ -48,6 +50,7 @@ void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY, bo
     FrameArea.height = SetLenY;
     FrameArea.x = SetAnchorX;
     FrameArea.y = SetAnchorY;
+    FrameTag = SetFrameTag;
 
     //This caps how small the frame can possibly be: stops Scale and Move button from overlapping
     if(FrameArea.width < (2 * EdgeButtonSize)){FrameArea.width = (2 * EdgeButtonSize);}
@@ -87,8 +90,12 @@ void Frames::DrawFrameBox(Color& FrameBoxColour, Color& BackGroundColour)
     //Draw the box around the Frame
     DrawRectangleLines(FrameArea.x, FrameArea.y, FrameArea.width, FrameArea.height, FrameBoxColour);
 
-    //Draw the Move Button
+    //Draw the Move Button and, when space permits, a Frame title
     DrawRectangle(MoveButton.x, MoveButton.y, MoveButton.width, MoveButton.height, FrameBoxColour);
+    if(MeasureText(FrameTag.c_str(), FrameTagFontSize) < MoveButton.width)
+    {
+        DrawText(FrameTag.c_str(), MoveButton.x, MoveButton.y, FrameTagFontSize, BackGroundColour);
+    }
     
     //Draw the Show Button
     DrawRectangle(ShowButton.x, ShowButton.y, ShowButton.width, ShowButton.height, FrameBoxColour);
@@ -122,12 +129,12 @@ void Frames::AdjustFrame(Vector2 MouseXY)
 
     if(IsDragging)
     {
-        Update(MouseXY.x, MouseXY.y, FrameArea.width, FrameArea.height, ShowContent);
+        Update(MouseXY.x, MouseXY.y, FrameArea.width, FrameArea.height, ShowContent, FrameTag);
 
         if(!CheckCollisionPointRec({FrameArea.x, FrameArea.y}, MainWindow))  
         {
             //TopLeft is out of bounds
-            Update((MouseXY.x > 0) * MouseXY.x, (MouseXY.y > 0) * MouseXY.y, FrameArea.width, FrameArea.height, ShowContent); //Your dumbest idea yet, but it works
+            Update((MouseXY.x > 0) * MouseXY.x, (MouseXY.y > 0) * MouseXY.y, FrameArea.width, FrameArea.height, ShowContent, FrameTag); //Your dumbest idea yet, but it works
         }
         if(!CheckCollisionPointRec({FrameArea.x + FrameArea.width, FrameArea.y + FrameArea.height}, MainWindow)) 
         {
@@ -143,12 +150,12 @@ void Frames::AdjustFrame(Vector2 MouseXY)
             (((FrameArea.x + FrameArea.width) > MainWindow.width) * (MainWindow.width - FrameArea.width)) + (((FrameArea.x + FrameArea.width) <= MainWindow.width) * FrameArea.x), 
             (((FrameArea.y + FrameArea.height) > MainWindow.height) * (MainWindow.height - FrameArea.height)) + (((FrameArea.y + FrameArea.height) <= MainWindow.height) * FrameArea.y),  
             FrameArea.width,
-            FrameArea.height, ShowContent);    
+            FrameArea.height, ShowContent, FrameTag);    
         }
     }
     if(IsScaling)
     {
-        Update(FrameArea.x, FrameArea.y, FrameArea.width + MouseXYDelta.x, FrameArea.height + MouseXYDelta.y, ShowContent);
+        Update(FrameArea.x, FrameArea.y, FrameArea.width + MouseXYDelta.x, FrameArea.height + MouseXYDelta.y, ShowContent, FrameTag);
 
         if(!CheckCollisionPointRec({FrameArea.x + FrameArea.width, FrameArea.y + FrameArea.height}, MainWindow)) 
         {
@@ -158,7 +165,7 @@ void Frames::AdjustFrame(Vector2 MouseXY)
             Update(FrameArea.x, FrameArea.y, 
             (((FrameArea.x + FrameArea.width) > MainWindow.width) * (MainWindow.width - FrameArea.x) + ((FrameArea.x + FrameArea.width) <= MainWindow.width) * FrameArea.width),
             (((FrameArea.y + FrameArea.height) > MainWindow.height) * (MainWindow.height - FrameArea.y) + ((FrameArea.y + FrameArea.height) <= MainWindow.height) * FrameArea.height),
-            ShowContent);
+            ShowContent, FrameTag);
         }
     }
 }

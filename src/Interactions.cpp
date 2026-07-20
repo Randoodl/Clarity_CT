@@ -145,7 +145,7 @@ void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RG
 
         //Lastly, the RGBSquareFrame is relative to the dial, update that one too
         DialOffsets = RGBDial.GetSquareInDialOffsets();
-        RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z, RGBSquareFrame.ShowContent);
+        RGBSquareFrame.Update(DialOffsets.x, DialOffsets.y, DialOffsets.z, DialOffsets.z, RGBSquareFrame.ShowContent, RGBSquareFrame.FrameTag);
 
         //Preserve the relative locations between the ShadeSquare and ShadeViewBox
         RGBSquare.CurrentShadeMouseLocation.x = RGBSquareFrame.FrameArea.x + float(RGBSquareFrame.FrameArea.width * RelativeDistanceX);

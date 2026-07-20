@@ -28,8 +28,9 @@ class Frames
     public:
         Frames();
 
-        //Tag for housekeeping
+        //Frame title to be optionally displayed at the top of the Frame
         std::string FrameTag;
+        int FrameTagFontSize;
 
         //Positional attributes for the whole Frame
         Rectangle FrameArea;  //XY absolute in relation to MainWindowXY
@@ -53,7 +54,7 @@ class Frames
         int MouseOffsetY; 
 
         //Everything needed to draw all Frame information to the screen
-        void Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY, bool SetShowContent);
+        void Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY, bool SetShowContent, std::string& SetFrameTag);
         void DrawFrameBox(Color& FrameBoxColour, Color& BackgroundColour);
         void AdjustFrame(Vector2 MouseXY);
         void DrawSingleColour(Color FillColour);
