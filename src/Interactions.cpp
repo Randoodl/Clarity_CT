@@ -23,6 +23,7 @@ ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& P
 {
     PassedMouseXY = {};
     ResetFrames = false;
+    ToggleHidden = true;
 }
 
 
@@ -30,7 +31,11 @@ void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames
 {
     if(!R_FrameState)
     {
-        if(CheckCollisionPointRec(PassedMouseXY, Tools.SaveButton))
+        if(CheckCollisionPointRec(PassedMouseXY, Tools.ToggleHiddenButton))
+        {
+            if(ToggleHidden){ToggleHidden = false;}else{ToggleHidden = true;};
+        }
+        else if(CheckCollisionPointRec(PassedMouseXY, Tools.SaveButton))
         {
             //Seems like a long goddamn way to pass down main(argv), but alas, here we are
             //I'm tired, Samwise

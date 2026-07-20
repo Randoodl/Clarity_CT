@@ -51,8 +51,10 @@ class ElementInteractions
         //The toolbar changes the state of FrameIsMutable, hence we need to work with the actual value and not a copy
         bool& R_FrameState;    
         bool ResetFrames; 
+
+        //Allows the toggling of Frame content visibility
+        bool ToggleHidden;
     
-        
         //Relevant collections of data passed by reference
         ColourFamily& R_ColourFamily;    
         std::map<Palette*, std::vector<Color*>>& R_PaletteActions;

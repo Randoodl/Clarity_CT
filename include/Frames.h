@@ -46,6 +46,7 @@ class Frames
 
         //This is to control whether or not the content of the Frame is visible
         bool ShowContent;
+        bool AllowShowButton;
 
         //These are used to account for the offset of the mouse click when targetting the move button (Stops Frame's topleft snapping to cursor)
         int MouseOffsetX; 

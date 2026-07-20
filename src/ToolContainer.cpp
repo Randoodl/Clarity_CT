@@ -77,7 +77,7 @@ void ToolContainer::DrawElements()
     RGBSquare.DrawShadeSquare();
 
     //Control whether or not the currently selected colour is shown
-    if(CurrentSelectedColourFrame.ShowContent)
+    if(CurrentSelectedColourFrame.ShowContent || !Interactions.ToggleHidden)
     {
         CurrentSelectedColourFrame.DrawSingleColour(ColourCollection.CurrentSelectedColour);
 
@@ -88,7 +88,7 @@ void ToolContainer::DrawElements()
     //Draw all visible Palettes
     for(Palette* EachPalette : AllPalettes)
     {
-        if(EachPalette->Visibility)
+        if(EachPalette->Visibility || !Interactions.ToggleHidden)
         {
             EachPalette->DrawPalette();
         }
@@ -150,14 +150,16 @@ void ToolContainer::InitialiseAllElements()
 {
     //Combining all initialisations under one method
 
-    //Toolbar for various utilities
+    //Toolbar for various utilities - explicitly set AllowShowButton to false, we never want to hide this element
+    ToolBarFrame.AllowShowButton = false;
     ToolBarFrame.Update(Layout.TOOL.AnchorX, Layout.TOOL.AnchorY, Layout.TOOL.LenX, Layout.TOOL.LenY, Layout.TOOL.Visibility);
     Tools.Update(ToolBarFrame.FrameArea);
     SetAllInterActionsToFalse();
     UpdateWindowMinimumSize();
 
-    //Initialise the Colour Dial's Frame and Element
+    //Initialise the Colour Dial's Frame and Element - as above, explicitly set AllowShowButton to false, why would you want to hide the CORE functionality?
     DialOffsets = {0, 0, 0};
+    RGBDialFrame.AllowShowButton =false;
     RGBDialFrame.Update(Layout.DIAL.AnchorX, Layout.DIAL.AnchorY, Layout.DIAL.LenX, Layout.DIAL.LenY, Layout.DIAL.Visibility);
     RGBDial.Update(RGBDialFrame.FrameArea.x + RGBDialFrame.FrameArea.width/2, 
                    RGBDialFrame.FrameArea.y + RGBDialFrame.FrameArea.height/2, 
@@ -452,7 +454,7 @@ void ToolContainer::InitialiseColourPreview(Palette& PreviewPalette, Frames& Pre
     PreviewFrame.Update(SetState.AnchorX, SetState.AnchorY, SetState.LenX, SetState.LenY, SetState.Visibility);
 
     //Set the Palette contained within the Frame
-    PreviewPalette.Update(PreviewFrame.FrameArea, 0, 0, true); //Not using the Variation properties here, so those are set to 0
+    PreviewPalette.Update(PreviewFrame.FrameArea, 0, 0, SetState.Visibility); //Not using the Variation properties here, so those are set to 0
     PreviewPalette.SetHueShadePair(Base, Shade);
     PreviewPalette.GeneratePaletteRectangles();
 }

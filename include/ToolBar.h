@@ -37,7 +37,7 @@ class ToolBar
 
         //Everything needed to calculate and keep track of buttons
         Rectangle LockButton;
-        Rectangle SettingsButton;  //CURRENTLY A DUMMY BUTTON
+        Rectangle ToggleHiddenButton; 
         Rectangle SaveButton;
         Rectangle ResetButton;
         Rectangle CodeModeButton;

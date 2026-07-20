@@ -31,6 +31,7 @@ Frames::Frames()
     IsScaling = false;
     IsVisible = true;
     ShowContent = true;
+    AllowShowButton = true;
     MouseOffsetX = {};
     MouseOffsetY = {};
     
@@ -54,14 +55,20 @@ void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY, bo
 
     //Generate a bar at the top of the window for dragging
     MoveButton.height =  EdgeButtonSize;
-    MoveButton.width = FrameArea.width - EdgeButtonSize;
+
+    //Allow some space for the ShowButton if needed
+    MoveButton.width = FrameArea.width - (EdgeButtonSize * AllowShowButton);
+ 
     MoveButton.x = FrameArea.x;
     MoveButton.y = FrameArea.y;
 
-    //Generate an eye-like at the top right for showing Frame content
-    ShowButton.height = ShowButton.width = EdgeButtonSize;
-    ShowButton.x = FrameArea.x + MoveButton.width;
-    ShowButton.y = FrameArea.y;
+    //Generate an eye-like at the top right for showing Frame content if allowed
+    if(AllowShowButton)
+    {
+        ShowButton.height = ShowButton.width = EdgeButtonSize;
+        ShowButton.x = FrameArea.x + MoveButton.width;
+        ShowButton.y = FrameArea.y;
+    }
 
     //Generate a triangle button at the bottom right for scaling
     ScaleButton.height = ScaleButton.width = EdgeButtonSize;
