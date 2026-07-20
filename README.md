@@ -24,7 +24,7 @@ It is not a well written program, and it is not meant to be. This is quite liter
 - **Interactive Colour Picker:** - Select a specific hue using the colour dial and narrow down its shade or tint.
 - **Display related colours:** - Automatically generate complement and triadic colours, alongside shades and tints thereof.
 - **Copyable HEX and RGB values:** - Easily copy colour values for use in other applications with a single click.
-- **Custom UI:** - Scale and move elements to create a comfortable layout in an optional Dark Mode.
+- **Custom UI:** - Scale, move or hide elements to create a comfortable layout in an optional Dark Mode.
 
 ### 🗹 Prerequisites <a name = "prerequisites"></a>
 - **raylib** (www.raylib.com)
@@ -46,7 +46,7 @@ make
     Somewhere along the way it went from 'a laugh' to an actual program (*though this statement is still up for debate*).
 
 * `Was AI used in this?`
-    * My guy, I invite you to look at the source code. There isn't a model lobotomised enough to come up with the duct taped together fustercluck that is Clarity CT. All of this code is a nightmarish fever dream cooked up by yours truly.
+    * My guy, I invite you to look at the [source code](./src/ToolContainer.cpp#L265). There isn't a model lobotomised enough to come up with the ramshackle, cobbled together fustercluck that is Clarity CT. All of this code is a nightmarish fever dream cooked up by yours truly. 100% idiot coded for the love of the game.
 
 * `No HSL?`  
     * Nope.  

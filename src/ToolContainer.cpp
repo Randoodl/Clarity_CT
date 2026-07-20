@@ -104,7 +104,7 @@ void ToolContainer::DrawElements()
         {
             if(ShowFrame->IsVisible)
             {
-                ShowFrame->DrawFrameBox(ColourCollection.FrameBoxColour);
+                ShowFrame->DrawFrameBox(ColourCollection.FrameBoxColour, ColourCollection.BackgroundColour);
             }
         }
     }
@@ -373,8 +373,7 @@ void ToolContainer::SetElementInteraction(Vector2 MouseXY)
                     Frame->IsScaling = true;
                 }
                 else if(CheckCollisionPointRec(MouseXY, Frame->ShowButton))
-                {
-                    std::cout << "Pressing!" << std::endl;
+                { 
                     if(Frame->ShowContent)
                     {
                         Frame->ShowContent = false;

@@ -54,16 +54,16 @@ void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY, bo
 
     //Generate a bar at the top of the window for dragging
     MoveButton.height =  EdgeButtonSize;
-    MoveButton.width = FrameArea.width;
+    MoveButton.width = FrameArea.width - EdgeButtonSize;
     MoveButton.x = FrameArea.x;
     MoveButton.y = FrameArea.y;
 
-    //Generate a square button at the bottom left for showing Frame content
+    //Generate an eye-like at the top right for showing Frame content
     ShowButton.height = ShowButton.width = EdgeButtonSize;
-    ShowButton.x = FrameArea.x;
-    ShowButton.y = FrameArea.height + FrameArea.y - EdgeButtonSize;
+    ShowButton.x = FrameArea.x + MoveButton.width;
+    ShowButton.y = FrameArea.y;
 
-    //Generate a square button at the bottom right for scaling
+    //Generate a triangle button at the bottom right for scaling
     ScaleButton.height = ScaleButton.width = EdgeButtonSize;
     ScaleButton.x = FrameArea.width + FrameArea.x - EdgeButtonSize;
     ScaleButton.y = FrameArea.height + FrameArea.y - EdgeButtonSize;
@@ -73,14 +73,30 @@ void Frames::Update(int SetAnchorX, int SetAnchorY, int SetLenX, int SetLenY, bo
 }
 
 
-void Frames::DrawFrameBox(Color& FrameBoxColour)
+void Frames::DrawFrameBox(Color& FrameBoxColour, Color& BackGroundColour)
 {
     //Draw the Frame surrounding the element, as well as the button areas
+
+    //Draw the box around the Frame
     DrawRectangleLines(FrameArea.x, FrameArea.y, FrameArea.width, FrameArea.height, FrameBoxColour);
-    for(Rectangle Button : {MoveButton, ScaleButton, ShowButton})
-    {
-        DrawRectangle(Button.x, Button.y, Button.width, Button.height, FrameBoxColour);
-    }
+
+    //Draw the Move Button
+    DrawRectangle(MoveButton.x, MoveButton.y, MoveButton.width, MoveButton.height, FrameBoxColour);
+    
+    //Draw the Show Button
+    DrawRectangle(ShowButton.x, ShowButton.y, ShowButton.width, ShowButton.height, FrameBoxColour);
+    DrawEllipse(ShowButton.x + ShowButton.width/2, ShowButton.y + ShowButton.height/2, ShowButton.width/2, ShowButton.height/4, BackGroundColour);
+    DrawCircle(ShowButton.x + ShowButton.width/2, ShowButton.y + ShowButton.height/2, ShowButton.width/4, FrameBoxColour);
+
+    //Draw the Scale Button
+    DrawTriangle(
+        {ScaleButton.x + ScaleButton.width, ScaleButton.y + ScaleButton.height},
+        {ScaleButton.x + ScaleButton.width, ScaleButton.y},
+        {ScaleButton.x, ScaleButton.y + ScaleButton.height},
+        FrameBoxColour
+    );
+
+
 } 
 
 
