@@ -157,7 +157,7 @@ void ElementInteractions::InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RG
 
 void ElementInteractions::InteractWithPalette(Frames& PaletteFrame, Palette& PaletteColours)
 {
-    if(!R_FrameState)
+    if(!R_FrameState && PaletteFrame.ShowContent)
     {
         Color ChosenColour = PaletteColours.GetVariationColour(PassedMouseXY);
         if(ChosenColour.a != RGBValMin) //Don't update if the alpha value is zero, which only happens if MouseXY is outside of the coloured Palette rects
@@ -176,7 +176,7 @@ void ElementInteractions::InteractWithPalette(Frames& PaletteFrame, Palette& Pal
 
 void ElementInteractions::InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour, bool& PassedCodeMode)
 {
-    if(!R_FrameState)
+    if(!R_FrameState && FloodedFrame.ShowContent)
     {
         GetRGBValuesToClipboard(int(FillColour.r), int(FillColour.g), int(FillColour.b), PassedCodeMode);  
     }

@@ -90,12 +90,18 @@ void Frames::DrawFrameBox(Color& FrameBoxColour, Color& BackGroundColour)
     //Draw the box around the Frame
     DrawRectangleLines(FrameArea.x, FrameArea.y, FrameArea.width, FrameArea.height, FrameBoxColour);
 
-    //Draw the Move Button and, when space permits, a Frame title
+    //Draw the Move Button
     DrawRectangle(MoveButton.x, MoveButton.y, MoveButton.width, MoveButton.height, FrameBoxColour);
-    if(MeasureText(FrameTag.c_str(), FrameTagFontSize) < MoveButton.width)
+
+    //give the Frame a title, optionally sized down to fit
+    std::string FrameTitle {FrameTag};
+    int TotalChars {(int)FrameTitle.size()};
+    while(MeasureText(FrameTitle.c_str(), FrameTagFontSize) > MoveButton.width)
     {
-        DrawText(FrameTag.c_str(), MoveButton.x, MoveButton.y, FrameTagFontSize, BackGroundColour);
+        TotalChars--;
+        FrameTitle = FrameTitle.substr(0, TotalChars) + "...";
     }
+    DrawText(FrameTitle.c_str(), MoveButton.x, MoveButton.y, FrameTagFontSize, BackGroundColour);
     
     //Draw the Show Button
     DrawRectangle(ShowButton.x, ShowButton.y, ShowButton.width, ShowButton.height, FrameBoxColour);

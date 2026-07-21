@@ -248,7 +248,7 @@ void ToolContainer::SetUIColours(bool DarkModeEnabled)
         ColourCollection.ToolBackgroundColour = (Color){55, 55, 64, 255};
         ColourCollection.ToolButtonColour = (Color){65, 65, 74, 255};
         ColourCollection.ToolIconColour = (Color){111, 111, 129, 255};
-        ColourCollection.FrameBoxColour = (Color){244, 244, 244, 255};
+        ColourCollection.FrameBoxColour = (Color){230, 230, 240, 255};
     }
     else //...why would you ever WANT light mode....?
     {
@@ -256,7 +256,7 @@ void ToolContainer::SetUIColours(bool DarkModeEnabled)
         ColourCollection.ToolBackgroundColour = (Color){214, 208, 208, 255};
         ColourCollection.ToolButtonColour = (Color){255, 245, 245, 255};
         ColourCollection.ToolIconColour = (Color){214, 208, 208, 255};
-        ColourCollection.FrameBoxColour = (Color){72, 72, 72, 255};
+        ColourCollection.FrameBoxColour = (Color){127, 149, 170, 255};
     }
 }
 
