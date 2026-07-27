@@ -40,7 +40,7 @@ void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames
             //Seems like a long goddamn way to pass down main(argv), but alas, here we are
             //I'm tired, Samwise
             ExportElementPositions(PassedFrames, DarkModeEnabled, HexModeEnabled,  PassedBinPath);
-            std::cout << "Exported config file\n";
+            std::cout << "Exported config file.\n";
         } 
         else if(CheckCollisionPointRec(PassedMouseXY, Tools.CodeModeButton))
         {
@@ -72,7 +72,7 @@ void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames
         if(CheckCollisionPointRec(PassedMouseXY, Tools.ResetButton))
         {
             ResetFrames = true;
-            std::cout << "Reset UI to default values\n";
+            std::cout << "Adopted default UI settings.\n";
         }
         PassedFrames[0]->ActiveFrame = false; //stops a held down click from spamming the button
     }
@@ -187,6 +187,21 @@ void ElementInteractions::InteractWithFloodFilledFrame(Frames& FloodedFrame, Col
 }
 
 
+void ElementInteractions::InteractWithColourDropper(Frames& ColourDropperFrame, ColourDropper& RGBDropper)
+{
+    if(!R_FrameState && ColourDropperFrame.ShowContent)
+    {
+        std::cout << "Interactin'" << std::endl;
+    }
+    else
+    {
+        ColourDropperFrame.AdjustFrame(PassedMouseXY);
+        RGBDropper.Update(ColourDropperFrame.FrameArea, ColourDropperFrame.ShowContent);
+        RGBDropper.GenerateDropperRectangles();
+    }
+}
+
+
 void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFrames, bool PassedDarkMode, bool PassedHexMode, char*& PassedBinPath)
 {
     //Export the current Frames [x, y, width, height] , DarkMode and CodeMode to a local .conf file
@@ -217,7 +232,7 @@ void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFra
     }
     catch(...) //Not doing any real error handling here, just if you canny do it, you canny
     {
-        std::cout << "Cannot write to config file\n";
+        std::cout << "Cannot write to config file.\n";
     }
 }
 

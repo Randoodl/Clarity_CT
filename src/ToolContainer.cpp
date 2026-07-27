@@ -42,10 +42,11 @@ ToolContainer::ToolContainer(char*& PassedBinPath)
     //    -ToolBar has to come first as to always be accessible
     //    -RGBSquareFrame has to come before RGBDial, otherwise clicks within RGBSquareFrame interact with RGBDial instead
     ElementFrames  = {&ToolBarFrame, &RGBSquareFrame, &RGBDialFrame, &BaseHueFrame, &ComplementFrame, &LowerTriadFrame, &UpperTriadFrame,
-                      &MainShadesTintsFrame, &ComplementShadesTintsFrame, &LowerTriadShadesTintsFrame, &UpperTriadShadesTintsFrame, &CurrentSelectedColourFrame};
+                      &MainShadesTintsFrame, &ComplementShadesTintsFrame, &LowerTriadShadesTintsFrame, &UpperTriadShadesTintsFrame, &CurrentSelectedColourFrame, 
+                      &ColourDropperFrame};
 
     LayoutStates   = {&Layout.TOOL, &Layout.SQUARE, &Layout.DIAL, &Layout.HUE, &Layout.COMP, &Layout.LTRIAD, &Layout.UTRIAD,
-                       &Layout.MAINST, &Layout.COMPST, &Layout.LTRIST, &Layout.UTRIST, &Layout.SELECT};
+                       &Layout.MAINST, &Layout.COMPST, &Layout.LTRIST, &Layout.UTRIST, &Layout.SELECT, &Layout.DROP};
 
     AllPalettes    = {&Hue, &Complement, &LowerTriad, &UpperTriad, &MainShadesTints, &ComplementShadesTints, &LowerTriadShadesTints, &UpperTriadShadesTints};
     PaletteActions = {
@@ -76,7 +77,7 @@ void ToolContainer::DrawElements()
     RGBDial.DrawRGBDial(ColourCollection.BackgroundColour);
     RGBSquare.DrawShadeSquare();
 
-    //Control whether or not the currently selected colour is shown
+    //Draw currently selected colour
     if(CurrentSelectedColourFrame.ShowContent || !Interactions.ToggleHidden)
     {
         CurrentSelectedColourFrame.DrawSingleColour(ColourCollection.CurrentSelectedColour);
@@ -92,6 +93,12 @@ void ToolContainer::DrawElements()
         {
             EachPalette->DrawPalette();
         }
+    }
+
+    //Draw the ColourDropper
+    if(ColourDropperFrame.ShowContent || !Interactions.ToggleHidden)
+    {
+        RGBDropper.DrawDropper();
     }
 
     //Toolbar has to be the last draw call, it has to ALWAYS be visible
@@ -181,8 +188,8 @@ void ToolContainer::InitialiseAllElements()
 
     //Initialise the ShadesTints
     //As above, so below, bundle this
-    SetVariationAmount = 10;
-    SetVariationDelta = 11;
+    SetVariationAmount = 11;
+    SetVariationDelta = 13;
     InitialiseShadesTints(MainShadesTints, MainShadesTintsFrame, ColourCollection.ShadedColour, SetVariationAmount, SetVariationDelta, Layout.MAINST);
     InitialiseShadesTints(ComplementShadesTints, ComplementShadesTintsFrame, ColourCollection.ShadedComplementColour, SetVariationAmount, SetVariationDelta, Layout.COMPST);
 
@@ -190,6 +197,14 @@ void ToolContainer::InitialiseAllElements()
     //      when resetting the layout. However, it might be I used the base colours for good reason, so keep an eye on this
     InitialiseShadesTints(LowerTriadShadesTints, LowerTriadShadesTintsFrame, ColourCollection.LowerTriadShade, SetVariationAmount, SetVariationDelta, Layout.LTRIST);
     InitialiseShadesTints(UpperTriadShadesTints, UpperTriadShadesTintsFrame, ColourCollection.UpperTriadShade, SetVariationAmount, SetVariationDelta, Layout.UTRIST);
+
+    //Initialise the Colour Dropper
+    ColourDropperFrame.Update(Layout.DROP.AnchorX, Layout.DROP.AnchorY, Layout.DROP.LenX, Layout.DROP.LenY, Layout.DROP.Visibility, Layout.DROP.ElementTag);
+    RGBDropper.MaxColours = 10;
+    RGBDropper.CellFrameColour = &ColourCollection.ToolIconColour;
+    RGBDropper.Update(ColourDropperFrame.FrameArea, ColourDropperFrame.ShowContent);
+    RGBDropper.GenerateStoredColours();
+    RGBDropper.GenerateDropperRectangles();
 }
 
 
@@ -331,7 +346,7 @@ void ToolContainer::LoadCustomConfig(char*& PassedBinPath)
     }
     else
     {
-        std::cout << "No config file found, setting defaults\n";
+        std::cout << "No config file found, using  defaults.\n";
     }
 }
 
@@ -440,6 +455,7 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
         case 9:  Interactions.InteractWithPalette(LowerTriadShadesTintsFrame, LowerTriadShadesTints); break;
         case 10: Interactions.InteractWithPalette(UpperTriadShadesTintsFrame, UpperTriadShadesTints); break;
         case 11: Interactions.InteractWithFloodFilledFrame(CurrentSelectedColourFrame, ColourCollection.CurrentSelectedColour, HexModeEnabled); break;
+        case 12: Interactions.InteractWithColourDropper(ColourDropperFrame, RGBDropper); break;
         
         default: break;
     }

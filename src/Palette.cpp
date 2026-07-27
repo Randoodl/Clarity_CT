@@ -162,7 +162,8 @@ void Palette::GenerateShadesTints(Color SeedColour)
     }
     
     //This gives a neat little "source colour" block at the start of the palette
-    PaletteColours.insert(PaletteColours.begin(), {SeedColour, SeedColour, BLANK});
+    //PaletteColours.insert(PaletteColours.begin(), {SeedColour, SeedColour, BLANK});
+        //Leaving this in for now, experimenting with letting the HueShadePair take on this functionality
 }
 
 

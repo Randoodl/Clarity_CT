@@ -105,7 +105,11 @@ class ToolContainer
         //CurrentSelectedColour - show currently narrowed-down colour and retrieve RGB/Hex value 
         Frames CurrentSelectedColourFrame;
         void ShowCurrentValue(bool PassedCodeMode);
- 
+
+        //ColourDropper - a space to drop and hold onto colours
+        Frames ColourDropperFrame;
+        ColourDropper RGBDropper;
+
         //Collections of objects for for loop functionality
         std::vector<Frames*> ElementFrames;
         std::vector<ElementState*> LayoutStates;

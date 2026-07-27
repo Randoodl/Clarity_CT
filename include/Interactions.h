@@ -27,6 +27,7 @@
 #include "./ToolBar.h"
 #include "./ColourFamily.h"
 #include "./Frames.h"
+#include "./ColourDropper.h"
 
 
 class ElementInteractions
@@ -65,6 +66,7 @@ class ElementInteractions
         void InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare, ColourDial& RGBDial, Vector3& DialOffsets);
         void InteractWithPalette(Frames& PaletteFrame, Palette& PaletteColours);
         void InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour, bool& PassedCodeMode);
+        void InteractWithColourDropper(Frames& ColourDroppedFrame, ColourDropper& RGBDropper);
 
         //config file exporting functionality tied to ToolBar
         void ExportElementPositions(std::vector<Frames*>& PassedFrames, bool PassedDarkMode, bool PassedHexMode, char*& PassedBinPath);

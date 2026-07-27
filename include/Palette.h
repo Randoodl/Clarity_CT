@@ -39,7 +39,7 @@ class Palette
         //This leaves room for customisation options later, if ever I want to implement that kind of functionality
         int VariationAmount;
         int VariationDelta;
-        int Visibility;
+        bool Visibility;
 
         //Return the value of the clicked on colour band
         Color GetVariationColour(Vector2 MouseXY);
