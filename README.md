@@ -1,6 +1,6 @@
-<img src="./assets/Cct.png" width="256" align="right"/>
-
 ## Clarity CT - RGB Colour Tool 🎨
+
+<img src="./assets/Cct.png" width="256" align="right"/>
 
 An RGB Colour Picker Tool written in C++ using raylib.  
 Held together by duct tape and half a dream.
