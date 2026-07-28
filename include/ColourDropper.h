@@ -27,16 +27,28 @@ class ColourDropper
 
     public:
         ColourDropper();
+
+        //The vector that stores the colours as well as the hard cap on storage
         int MaxColours;
-        bool Visibility;
+        std::vector<Color> StoredColours;
+        
+        //UI related variables
         Color* CellFrameColour;
-        void DrawDropper();
+        bool Visibility;
+        
+        //Return the RGB value of a cell when clicked
+        Color GetDropperValue(Vector2 MouseXY);
+
+        //Everything needed to calculate and draw the dropper
         void Update(Rectangle SetDropperArea, bool SetVisibility);
+        void DrawDropper();
         void GenerateStoredColours();
         void GenerateDropperRectangles();
-
+        
     private:
-        std::vector<Color> StoredColours;
-        std::vector<Rectangle> DropperRectangles;
         Rectangle DropperArea;
+
+        //The smaller, subdivided bars of the total dropper area
+        std::vector<Rectangle> DropperRectangles;
+        
 };

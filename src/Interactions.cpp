@@ -160,8 +160,9 @@ void ElementInteractions::InteractWithPalette(Frames& PaletteFrame, Palette& Pal
     if(!R_FrameState && PaletteFrame.ShowContent)
     {
         Color ChosenColour = PaletteColours.GetVariationColour(PassedMouseXY);
-        if(ChosenColour.a != RGBValMin) //Don't update if the alpha value is zero, which only happens if MouseXY is outside of the coloured Palette rects
+        if(ChosenColour.a != RGBValMin) 
         {
+            //Don't update if the alpha value is zero, which only happens if MouseXY is outside of the coloured Palette rects
             R_ColourFamily.CurrentSelectedColour = ChosenColour;
         } 
     }
@@ -174,11 +175,20 @@ void ElementInteractions::InteractWithPalette(Frames& PaletteFrame, Palette& Pal
 }
 
 
-void ElementInteractions::InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour, bool& PassedCodeMode)
+void ElementInteractions::InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour, bool& PassedCodeMode, std::vector<Color>& PassedDropperColours)
 {
     if(!R_FrameState && FloodedFrame.ShowContent)
     {
+        //First, copy the values (either HEX or RGB)
         GetRGBValuesToClipboard(int(FillColour.r), int(FillColour.g), int(FillColour.b), PassedCodeMode);  
+
+        //Then, if the colour is not being tracked yet, do so
+        if(!CompareColours(PassedDropperColours, FillColour))
+        {
+            //Stored colours follow a FIFO principle
+            PassedDropperColours.pop_back();
+            PassedDropperColours.insert(PassedDropperColours.begin(), FillColour);
+        }
     }
     else
     {
@@ -191,7 +201,12 @@ void ElementInteractions::InteractWithColourDropper(Frames& ColourDropperFrame, 
 {
     if(!R_FrameState && ColourDropperFrame.ShowContent)
     {
-        std::cout << "Interactin'" << std::endl;
+        Color ChosenColour = RGBDropper.GetDropperValue(PassedMouseXY);
+        if(ChosenColour.a != RGBValMin) 
+        {
+            //Don't update if the alpha value is zero, which happens when clicking on an empty cell or if the function returns a dummy BLANK
+            R_ColourFamily.CurrentSelectedColour = ChosenColour;
+        }
     }
     else
     {
@@ -289,7 +304,19 @@ void ElementInteractions::UpdatePaletteColours(std::map<Palette*, std::vector<Co
 }
 
 
+bool ElementInteractions::CompareColours(std::vector<Color>& KnownColours, Color& FillColour)
+{
+    //A somewhat hamfisted way to figure out whether or not a colour is already being tracked or not
+    bool ColourIsKnown = false;
 
-
-
-
+    for(Color KnownColour : KnownColours)
+    {
+        if(KnownColour.r == FillColour.r && KnownColour.g == FillColour.g && KnownColour.b == FillColour.b)
+        {
+            //This is an exact match of RGB to an already stored RGB value
+            ColourIsKnown = true;
+            break;
+        }
+    }
+    return ColourIsKnown;
+}

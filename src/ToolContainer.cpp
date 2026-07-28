@@ -454,7 +454,7 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
         case 8:  Interactions.InteractWithPalette(ComplementShadesTintsFrame, ComplementShadesTints); break;
         case 9:  Interactions.InteractWithPalette(LowerTriadShadesTintsFrame, LowerTriadShadesTints); break;
         case 10: Interactions.InteractWithPalette(UpperTriadShadesTintsFrame, UpperTriadShadesTints); break;
-        case 11: Interactions.InteractWithFloodFilledFrame(CurrentSelectedColourFrame, ColourCollection.CurrentSelectedColour, HexModeEnabled); break;
+        case 11: Interactions.InteractWithFloodFilledFrame(CurrentSelectedColourFrame, ColourCollection.CurrentSelectedColour, HexModeEnabled, RGBDropper.StoredColours); break;
         case 12: Interactions.InteractWithColourDropper(ColourDropperFrame, RGBDropper); break;
         
         default: break;

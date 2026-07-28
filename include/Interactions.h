@@ -65,7 +65,7 @@ class ElementInteractions
         void InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare);
         void InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare, ColourDial& RGBDial, Vector3& DialOffsets);
         void InteractWithPalette(Frames& PaletteFrame, Palette& PaletteColours);
-        void InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour, bool& PassedCodeMode);
+        void InteractWithFloodFilledFrame(Frames& FloodedFrame, Color& FillColour, bool& PassedCodeMode, std::vector<Color>& PassedDropperColours);
         void InteractWithColourDropper(Frames& ColourDroppedFrame, ColourDropper& RGBDropper);
 
         //config file exporting functionality tied to ToolBar
@@ -77,4 +77,7 @@ class ElementInteractions
 
         //Relevant to InteractWithRGBDial and InteractWithShadeSquare
         void UpdatePaletteColours(std::map<Palette*, std::vector<Color*>>& PassedPaletteActions);
+
+        //Relevant to InteractWithFloodFilledFrame
+        bool CompareColours(std::vector<Color>& KnownColours, Color& FilledColour);
 };

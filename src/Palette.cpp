@@ -44,7 +44,7 @@ Color Palette::GetVariationColour(Vector2 MouseXY)
         }
     }
     //Alpha value 0 for sentinel purposes
-    return {0, 0, 0, 0}; 
+    return BLANK; 
 }
 
 
@@ -215,6 +215,7 @@ void Palette::GeneratePaletteRectangles()
 
 void Palette::DrawPalette()
 {       
+    //Cycle through both PaletteRectangles and PaletteColours vectors to display a PaletteRectangle with its paired colour
     for(int Variation {0}; Variation < int(PaletteColours.size()); ++Variation)
     {
         Rectangle GetRectangle = PaletteRectangles[Variation];

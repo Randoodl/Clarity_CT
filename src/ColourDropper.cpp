@@ -16,36 +16,20 @@
 */
 
 #include "../include/ColourDropper.h"
-#include <iostream>
+#include "../include/Constants.h"
+
 
 ColourDropper::ColourDropper() 
 {
     //public
-    Visibility = true;
     MaxColours = {};
+    StoredColours = {};
     CellFrameColour = {};
+    Visibility = true;
    
     //private
-    StoredColours = {};
-    DropperRectangles = {};
     DropperArea = {};
-    
-
-}
-
-
-void ColourDropper::DrawDropper()
-{
-    for(int i_StoredColour {0}; i_StoredColour < MaxColours; ++ i_StoredColour)
-    {
-        //Draw the held colours
-    }
-
-    for(Rectangle DropperCell : DropperRectangles)
-    {
-        DrawRectangleLinesEx(DropperCell, 2, *CellFrameColour);
-    }
-    //DrawRectangle(DropperArea.x, DropperArea.y, DropperArea.width, DropperArea.height, GREEN);
+    DropperRectangles = {};
 }
 
 
@@ -56,18 +40,73 @@ void ColourDropper::Update(Rectangle SetDropperArea, bool SetVisibility)
 }
 
 
+Color ColourDropper::GetDropperValue(Vector2 MouseXY)
+{
+    //Return the RGB values from a clicked-on DropperRectangle
+    for(int i_DropperRectangle {0}; i_DropperRectangle < MaxColours; ++i_DropperRectangle)
+    {
+        if(CheckCollisionPointRec(MouseXY, DropperRectangles[i_DropperRectangle]))
+        {
+            return StoredColours[i_DropperRectangle];
+        }
+    }
+    return BLANK;  //Default dummy value
+}
+
+
+void ColourDropper::DrawDropper()
+{
+    //Cycle through both DropperRectangles and StoredColours vectors to display a DropperRectangle with its paired colour
+    for(int i_StoredColour {0}; i_StoredColour < MaxColours; ++ i_StoredColour)
+    {
+        DrawRectangle(DropperRectangles[i_StoredColour].x,
+                      DropperRectangles[i_StoredColour].y,
+                      DropperRectangles[i_StoredColour].width,
+                      DropperRectangles[i_StoredColour].height,
+                      StoredColours[i_StoredColour]);
+    }
+
+    //Overlay the colours with a visual frame, this is mostly to show "empty cells" when no colours are present yet
+    for(Rectangle DropperCell : DropperRectangles)
+    {
+        DrawRectangleLinesEx(DropperCell, 2, *CellFrameColour);
+    }
+}
+
+
 void ColourDropper::GenerateStoredColours()
 {
     //Create the vector wherein selected colours can be stored
+
+    //Keep track of already present colours in case of a UI reset
+    std::vector<Color> PreservedColours {};
+
+    for(Color ColourCell : StoredColours)
+    {
+        //If any Color in the StoredColours has a non-zero alpha, then it must already be populated
+        if(ColourCell.a != RGBValMin)
+        {
+            PreservedColours = StoredColours;
+            break;
+        }
+    }
 
     //Reset vector
     StoredColours.clear();
     StoredColours.reserve(MaxColours);
 
-    //Populate the vector with dummy values of alpha 0
-    for(int ColourIndex {0}; ColourIndex < MaxColours; ++ ColourIndex)
+    //Potentially overwrite StoredColours with already present values
+    if(PreservedColours.size())
     {
-        StoredColours.emplace_back((Color){0, 0, 0, 0});
+        StoredColours = PreservedColours;
+    }
+    else
+    {
+        //Populate the vector with dummy values
+        for(int ColourIndex {0}; ColourIndex < MaxColours; ++ ColourIndex)
+        {
+            StoredColours.emplace_back(BLANK);
+        }
     }
 }
 
