@@ -2,8 +2,6 @@
 CXX = g++
 SOURCE_DIR = ./src
 BUILD_DIR  = ./build
-SOURCE_DIR = ./src
-BUILD_DIR  = ./build
 OBJ_DIR    = $(BUILD_DIR)/obj
 OUTPUT = $(BUILD_DIR)/Clarity_CT
 
@@ -47,7 +45,6 @@ clean:
 #For linux debugging purposes only
 check: $(OUTPUT)
 	valgrind -s --log-file=./build/log_"`date +%Y-%m-%d-%T`".txt --leak-check=full ./$<
-
 
 .PHONY: run check clean
 

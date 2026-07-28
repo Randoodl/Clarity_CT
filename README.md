@@ -7,6 +7,7 @@ A C++ based RGB Colour Picker Tool built with the raylib library.
 + [Features](#features)
 + [Prerequisites](#prerequisites)
 + [Build from source](#build)
++ [Using Clarity CT](#usage)
 + [Answers to questions nobody aksed](#faq)
 
 ### ❓About <a name = "about"></a>
@@ -26,11 +27,11 @@ It is not a well written program, and it is not meant to be. This is quite liter
 - **Copyable HEX and RGB values:** - Easily copy colour values for use in other applications with a single click.
 - **Custom UI:** - Scale, move or hide elements to create a comfortable layout in an optional Dark Mode.
 
-### 🗹 Prerequisites <a name = "prerequisites"></a>
+### ✅ Prerequisites <a name = "prerequisites"></a>
 - **raylib** (www.raylib.com)
 
 ### 🏗️ Building from source <a name = "build"></a>
-Compilation is currently only tested with C++20 on GCC 13.3 and raylib v5.5
+Compilation is currently only tested with C++20 on GCC 13.3 and raylib v5.6
 #### Using Make:
 Clone the repository and compile using Make
 ```sh
@@ -39,6 +40,25 @@ cd Clarity_CT
 make
 ```
 
+### ⌨️ Using Clarity CT <a name = "usage"></a>
+Clarity CT is designed to be intuitive and lazily operable with nothing but the press of a mouse button. Practically every generated colour you can see on screen is clickable.  
+Clicking the `Current Colour` element will copy the colour's RGB or HEX value to your clipboard, depending on your notation mode.  
+The `Toolbar` allows you to change the way Clarity CT presents itself.
+
+
+| Icon                                                                     | Action                                                                      |
+| :----------------------------------------------------------------------- | :-------------------------------------------------------------------------- |
+| <img src="./assets/ToolBarIcons/lock.png"     alt="lock" width="32">     | Show the frames to scale, move or hide elements.                            |
+| <img src="./assets/ToolBarIcons/codemode.png" alt="codemode" width="32"> | Switch between RGB and HEX notation.                                        |
+| <img src="./assets/ToolBarIcons/darkmode.png" alt="darkmode" width="32"> | Toggle dark mode.                                                           |
+| <img src="./assets/ToolBarIcons/hidden.png"   alt="hidden" width="32">   | Toggle showing hidden elements (they remain non-interactive while hidden).  |
+| <img src="./assets/ToolBarIcons/save.png"     alt="save" width="32">     | Save current configuration (layout, notation mode, dark mode toggle).       |
+| <img src="./assets/ToolBarIcons/reset.png"    alt="reset" width="32">    | Reset configuration to default settings (does not overwrite config file).   |
+
+> [!NOTE]  
+> The configuration is saved in a daringly named Clarity.conf alongside the binary.
+
+
 ### ❓ Answers to questions nobody asked <a name = "faq"></a>
 * `Why?`  
     * Because, while messing around with RGB channels in python, I came up with what has got to be [the worst way to whip up 1530 different RGB hue tuples](./src/ColourDial.cpp#L144).  
@@ -46,7 +66,7 @@ make
     Somewhere along the way it went from 'a laugh' to an actual program (*though this statement is still up for debate*).
 
 * `Was AI used in this?`
-    * My guy, I invite you to look at the [source code](./src/ToolContainer.cpp#L265). There isn't a model lobotomised enough to come up with the ramshackle, cobbled together fustercluck that is Clarity CT. All of this code is a nightmarish fever dream cooked up by yours truly. 100% idiot coded for the love of the game.
+    * My guy, I invite you to look at the [source code](./src/ToolContainer.cpp#L282). There isn't a model lobotomised enough to come up with the ramshackle, cobbled together fustercluck that is Clarity CT. All of this code is a nightmarish fever dream cooked up by yours truly. 100% idiot coded for the love of the game.
 
 * `No HSL?`  
     * Nope.  
