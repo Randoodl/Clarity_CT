@@ -1,6 +1,9 @@
+<img src="./assets/Cct.png" width="256" align="right"/>
+
 ## Clarity CT - RGB Colour Tool 🎨
 
-A C++ based RGB Colour Picker Tool built with the raylib library.
+An RGB Colour Picker Tool written in C++ using raylib.  
+Held together by duct tape and half a dream.
 
 ### 📖 Contents
 + [About](#about)
@@ -10,18 +13,18 @@ A C++ based RGB Colour Picker Tool built with the raylib library.
 + [Using Clarity CT](#usage)
 + [Answers to questions nobody aksed](#faq)
 
-### ❓About <a name = "about"></a>
+### 🔍 About <a name = "about"></a>
 Clarity CT is a simple, customisable RGB colour picker and palette tool intended to be used alongside graphic design applications.  
 Its whole purpose is to provide you with an easily copyable colour value in either RGB or HEX notation.  
-It started as a small, fun foray into raylib and turned into the behemoth it is now.
+It started as a small, fun foray into raylib and turned into the poorly written spaghetti behemoth it is now.
 
 >`"Oh. That's gross. That is, in fact, heinous."`  
 >*-Someone I showed the code to*
 
-It is not a well written program, and it is not meant to be. This is quite literally just a pet project duct taped together by a hobbyist that grew way beyond the scope it was supposed to have. If you want to have a peek under the hood, then that's on you.
+It is not a well written program, and it is not meant to be. This is quite literally just a pet project cobbled together by a hobbyist that grew way beyond the scope it was supposed to have. If you want to have a peek under the hood, then that's on you.
 
 
-### 🛠️ Features <a name = "features"></a>
+### 🎨 Features <a name = "features"></a>
 - **Interactive Colour Picker:** - Select a specific hue using the colour dial and narrow down its shade or tint.
 - **Display related colours:** - Automatically generate complement and triadic colours, alongside shades and tints thereof.
 - **Copyable HEX and RGB values:** - Easily copy colour values for use in other applications with a single click.
@@ -30,7 +33,7 @@ It is not a well written program, and it is not meant to be. This is quite liter
 ### ✅ Prerequisites <a name = "prerequisites"></a>
 - **raylib** (www.raylib.com)
 
-### 🏗️ Building from source <a name = "build"></a>
+### 🛠️ Building from source <a name = "build"></a>
 Compilation is currently only tested with C++20 on GCC 13.3 and raylib v5.6
 #### Using Make:
 Clone the repository and compile using Make
@@ -41,23 +44,27 @@ make
 ```
 
 ### ⌨️ Using Clarity CT <a name = "usage"></a>
-Clarity CT is designed to be intuitive and lazily operable with nothing but the press of a mouse button. Practically every generated colour you can see on screen is clickable.  
-Clicking the `Current Colour` element will copy the colour's RGB or HEX value to your clipboard, depending on your notation mode.  
-The `Toolbar` allows you to change the way Clarity CT presents itself.
+Clarity CT is designed to be intuitive and lazily operable with single clicks. Practically every generated colour you can see on-screen is selectable.  
 
+Clicking the `Current Colour` element will copy the colour's RGB or HEX value to your clipboard, depending on your toggled notation mode.  
 
-| Icon                                                                     | Action                                                                      |
-| :----------------------------------------------------------------------- | :-------------------------------------------------------------------------- |
-| <img src="./assets/ToolBarIcons/lock.png"     alt="lock" width="32">     | Show the frames to scale, move or hide elements.                            |
-| <img src="./assets/ToolBarIcons/codemode.png" alt="codemode" width="32"> | Switch between RGB and HEX notation.                                        |
-| <img src="./assets/ToolBarIcons/darkmode.png" alt="darkmode" width="32"> | Toggle dark mode.                                                           |
-| <img src="./assets/ToolBarIcons/hidden.png"   alt="hidden" width="32">   | Toggle showing hidden elements (they remain non-interactive while hidden).  |
-| <img src="./assets/ToolBarIcons/save.png"     alt="save" width="32">     | Save current configuration (layout, notation mode, dark mode toggle).       |
-| <img src="./assets/ToolBarIcons/reset.png"    alt="reset" width="32">    | Reset configuration to default settings (does not overwrite config file).   |
+The `Toolbar` allows you to change the way Clarity CT presents itself, giving you the ability to create a layout that is comfortable to use.
+
+| Icon                                                                      | Action                                                                      |
+| :------------------------------------------------------------------------ | :-------------------------------------------------------------------------- |
+| <img src="./assets/ToolBarIcons/lock.png"     alt="lock" width="32"/>     | Show the frames to scale, move or hide elements.                            |
+| <img src="./assets/ToolBarIcons/codemode.png" alt="codemode" width="32"/> | Switch between RGB and HEX notation.                                        |
+| <img src="./assets/ToolBarIcons/darkmode.png" alt="darkmode" width="32"/> | Toggle dark mode.                                                           |
+| <img src="./assets/ToolBarIcons/hidden.png"   alt="hidden" width="32"/>   | Toggle showing hidden elements (they remain non-interactive while hidden).  |
+| <img src="./assets/ToolBarIcons/save.png"     alt="save" width="32"/>     | Save current configuration (layout, notation mode, dark mode toggle).       |
+| <img src="./assets/ToolBarIcons/reset.png"    alt="reset" width="32"/>    | Reset configuration to default settings (does not overwrite config file).   |
+
+> [!TIP]  
+> A Frame with its content hidden can be dragged off-screen to declutter the UI.  
+> It's not an elegant way of doing it, but it works and I have put too much time into this joke-taken-too-seriously project as is.
 
 > [!NOTE]  
 > The configuration is saved in a daringly named Clarity.conf alongside the binary.
-
 
 ### ❓ Answers to questions nobody asked <a name = "faq"></a>
 * `Why?`  
