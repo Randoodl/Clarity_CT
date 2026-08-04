@@ -21,18 +21,18 @@
 ColourFamily::ColourFamily()
 {
     //UI colours
-    BackgroundColour = BLACK;
+    BackgroundColour     = BLACK;
     ToolBackgroundColour = BLACK;
-    ToolButtonColour = BLACK;
-    ToolIconColour = BLACK;
-    FrameBoxColour = BLACK;
+    ToolButtonColour     = BLACK;
+    ToolIconColour       = BLACK;
+    FrameBoxColour       = BLACK;
 
     //Interactible colours
-    CurrentSelectedColour = {255, 0, 0, 255};
-    BaseHueColour = {255, 0, 0, 255};
-    ShadedColour  = {255, 0, 0, 255};
+    CurrentSelectedColour  = FULLRED; //Because raylib's RED isn't a pure 255,0,0 red.
+    BaseHueColour          = FULLRED;
+    ShadedColour           = FULLRED;
     ComplementColour       = BLACK;
-    ShadedComplementColour = {0, 255, 255, 255};
+    ShadedComplementColour = BLACK;
     LowerTriadColour       = BLACK;
     UpperTriadColour       = BLACK;
     LowerTriadShade        = BLACK;
@@ -46,6 +46,7 @@ void ColourFamily::Update()
     
     //Setting the complements of Hue and Shade
     SetComplement(BaseHueColour, ComplementColour);
+    SetComplement(ShadedColour, ShadedComplementColour);
 
     //Setting the triads of Hue and Shade
     SetTriad(BaseHueColour, LowerTriadColour, UpperTriadColour);

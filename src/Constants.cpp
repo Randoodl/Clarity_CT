@@ -20,3 +20,4 @@
 
 const int RGBValMin = 0;
 const int RGBValMax = 255;
+const Color FULLRED = {255, 0, 0, 255};

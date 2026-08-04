@@ -231,7 +231,7 @@ void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFra
         std::ofstream ExportFile(ExportPath / "Clarity.conf");
 
         //Store all Frames' positonal data in [x, y, width, height] format
-        //It counts up to n of Frames, so the last line for DarkMode toggling does not get counted here
+        //It counts up to n of Frames, so the last lines for DarkMode/HexMode toggling do not get counted here
         for(auto Line : PassedFrames) 
         {
             ExportFile << Line->FrameArea.x << "," << Line->FrameArea.y << "," << Line->FrameArea.width << "," << Line->FrameArea.height << "," << Line->ShowContent <<"\n";

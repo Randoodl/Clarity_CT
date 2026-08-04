@@ -76,6 +76,7 @@ void Palette::GenerateShadesTints(Color SeedColour)
     //Generate a vector of colours based on the SeedColour
 
     //Reset vector
+    //Reserving space for both the darker and lighter half of the spectrum (VariationAmount * 2) as well as the seed colour (+1)
     PaletteColours.clear();
     PaletteColours.reserve((VariationAmount * 2) + 1);
 
@@ -111,40 +112,27 @@ void Palette::GenerateShadesTints(Color SeedColour)
         //Generate a spread of variations 
         for(int Variation {0}; Variation < VariationAmount; ++Variation)
         {
-            Color SetColour = {0, 0, 0, 255};    //Placeholder colour to work with
+            Color SetColour = BLACK;    //Placeholder colour to work with
 
             //Update Variation's RGB values, keeping it between 0-255
 
-            //RED
-            if(RGBFloats[0] - (FactorRed * VariationDelta) >= RGBValMin && RGBFloats[0] - (FactorRed * VariationDelta) <= RGBValMax)
-            {
-                RGBFloats[0] -= (FactorRed * VariationDelta);
-            }
-            else
-            {
-                RGBFloats[0] = (!GenerateShades * RGBValMax); //0 if shades, 255 if not shades
-            }
+            //Array of scaling factors for looping purposes
+            float FactorRGB[3] {FactorRed, FactorGreen, FactorBlue};
 
-            //GREEN
-            if(RGBFloats[1] - (FactorGreen * VariationDelta) >= RGBValMin && RGBFloats[1] - (FactorGreen * VariationDelta) <= RGBValMax)
+            //For each RGB channel, update the colour value by adding its respective factor
+            //If the value ends up outside of [0-255], set it to either 0 or 255 based on wheter or not it's generating Shades
+            for(int i_RGB{0}; i_RGB < 3; ++i_RGB)
             {
-                RGBFloats[1] -= (FactorGreen * VariationDelta);
+                if(RGBFloats[i_RGB] - (FactorRGB[i_RGB] * VariationDelta) >= RGBValMin && RGBFloats[i_RGB] - (FactorRGB[i_RGB] * VariationDelta) <= RGBValMax)
+                {
+                    RGBFloats[i_RGB] -= (FactorRGB[i_RGB] * VariationDelta);
+                }
+                else
+                {
+                    RGBFloats[i_RGB] = (!GenerateShades * RGBValMax); //0 if shades, 255 if not shades
+                }
             }
-            else
-            {
-                RGBFloats[1] = (!GenerateShades * RGBValMax);
-            }
-
-            //BLUE
-            if(RGBFloats[2] - (FactorBlue * VariationDelta) >= RGBValMin && RGBFloats[2] - (FactorBlue * VariationDelta) <= RGBValMax)
-            {
-                RGBFloats[2] -= (FactorBlue * VariationDelta);
-            }
-            else
-            {
-                RGBFloats[2] = (!GenerateShades * RGBValMax);
-            }
-
+            
             //Update the colour and add to vector
             SetColour.r = RGBFloats[0];
             SetColour.g = RGBFloats[1];
@@ -179,7 +167,7 @@ void Palette::GeneratePaletteRectangles()
     //Generate rectangle areas relative to how many colours there are to represent
     for(int Variation {0}; Variation < TotalColours; ++Variation)
     {
-        Rectangle SetRectangle = {0, 0, 0, 0};  //Placeholder rectangle to work with
+        Rectangle SetRectangle = {};  //Placeholder rectangle to work with
 
         if(PaletteArea.width >= PaletteArea.height) //Sort horizontally
         {
@@ -197,7 +185,6 @@ void Palette::GeneratePaletteRectangles()
         }
 
         PaletteRectangles.emplace_back(SetRectangle);
-        
     }
 
     //Fix leftover gap at the right/bottom side of the Palette as result of floats narrowing

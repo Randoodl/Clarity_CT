@@ -179,6 +179,7 @@ void Frames::AdjustFrame(Vector2 MouseXY)
 
 void Frames::DrawSingleColour(Color FillColour)
 {
+    //This is only really relevant for the Frame that holds the currently selected colour
     DrawRectangle(FrameArea.x, FrameArea.y, FrameArea.width, FrameArea.height, FillColour);
 }
 

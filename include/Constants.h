@@ -17,7 +17,10 @@
 
 #pragma once
 
+#include <raylib.h>
 
-//Essentially just storing some commonly used numbers here
+
+//Essentially just storing some commonly used values here
 extern const int RGBValMin;
 extern const int RGBValMax;
+extern const Color FULLRED;

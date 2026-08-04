@@ -17,12 +17,11 @@
 
 #pragma once
 
-#include "./IconString.h"
-#include "./Constants.h"
-
-#include <raylib.h>
 #include <vector>
 #include <cmath>
+
+#include "./IconString.h"
+#include "./Constants.h"
 
 
 class ToolBar

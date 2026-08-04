@@ -103,7 +103,7 @@ void ColourDropper::GenerateStoredColours()
     else
     {
         //Populate the vector with dummy values
-        for(int ColourIndex {0}; ColourIndex < MaxColours; ++ ColourIndex)
+        for(int ColourIndex {0}; ColourIndex < MaxColours; ++ColourIndex)
         {
             StoredColours.emplace_back(BLANK);
         }
@@ -123,7 +123,7 @@ void ColourDropper::GenerateDropperRectangles()
     //Populate the total frame area with rectangular sub-areas
     for(int Rects {0}; Rects < TotalColours; ++Rects)
     {
-        Rectangle SetRectangle = {0, 0, 0, 0}; //Placeholder
+        Rectangle SetRectangle = {}; //Placeholder
 
         if(DropperArea.width >= DropperArea.height) //Sort horizontally
         {

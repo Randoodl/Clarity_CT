@@ -25,7 +25,7 @@ ColourDial::ColourDial()
     DialBandThickness = {};
     DialInnerRadius = {};
     DialOuterRadius = {};
-    CurrentSaturateColour = {255, 0, 0, 255};
+    CurrentSaturateColour = FULLRED;
    
     //private
     Current_iRGB = {};
@@ -67,7 +67,7 @@ Vector3 ColourDial::GetSquareInDialOffsets()
     //Somewhere out there, my Maths teacher must be chuffed I'm finally applying geometry 
     
     //Placeholder Vec3 to overwrite with actual values
-    Vector3 Offsets = {0, 0, 0};
+    Vector3 Offsets = {};
 
     //We have C in A^2*B^2 = C^2, but we need A or B (they are equivalent)
     double AnchorPointOffset = sqrt(0.5 * pow(DialInnerRadius, 2));
