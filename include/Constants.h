@@ -24,3 +24,4 @@
 extern const int RGBValMin;
 extern const int RGBValMax;
 extern const Color FULLRED;
+extern const Color HIGHLIGHT;

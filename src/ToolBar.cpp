@@ -35,7 +35,7 @@ ToolBar::ToolBar()
     Buttons = {&LockButton, &CodeModeButton, &DarkModeButton, &ToggleHiddenButton, &SaveButton, &ResetButton};
     ButtonAmount = Buttons.size();
     RawIconStrings = {&AllIconStrings.LockString, &AllIconStrings.CodeModeString, &AllIconStrings.DarkModeString, &AllIconStrings.HiddenString, &AllIconStrings.SaveString, &AllIconStrings.ResetString};
-    Icons = {&LockIcon, &CodeModeIcon, &DarkModeIcon, &SettingsIcon, &SaveIcon, &ResetIcon};
+    Icons = {&LockIcon, &CodeModeIcon, &DarkModeIcon, &HiddenIcon, &SaveIcon, &ResetIcon};
 
     //This sets all Texture2Ds
     GenerateIconTextures(RawIconStrings, Icons);

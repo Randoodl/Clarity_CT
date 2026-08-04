@@ -54,7 +54,7 @@ class ToolBar
 
         //All Icon textures
         Texture2D LockIcon;
-        Texture2D SettingsIcon;
+        Texture2D HiddenIcon;
         Texture2D SaveIcon;
         Texture2D ResetIcon;
         Texture2D CodeModeIcon;

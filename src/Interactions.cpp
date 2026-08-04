@@ -189,6 +189,9 @@ void ElementInteractions::InteractWithFloodFilledFrame(Frames& FloodedFrame, Col
             PassedDropperColours.pop_back();
             PassedDropperColours.insert(PassedDropperColours.begin(), FillColour);
         }
+
+        //Stop the button from being spammed when held down
+        FloodedFrame.ActiveFrame = false;
     }
     else
     {
@@ -207,6 +210,9 @@ void ElementInteractions::InteractWithColourDropper(Frames& ColourDropperFrame, 
             //Don't update if the alpha value is zero, which happens when clicking on an empty cell or if the function returns a dummy BLANK
             R_ColourFamily.CurrentSelectedColour = ChosenColour;
         }
+
+        //Stop the button from being spammed when held down
+        ColourDropperFrame.ActiveFrame = false;
     }
     else
     {

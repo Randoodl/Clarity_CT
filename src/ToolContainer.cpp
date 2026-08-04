@@ -103,6 +103,11 @@ void ToolContainer::DrawElements()
 
     //Toolbar has to be the last draw call, it has to ALWAYS be visible
     Tools.DrawToolBar(ColourCollection.ToolBackgroundColour, ColourCollection.ToolButtonColour, ColourCollection.ToolIconColour);  
+    if(!Interactions.ToggleHidden)
+    {
+        //A dumb way to highlight whenever ToggleHidden is active, might work this out properly if more toggles get added
+        DrawRectangle(Tools.ToggleHiddenButton.x, Tools.ToggleHiddenButton.y, Tools.ToggleHiddenButton.width, Tools.ToggleHiddenButton.height, HIGHLIGHT);
+    }
 
     //Draw the FrameBoxes around elements when unlocked
     if(FrameIsMutable)
