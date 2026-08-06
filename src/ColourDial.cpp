@@ -146,6 +146,9 @@ std::map<int, std::vector<int>> ColourDial::GenerateRGBTuples()
     //using some circus math that I only understood at the moment of writing it.
     //Change literally any number below and watch ColourDial break, while remaining fully functional (along with the rest of Clarity CT)
     //I felt like it needed to be included, since this Frankensteinian joke of an algorithm is what got me to write this barely functional pile of code to begin with
+    //UPDATE: 
+    //  I have since painstakingly retraced the hoops I must have recklessly limbo danced under in order to get this comedy machinery to work
+    //  and documented it in /docs/Notes/ClownMath.md
 
     /*
     {

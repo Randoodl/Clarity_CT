@@ -73,7 +73,7 @@ The `Toolbar` allows you to change the way Clarity CT presents itself, giving yo
     Somewhere along the way it went from 'a laugh' to an actual program (*though this statement is still up for debate*).
 
 * `Was AI used in this?`
-    * My guy, I invite you to look at the [source code](./src/ToolContainer.cpp#L282). There isn't a model lobotomised enough to come up with the ramshackle, cobbled together fustercluck that is Clarity CT. All of this code is a nightmarish fever dream cooked up by yours truly. 100% idiot coded for the love of the game.
+    * My guy, I invite you to look at the [source code](./src/ToolContainer.cpp#L287). There isn't a model lobotomised enough to come up with the ramshackle, cobbled together fustercluck that is Clarity CT. All of this code is a nightmarish fever dream cooked up by yours truly. 100% idiot coded for the love of the game.
 
 * `No HSL?`  
     * Nope.  
