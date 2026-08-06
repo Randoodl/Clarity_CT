@@ -50,9 +50,9 @@ This ensures that we can mathematically refer to each subset with numbers 1 thro
 #### 2. What are we even trying to do here?  
 The idea is to encode three patterns into this 1530 step for-loop. For each subset, which is really just a chunk in the for-loop of size 255, apply an addition to continuously modified `InitialBGR` for each channel in $(B, G, R)$. The addition can either be $1$, $0$ or $-1$, which will allow each colour channel to rise and fall between $0$ and $255$.  
 The addition patterns, listed per subset, are as follows:
->$R_+:\[0, -1, 0, 0, 1, 0\]$  
->$G_+:\[1, 0, 0, -1, 0, 0\]$  
->$B_+:\[0, 0, 1, 0, 0, -1\]$
+>$R_+:\\{0, -1, 0, 0, 1, 0\\}$  
+>$G_+:\\{1, 0, 0, -1, 0, 0\\}$  
+>$B_+:\\{0, 0, 1, 0, 0, -1\\}$
 
 So for subset 1 (read: `AllPossibleCombinations` 0 through 254) we only increment Green, then in subset 2 we only decrement Red, and so on.
 
@@ -65,8 +65,8 @@ Looking at the subsets it appears the Blue channel is locked in subsets 1, 2, 4 
 InitialBGR[ChannelIndex] += 40 % Subset
 ```
 
-This will increment all channels in subsets 3 or 6, by `40 mod [3, 6]` or $\[1, 4\]$ respectively. Meaning the addition pattern for each channel becomes:  
->$R_+ = G_+ = B_+:\[0, 0, 1, 0, 0, 4\]$
+This will increment all channels in subsets 3 or 6, by `40 mod [3, 6]` or $\\{1, 4\\}$ respectively. Meaning the addition pattern for each channel becomes:  
+>$R_+ = G_+ = B_+:\\{0, 0, 1, 0, 0, 4\\}$
 
 #### 4. Roping Green and Red into the equation  
 The Green channel only changes in subsets 1 and 4, and here we can take advantage of `ChannelIndex`. 
@@ -76,21 +76,21 @@ By adding $(ChannelIndex * 2)$ to the modulus, we change how the modulation work
 InitialBGR[ChannelIndex] += 40 % (Subset + (ChannelIndex * 2))
 ```
 For the Green channel this means that the modulus for each subset becomes  
->$G_m:\[1, 2, 3, 4, 5, 6\] + (1 * 2) \rightarrow \[3, 4, 5, 6, 7, 8\]$  
+>$G_m:\\{1, 2, 3, 4, 5, 6\\} + (1 * 2) \rightarrow \\{3, 4, 5, 6, 7, 8\\}$  
 
-Where 3, 6 and 7 are the only moduli which are **not** a factor of 40, meaning that for the subsets 1, 4 and 5 the Green channel will be incremented by `40 mod [3, 6, 7]` or $\[1, 4, 5\]$ respectively. Meaning the addition pattern becomes:  
->$G_+:\[1, 0, 0, 4, 5, 0\]$  
+Where 3, 6 and 7 are the only moduli which are **not** a factor of 40, meaning that for the subsets 1, 4 and 5 the Green channel will be incremented by `40 mod [3, 6, 7]` or $\\{1, 4, 5\\}$ respectively. Meaning the addition pattern becomes:  
+>$G_+:\\{1, 0, 0, 4, 5, 0\\}$  
 
 For the Red channel this means that the modulus for each subset becomes  
->$R_m:\[1, 2, 3, 4, 5, 6\] + (2 * 2) \rightarrow \[5, 6, 7, 8, 9, 10\]$  
+>$R_m:\\{1, 2, 3, 4, 5, 6\\} + (2 * 2) \rightarrow \\{5, 6, 7, 8, 9, 10\\}$  
 
-Where 6, 7 and 9 are the only moduli which are **not** a factor of 40, meaning that for the subsets 2, 3 and 5 the Red channel will be incremented by `40 mod [6, 7, 9]` or $\[4, 5, 4\]$ respectively. Meaning the addition pattern becomes:  
->$R_+:\[0, 4, 5, 0, 4, 0\]$  
+Where 6, 7 and 9 are the only moduli which are **not** a factor of 40, meaning that for the subsets 2, 3 and 5 the Red channel will be incremented by `40 mod [6, 7, 9]` or $\\{4, 5, 4\\}$ respectively. Meaning the addition pattern becomes:  
+>$R_+:\\{0, 4, 5, 0, 4, 0\\}$  
 
 Because of this change, Green no longer increments in subset 3 and 6 because `40 mod [5, 8] = 0`. Red no longer increments in subset 6 since `40 mod 10 = 0`.  
 
 Because the `ChannelIndex` of Blue is 0, modifying the modulus has no effect so the addition pattern of Blue remains:  
->$B_+:\[0, 0, 1, 0, 0, 4\]$  
+>$B_+:\\{0, 0, 1, 0, 0, 4\\}$  
 
 #### 5. Curbing growth for all channels
 Currently, all channels ever only increment and mainly do so with values larger than 1; namely 4 or 5. We can once again make use of floor division to isolate the subsets where these larger additions happen.
@@ -100,18 +100,18 @@ int((40 % (Subset + (ChannelIndex * 2))) / 4)
 
 Which means:
 >$\ $   
->${\Large\lfloor\frac{R_+:\[0, 4, 5, 0, 4, 0\]}{4} \rfloor} \rightarrow R_f:\[0,1,1,0,1,0\]$   
+>${\Large\lfloor\frac{R_+:\\{0, 4, 5, 0, 4, 0\\}}{4} \rfloor} \rightarrow R_f:\\{0,1,1,0,1,0\\}$   
 >$\ $   
->${\Large\lfloor\frac{G_+:\[1, 0, 0, 4, 5, 0\]}{4} \rfloor} \rightarrow G_f:\[0,0,0,1,1,0\]$  
+>${\Large\lfloor\frac{G_+:\\{1, 0, 0, 4, 5, 0\\}}{4} \rfloor} \rightarrow G_f:\\{0,0,0,1,1,0\\}$  
 >$\ $   
->${\Large\lfloor\frac{B_+:\[0, 0, 1, 0, 0, 4\]}{4} \rfloor} \rightarrow B_f:\[0,0,0,0,0,1\]$  
+>${\Large\lfloor\frac{B_+:\\{0, 0, 1, 0, 0, 4\\}}{4} \rfloor} \rightarrow B_f:\\{0,0,0,0,0,1\\}$  
 >$\ $  
   
 Now, by multiplying each value in $RGB_f$ by $-5$ and adding $RGB_f$ to $RGB_+$, we can change the addition patterns as such: 
 
->$R_+:\[0, 4, 5, 0, 4, 0\] + R_f:\[0,-5,-5,0,-5,0\] \rightarrow \[0, -1, 0, 0, -1, 0\]$  
->$G_+:\[1, 0, 0, 4, 5, 0\] + G_f:\[0,0,0,-5,-5,0\] \rightarrow \[1, 0, 0, -1, 0, 0\]$  
->$B_+:\[0, 0, 1, 0, 0, 4\] + B_f:\[0,0,0,0,0,-5\] \rightarrow \[0, 0, 1, 0, 0, -1\]$
+>$R_+:\\{0, 4, 5, 0, 4, 0\\} + R_f:\\{0,-5,-5,0,-5,0\\} \rightarrow \\{0, -1, 0, 0, -1, 0\\}$  
+>$G_+:\\{1, 0, 0, 4, 5, 0\\} + G_f:\\{0,0,0,-5,-5,0\\} \rightarrow \\{1, 0, 0, -1, 0, 0\\}$  
+>$B_+:\\{0, 0, 1, 0, 0, 4\\} + B_f:\\{0,0,0,0,0,-5\\} \rightarrow \\{0, 0, 1, 0, 0, -1\\}$
 
 This, then, fixes Green, Blue and _most of_ Red, which now has a subtraction in subset 5 which ought to be an addition.  
 Thus far, the formula as a whole is:
@@ -124,7 +124,7 @@ Which is already starting to look incredibly stupid, but at least correctly calc
 
 #### 6. Fixing Red's subtraction in subset 5 with more modular mayhem 
 The last thing to tweak is Red's addition pattern, which currently is:  
->$R_+:\[0, -1, 0, 0, -1, 0\]$  
+>$R_+:\\{0, -1, 0, 0, -1, 0\\}$  
 
 So we need to find a way to add $2$ to this addition pattern in subset 5. Which can be done, once again, using floor division with the following tidbit:
 ```c
