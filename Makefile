@@ -20,7 +20,7 @@ CXXFLAGS = -std=c++20 -Wall -Werror -Wformat -O2
 #Lists of source file names
 SOURCENAMES := $(wildcard $(SOURCE_DIR)/*.cpp)
 
-#Derrived object file names
+#Derived object file names
 OBJECTNAMES := $(patsubst $(SOURCE_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SOURCENAMES))
 
 #Object file linking
@@ -46,9 +46,4 @@ clean:
 check: $(OUTPUT)
 	valgrind -s --log-file=./build/log_"`date +%Y-%m-%d-%T`".txt --leak-check=full ./$<
 
-.PHONY: run check clean
-
-
-
-
-	
+.PHONY: run check clean	

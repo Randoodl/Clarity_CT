@@ -61,7 +61,7 @@ class ElementInteractions
         std::map<Palette*, std::vector<Color*>>& R_PaletteActions;
         
         //All interactions as listed in ToolContainer::DecideElementInteraction
-        void InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, bool& HexModeEnabled, char*& PassedBinPath);
+        void InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, bool& HexModeEnabled, std::string& PassedConfigPath);
         void InteractWithShadeSquare(Frames& RGBSquareFrame, ShadeSquare& RGBSquare);
         void InteractwithRGBDial(Frames& RGBSquareFrame, Frames& RGBDialFrame, ShadeSquare& RGBSquare, ColourDial& RGBDial, Vector3& DialOffsets);
         void InteractWithPalette(Frames& PaletteFrame, Palette& PaletteColours);
@@ -69,7 +69,7 @@ class ElementInteractions
         void InteractWithColourDropper(Frames& ColourDroppedFrame, ColourDropper& RGBDropper);
 
         //config file exporting functionality tied to ToolBar
-        void ExportElementPositions(std::vector<Frames*>& PassedFrames, bool PassedDarkMode, bool PassedHexMode, char*& PassedBinPath);
+        void ExportElementPositions(std::vector<Frames*>& PassedFrames, bool PassedDarkMode, bool PassedHexMode, std::string& PassedConfigPath);
 
     private:
         //Relevant to InterActWithFloodFilledFrame

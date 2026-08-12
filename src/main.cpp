@@ -15,6 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #include "../include/ToolContainer.h"
 #include "../include/EmbeddedFont.h"
 
@@ -25,14 +28,20 @@ int main(int argc, char* argv[])
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE);   
     SetTraceLogLevel(7); //toggle Raylib output
 
-    //The path of the running executable
-    char* BinPath {argv[0]};
-    
+    //Set up config directory for Windows/Linux
+    #ifdef __WIN32
+        std::string ConfigPath {getenv("APPDATA") + (std::string)"\\ClarityCT"};
+        mkdir(ConfigPath.c_str())
+    #elif __linux__
+        std::string ConfigPath {getenv("HOME") + (std::string)"/.config/ClarityCT"};
+        mkdir(ConfigPath.c_str(), 0777);
+    #endif    
+
     //Starting with a small window and updating the minimum size at runtime
     InitWindow(100, 100, "Clarity Colour Tool"); 
     SetTargetFPS(60);
 
-    ToolContainer ToolInstance = ToolContainer(BinPath);
+    ToolContainer ToolInstance = ToolContainer(ConfigPath);
     ToolInstance.BoxFont = LoadFont_EmbeddedFont();   //Font: ari-w9500-display.ttf courtesy of Catterio Sylt
     
     while(!WindowShouldClose())

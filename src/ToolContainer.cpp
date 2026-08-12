@@ -18,10 +18,10 @@
 #include "../include/ToolContainer.h"
 
 
-ToolContainer::ToolContainer(char*& PassedBinPath)
+ToolContainer::ToolContainer(std::string& PassedConfigPath)
 {  
     //Grab executable path
-    BinPath = PassedBinPath;
+    ConfigPath = PassedConfigPath;
 
     //Initialise all colours in the collection.
     ColourCollection.Update();
@@ -62,7 +62,7 @@ ToolContainer::ToolContainer(char*& PassedBinPath)
 
     //Try and load in the config file
     //If it doesn't exist/is inccessible, it falls back on the values given in Defaults.h
-    LoadCustomConfig(BinPath);
+    LoadCustomConfig(ConfigPath);
     InitialiseAllElements();
     SetUIColours(DarkModeEnabled);
     UpdateWindowMinimumSize();
@@ -281,18 +281,14 @@ void ToolContainer::SetUIColours(bool DarkModeEnabled)
 }
 
 
-void ToolContainer::LoadCustomConfig(char*& PassedBinPath)
+void ToolContainer::LoadCustomConfig(std::string& PassedConfigPath)
 {
     //Attempts to load the custom .conf file of all Element position and dimension data
     //Imagine if I implemented a proper way of loading custom UI settings
     //I mean I'm not going to, but just imagine
 
-    //Location of the Clarity executable
-    std::filesystem::path ExportPath {PassedBinPath};
-    ExportPath = ExportPath.parent_path();
-
     //Check if the .conf file exists, or exit early and fall back to default Layout values
-    if(std::filesystem::exists(ExportPath / "Clarity.conf"))
+    if(std::filesystem::exists(PassedConfigPath + "/Clarity.conf"))
     {
         try
         {
@@ -300,7 +296,7 @@ void ToolContainer::LoadCustomConfig(char*& PassedBinPath)
             std::vector<std::vector<int>> AllParameters;
 
             //Open the file and create a string for reading lines
-            std::ifstream OpenExportFile(ExportPath / "Clarity.conf");
+            std::ifstream OpenExportFile(PassedConfigPath + "/Clarity.conf");
             std::string ElementParameters;
 
             //Read each line in the .conf
@@ -435,7 +431,7 @@ void ToolContainer::DecideElementInteraction(int ActiveElementFrame)
     switch(ActiveElementFrame)
     {
         case 0: 
-            Interactions.InteractWithToolBar(ElementFrames, Tools, DarkModeEnabled, HexModeEnabled, BinPath); 
+            Interactions.InteractWithToolBar(ElementFrames, Tools, DarkModeEnabled, HexModeEnabled, ConfigPath); 
             
             //Reads the ResetFrame state every time the Toolbar is interacted with, kind of eh.......
             if(Interactions.ResetFrames)

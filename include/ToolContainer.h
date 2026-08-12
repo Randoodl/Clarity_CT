@@ -27,7 +27,7 @@ class ToolContainer
     //As well as the methods to interact with 'em
     
     public:
-        ToolContainer(char*& PassedBinPath);
+        ToolContainer(std::string& PassedConfigPath);
 
         void DrawElements();
         void MouseClickHandler();
@@ -41,7 +41,7 @@ class ToolContainer
     private:
 
         //UI related attributes and methods 
-        char* BinPath;
+        std::string ConfigPath;
         bool FrameIsMutable;  
         bool DarkModeEnabled;
         bool HexModeEnabled;
@@ -55,7 +55,7 @@ class ToolContainer
         const Defaults BackupLayout; 
 
         //Custom layout methods
-        void LoadCustomConfig(char*& PassedBinPath);
+        void LoadCustomConfig(std::string& PassedConfigPath);
         void DefaultFallback();
 
         //Interactions of elements with the Mouse

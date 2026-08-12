@@ -142,7 +142,7 @@ std::map<int, std::vector<int>> ColourDial::GenerateRGBTuples()
     }
 
     //The following is arguably the absolute worst way to determine RGB tuples, but it is also the funniest one. 
-    //Instead of relying on PatternArray, all colour channels are derrived solely from their index in the 0-1529 possible Hue combinations map
+    //Instead of relying on PatternArray, all colour channels are derived solely from their index in the 0-1529 possible Hue combinations map
     //using some circus math that I only understood at the moment of writing it.
     //Change literally any number below and watch ColourDial break, while remaining fully functional (along with the rest of Clarity CT)
     //I felt like it needed to be included, since this Frankensteinian joke of an algorithm is what got me to write this barely functional pile of code to begin with

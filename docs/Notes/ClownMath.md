@@ -10,10 +10,10 @@ If you like math, or if you're even on friendly terms with math, I'd suggest you
 ---
 
 ### Generating fully saturated RGB tuples in a for-loop by making modular math weep<a name="rgbtuplegeneration"></a>  
-Given the colour tuple $(R, G, B)$, it is possible to generate a set of all fully saturated RGB tuples, meaning tuples where one value is set to $0$, one value is set to $225$ and one value is either ascending or descending,  through a for-loop in such a way that the following pattern emerges:  
+Given the colour tuple $(R, G, B)$, it is possible to generate a set of all fully saturated RGB tuples, meaning tuples where one value is set to $0$, one value is set to $255$ and one value is either ascending or descending,  through a for-loop in such a way that the following pattern emerges:  
 >$(255, \uparrow, 0), (\downarrow, 255, 0), (0, 255, \uparrow), (0, \downarrow, 255), (\uparrow, 0, 255),  (255, 0, \downarrow)$   
 
-The pattern is cyclical and can be divided into $6$ equal subsets of length $225$, therefore the total number of possible RGB tuples is $1530$.
+The pattern is cyclical and can be divided into $6$ equal subsets of length $255$, therefore the total number of possible RGB tuples is $1530$.
  
 For indexing purposes (and because I've decided to set it up this way in the code for reasons that currently elude me), the initial condition of this for-loop is $(B, G, R) = (0, 0, 255)$, which is essentially just the normal tuple for a fully saturated red, but in reverse.  
 The for-loop itself is structured as follows:  
@@ -69,7 +69,7 @@ This will increment all channels in subsets 3 or 6, by `40 mod [3, 6]` or $\\{1,
 >$R_+ = G_+ = B_+:\\{0, 0, 1, 0, 0, 4\\}$
 
 #### 4. Roping Green and Red into the equation  
-The Green channel only changes in subsets 1 and 4, and here we can take advantage of `ChannelIndex`. 
+The Green channel only changes in subsets 1 and 4 and here we can take advantage of `ChannelIndex`. 
 By adding $(ChannelIndex * 2)$ to the modulus, we change how the modulation works for the Red and Green channels. The Blue channel remains unchanged as its ChannelIndex is always 0, thus it does not factor into the modulus.
 ```c
 //Modifying modulus
@@ -136,7 +136,7 @@ The floor division will only evaluate to $1$ while working with subset 5 or 6, m
 ```
 This will evaluate to $1$ when the subset is 5 and $0$ when the subset is 6.  
 It will also evalute to non-zero numbers in subsets 1 through 4, but since we multiply this by the result of the floor division by 9 tidbit, these positive values for subsets 1 through 4 will be multiplied by $0$ and thus be rendered moot.   
-Putting it altogether yields:
+Putting it all together yields:
 ```c
 InitialBGR = {0, 0, 255}
 

@@ -27,7 +27,7 @@ ElementInteractions::ElementInteractions(bool& PassedFrameState, ColourFamily& P
 }
 
 
-void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, bool& HexModeEnabled, char*& PassedBinPath)
+void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames, ToolBar& Tools, bool& DarkModeEnabled, bool& HexModeEnabled, std::string& PassedConfigPath)
 {
     if(!R_FrameState)
     {
@@ -39,7 +39,7 @@ void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames
         {
             //Seems like a long goddamn way to pass down main(argv), but alas, here we are
             //I'm tired, Samwise
-            ExportElementPositions(PassedFrames, DarkModeEnabled, HexModeEnabled,  PassedBinPath);
+            ExportElementPositions(PassedFrames, DarkModeEnabled, HexModeEnabled,  PassedConfigPath);
             std::cout << "Exported config file.\n";
         } 
         else if(CheckCollisionPointRec(PassedMouseXY, Tools.CodeModeButton))
@@ -223,18 +223,13 @@ void ElementInteractions::InteractWithColourDropper(Frames& ColourDropperFrame, 
 }
 
 
-void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFrames, bool PassedDarkMode, bool PassedHexMode, char*& PassedBinPath)
+void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFrames, bool PassedDarkMode, bool PassedHexMode, std::string& PassedConfigPath)
 {
     //Export the current Frames [x, y, width, height] , DarkMode and CodeMode to a local .conf file
-
-    //Get the parent directory of the Clarity_CT executable
-    std::filesystem::path ExportPath {PassedBinPath};
-    ExportPath = ExportPath.parent_path();
-
     try
     {
         //Open (or create) the config file
-        std::ofstream ExportFile(ExportPath / "Clarity.conf");
+        std::ofstream ExportFile(PassedConfigPath + "/Clarity.conf");
 
         //Store all Frames' positonal data in [x, y, width, height] format
         //It counts up to n of Frames, so the last lines for DarkMode/HexMode toggling do not get counted here
