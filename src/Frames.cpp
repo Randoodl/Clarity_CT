@@ -94,7 +94,7 @@ void Frames::DrawFrameBox(Color& FrameBoxColour, Color& BackGroundColour)
     DrawRectangle(MoveButton.x, MoveButton.y, MoveButton.width, MoveButton.height, FrameBoxColour);
 
     //give the Frame a title, optionally sized down to fit
-    std::string FrameTitle {FrameTag};
+    std::string FrameTitle {" " + FrameTag};
     int TotalChars {(int)FrameTitle.size()};
     while(MeasureText(FrameTitle.c_str(), FrameTagFontSize) > MoveButton.width)
     {
@@ -105,8 +105,15 @@ void Frames::DrawFrameBox(Color& FrameBoxColour, Color& BackGroundColour)
     
     //Draw the Show Button
     DrawRectangle(ShowButton.x, ShowButton.y, ShowButton.width, ShowButton.height, FrameBoxColour);
-    DrawEllipse(ShowButton.x + ShowButton.width/2, ShowButton.y + ShowButton.height/2, ShowButton.width/2, ShowButton.height/4, BackGroundColour);
-    DrawCircle(ShowButton.x + ShowButton.width/2, ShowButton.y + ShowButton.height/2, ShowButton.width/4, FrameBoxColour);
+    DrawEllipse(ShowButton.x + ShowButton.width/3, ShowButton.y + ShowButton.height/2, ShowButton.width/2, ShowButton.height/4, BackGroundColour);
+    if(ShowContent)
+    {
+        DrawCircle(ShowButton.x + ShowButton.width/3, ShowButton.y + ShowButton.height/2, ShowButton.width/4, FrameBoxColour);
+    }
+    else
+    {
+        DrawEllipse(ShowButton.x + ShowButton.width/3, ShowButton.y + ShowButton.height/3, ShowButton.width/2, ShowButton.height/4, FrameBoxColour);
+    }
 
     //Draw the Scale Button
     DrawTriangle(
@@ -115,8 +122,6 @@ void Frames::DrawFrameBox(Color& FrameBoxColour, Color& BackGroundColour)
         {ScaleButton.x, ScaleButton.y + ScaleButton.height},
         FrameBoxColour
     );
-
-
 } 
 
 

@@ -29,16 +29,17 @@ int main(int argc, char* argv[])
     SetTraceLogLevel(7); //toggle Raylib output
 
     //Set up config directory for Windows/Linux
+    std::string ConfigPath {};
     #ifdef __WIN32
-        std::string ConfigPath {getenv("APPDATA") + (std::string)"\\ClarityCT"};
-        mkdir(ConfigPath.c_str())
+        ConfigPath  = getenv("APPDATA") + (std::string)"\\ClarityCT";
+        mkdir(ConfigPath.c_str());
     #elif __linux__
-        std::string ConfigPath {getenv("HOME") + (std::string)"/.config/ClarityCT"};
+        ConfigPath = getenv("HOME") + (std::string)"/.config/ClarityCT";
         mkdir(ConfigPath.c_str(), 0777);
     #endif    
 
     //Starting with a small window and updating the minimum size at runtime
-    InitWindow(100, 100, "Clarity Colour Tool"); 
+    InitWindow(100, 100, "Clarity CT"); 
     SetTargetFPS(60);
 
     ToolContainer ToolInstance = ToolContainer(ConfigPath);

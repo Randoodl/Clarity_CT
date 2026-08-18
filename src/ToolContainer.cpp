@@ -292,8 +292,8 @@ void ToolContainer::LoadCustomConfig(std::string& PassedConfigPath)
     {
         try
         {
-            //Stores all Element parameters as vectors of ints
-            std::vector<std::vector<int>> AllParameters;
+            //Stores all Element parameters as vectors of strings
+            std::vector<std::vector<std::string>> AllParameters {};
 
             //Open the file and create a string for reading lines
             std::ifstream OpenExportFile(PassedConfigPath + "/Clarity.conf");
@@ -305,14 +305,14 @@ void ToolContainer::LoadCustomConfig(std::string& PassedConfigPath)
                 std::stringstream ReadString(ElementParameters);
                 std::string SingleParameter;
 
-                //stores [x, y, width, height]
-                std::vector<int> ParametersPerLine;
+                //stores [tag, x, y, width, height]
+                std::vector<std::string> ParametersPerLine;
 
                 //Read a single line and split it on the ','
                 while(getline(ReadString, SingleParameter, ','))
                 {
-                    //Create the [x, y, width, height] vector for this line
-                    ParametersPerLine.emplace_back(stoi(SingleParameter));
+                    //Create the [tag, x, y, width, height] vector for this line
+                    ParametersPerLine.emplace_back(SingleParameter);
                 }
                 AllParameters.emplace_back(ParametersPerLine);
             }
@@ -322,22 +322,23 @@ void ToolContainer::LoadCustomConfig(std::string& PassedConfigPath)
 
             //Iterate through each Frame (even the hidden ones)
             for(ElementState* ElementUIData: LayoutStates)
-            {   
+            {
                 //Overwrite the default values for all Elements with loaded .conf values
                 {
-                    ElementUIData->AnchorX    = AllParameters[ReadingLine][0];
-                    ElementUIData->AnchorY    = AllParameters[ReadingLine][1];
-                    ElementUIData->LenX       = AllParameters[ReadingLine][2];
-                    ElementUIData->LenY       = AllParameters[ReadingLine][3]; 
-                    ElementUIData->Visibility = AllParameters[ReadingLine][4];
+                    ElementUIData->ElementTag = AllParameters[ReadingLine][0];
+                    ElementUIData->AnchorX    = stoi(AllParameters[ReadingLine][1]);
+                    ElementUIData->AnchorY    = stoi(AllParameters[ReadingLine][2]);
+                    ElementUIData->LenX       = stoi(AllParameters[ReadingLine][3]);
+                    ElementUIData->LenY       = stoi(AllParameters[ReadingLine][4]); 
+                    ElementUIData->Visibility = stoi(AllParameters[ReadingLine][5]);
                 }
                 ++ReadingLine;
             }
 
             //Lasty, toggle Darkmode and HexMode
             //It is still stored as a vector<vector<int>>, so it needs to be accessed though back >and< index
-            HexModeEnabled  = AllParameters[AllParameters.size() - 2][0];
-            DarkModeEnabled = AllParameters[AllParameters.size() - 1][0];
+            HexModeEnabled  = stoi(AllParameters[AllParameters.size() - 2][0]);
+            DarkModeEnabled = stoi(AllParameters[AllParameters.size() - 1][0]);
         }
         catch(...) //Well aware this is bad practice, but this doesn't call for actual error handling, I just need it to reset the .conf
         {
@@ -375,7 +376,6 @@ void ToolContainer::SetElementInteraction(Vector2 MouseXY)
         if(CheckCollisionPointRec(MouseXY, Frame->FrameArea))
         {
             Frame->ActiveFrame = true;
-
             Frame->MouseOffsetX = Frame->FrameArea.x - MouseXY.x;
             Frame->MouseOffsetY = Frame->FrameArea.y - MouseXY.y;
 

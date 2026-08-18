@@ -39,6 +39,9 @@ void ElementInteractions::InteractWithToolBar(std::vector<Frames*>& PassedFrames
         {
             //Seems like a long goddamn way to pass down main(argv), but alas, here we are
             //I'm tired, Samwise
+            //  This was already an ass-backwards way of storing .conf files, but now that it is stored in ~/.config or %appdata% it's even sillier
+            //  The entire labyrinthine pipeline of passing the .conf location here was already built, so I decided to keep it this way.
+            //  What's FOSS without a little bit of tech debt, anyway?
             ExportElementPositions(PassedFrames, DarkModeEnabled, HexModeEnabled,  PassedConfigPath);
             std::cout << "Exported config file.\n";
         } 
@@ -234,8 +237,9 @@ void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFra
         //Store all Frames' positonal data in [x, y, width, height] format
         //It counts up to n of Frames, so the last lines for DarkMode/HexMode toggling do not get counted here
         for(auto Line : PassedFrames) 
-        {
-            ExportFile << Line->FrameArea.x << "," << Line->FrameArea.y << "," << Line->FrameArea.width << "," << Line->FrameArea.height << "," << Line->ShowContent <<"\n";
+        { 
+            ExportFile << Line->FrameTag << ", "<< Line->FrameArea.x << "," << Line->FrameArea.y << "," 
+            << Line->FrameArea.width << "," << Line->FrameArea.height << "," << Line->ShowContent <<"\n";
         }
 
         //Tack on a Dec/Hex mode at the almost end
