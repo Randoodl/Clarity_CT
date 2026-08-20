@@ -157,7 +157,57 @@ for(int TupleCombination in int AllPossibleCombinations)
 ```
 
 And there you have it, the silliest algorithm to generate a full set of all possible fully saturated RGB tuples. You could likely collapse this down to just one for-loop by iterating over `AllPossibleCombinations` thrice and then using some more modular math wizardry to determine whether to modify $R$, $G$ or $B$, but I do believe this unwarranted attack on math has gone on for long enough, so here is where I'll draw the line.  
-_for now._
+_~~for now.~~_
+
+#### 7. I lied; I can make it worse, just watch me  
+As of now, we're left with a for-loop nested in a for-loop: first for each  tuple in the 1530 `AllPossibleCombinations`, and then for each channel in $\\{B, G, R\\}$, which essentially means we're looping through `AllPossibleCombinations` three times. We can (and against all better judgement _will_) encode all of this information in just one loop.  
+By combining `AllPossibleCombinations` with `length(InitialBGR)` we get a total of  
+
+>$1530 * 3 = 4590$  
+
+Combined combinations, let's daringly call this `CombinedCombinations`.  
+ This is the total number of operations that need to be done in order for all fully saturated colours to be calculated. Adjust $B$, then $G$, lastly $R$ and all of that 1530 times over.  
+Let's then look at the loop structure we have so far:
+
+```c
+for(int TupleCombination in int AllPossibleCombinations)
+{  
+  for(int ChannelIndex in length(InitialBGR))
+  {
+    //The dumbest code you've ever set eyes on
+  }
+}
+```
+
+`ChannelIndex` is a value between 0 and 2 and can itself be calculated from TupleCombination through $(TupleCombination \% 3)$. Meaning all references to `ChannelIndex` in the earlier algorithm can simply be replaced with this calculation. 
+
+```c
+for(int TupleCombination in int CombinedCombinations)
+{  
+    InitialBGR[TupleCombination % 3] += //Currently broken code 
+}
+```
+
+Why is the code broken at this point? Because we've not adjusted the `Subset` logic. The `Subset` calculation expects values from 0-1529, not 0-4589, but we can scale this down to `ScaledSet` by once again making use of our good old friend: floor division.
+
+>$\\{ScaledSet = \Large\lfloor\frac{Subset}{3}\rfloor\\}$   
+
+Now, with `CombinedCombinations` accounting for the triple channels, `ChannelIndex` replaced with $(TupleCombination \% 3)$ and the subsets scaled accordinly, what we are left with the following disgustingly absurd for-loop:
+
+```c
+for(int TupleCombination in int CombinedCombinations)
+{  
+    //Replacing ChannelIndex with (TupleCombination % 3)
+    //Swapping Subset for ScaledSet
+    InitialBGR[TupleCombination % 3] += (40 % (ScaledSet + ((TupleCombination % 3) * 2))) 
+                                     - (5 * (int((40 % (ScaledSet + ((TupleCombination % 3) * 2))) / 4))) 
+                                     + (2 * (int((ScaledSet + ((TupleCombination % 3) * 2)) / 9))
+                                     * (10 % (ScaledSet + ((TupleCombination % 3) * 2))))
+}
+```
+
+The underlying logic still works, as long as the subsets are scaled accordingly, so nothing needs to be tinkered with over there. With everything now made relative to `CombinedCombinations` we can now wrap it all up in one tight, ~~neat~~, ridiculous for-loop.  
+When God comes knocking I will not ask him to forgive my hubris.
 
 ---
 

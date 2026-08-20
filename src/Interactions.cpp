@@ -238,7 +238,7 @@ void ElementInteractions::ExportElementPositions(std::vector<Frames*>& PassedFra
         //It counts up to n of Frames, so the last lines for DarkMode/HexMode toggling do not get counted here
         for(auto Line : PassedFrames) 
         { 
-            ExportFile << Line->FrameTag << ", "<< Line->FrameArea.x << "," << Line->FrameArea.y << "," 
+            ExportFile << Line->FrameTag << ","<< Line->FrameArea.x << "," << Line->FrameArea.y << "," 
             << Line->FrameArea.width << "," << Line->FrameArea.height << "," << Line->ShowContent <<"\n";
         }
 

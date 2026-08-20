@@ -160,6 +160,18 @@ std::map<int, std::vector<int>> ColourDial::GenerateRGBTuples()
         }
     }
     */
+   
+    /*
+    Because I apparently have nothing better to do with my spare time, I have since tinkered with it to make an even more obtuse, single for-loop
+    It is ridiculous, but it also brings me great joy
+    
+    for(int RGBStep {0}; RGBStep < (BandsAmount * 3); ++RGBStep)
+    {
+        MapOfRGBTuples[int(RGBStep / 3)] = BGRTuple;
+        BGRTuple[RGBStep % 3] += (40 % ((int(int(RGBStep / 3) / RGBValMax) + 1) + ((RGBStep % 3) * 2))) - (5 * (int((40 % ((int(int(RGBStep / 3) / RGBValMax) + 1) + ((RGBStep % 3) * 2))) / 4)))
+        + (2* (int(((int(int(RGBStep / 3) / RGBValMax) + 1) + ((RGBStep % 3) * 2)) / 9)) * (10 % ((int(int(RGBStep / 3) / RGBValMax) + 1) + ((RGBStep % 3) * 2))));
+    }
+    */
     
     return MapOfRGBTuples;
 }
