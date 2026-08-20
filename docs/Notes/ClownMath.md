@@ -179,7 +179,7 @@ for(int TupleCombination in int AllPossibleCombinations)
 }
 ```
 
-`ChannelIndex` is a value between 0 and 2 and can itself be calculated from TupleCombination through $(TupleCombination \% 3)$. Meaning all references to `ChannelIndex` in the earlier algorithm can simply be replaced with this calculation. 
+`ChannelIndex` is a value between 0 and 2 and can itself be calculated from TupleCombination through $(TupleCombination \\% 3)$. Meaning all references to `ChannelIndex` in the earlier algorithm can simply be replaced with this calculation. 
 
 ```c
 for(int TupleCombination in int CombinedCombinations)
@@ -190,9 +190,9 @@ for(int TupleCombination in int CombinedCombinations)
 
 Why is the code broken at this point? Because we've not adjusted the `Subset` logic. The `Subset` calculation expects values from 0-1529, not 0-4589, but we can scale this down to `ScaledSet` by once again making use of our good old friend: floor division.
 
->$\\{ScaledSet = \Large\lfloor\frac{Subset}{3}\rfloor\\}$   
+>$ScaledSet = \Large\lfloor\frac{Subset}{3}\rfloor$   
 
-Now, with `CombinedCombinations` accounting for the triple channels, `ChannelIndex` replaced with $(TupleCombination \% 3)$ and the subsets scaled accordinly, what we are left with the following disgustingly absurd for-loop:
+Now, with `CombinedCombinations` accounting for the triple channels, `ChannelIndex` replaced with $(TupleCombination \\% 3)$ and the subsets scaled accordingly, what we are left with is the following disgustingly absurd for-loop:
 
 ```c
 for(int TupleCombination in int CombinedCombinations)
@@ -206,8 +206,8 @@ for(int TupleCombination in int CombinedCombinations)
 }
 ```
 
-The underlying logic still works, as long as the subsets are scaled accordingly, so nothing needs to be tinkered with over there. With everything now made relative to `CombinedCombinations` we can now wrap it all up in one tight, ~~neat~~, ridiculous for-loop.  
-When God comes knocking I will not ask him to forgive my hubris.
+The underlying logic still works as long as the subsets are scaled accordingly, so nothing needs to be tinkered with over there. With everything now made relative to `CombinedCombinations` we can now wrap it all up in one tight, ~~neat~~, ridiculous for-loop.  
+When God comes knocking on my door I will not ask him to forgive me for my hubris.
 
 ---
 
