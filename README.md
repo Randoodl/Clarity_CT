@@ -64,7 +64,7 @@ The `Toolbar` allows you to change the way Clarity CT presents itself, giving yo
 > It's not an elegant way of doing it, but it works and I have put too much time into this joke-taken-too-seriously project as is.
 
 > [!NOTE]  
-> The configuration is saved in a daringly named Clarity.conf alongside the binary.
+> The configuration is saved in a daringly named Clarity.conf in either `~\AppData\Roaming\ClarityCT\` or `~/.config/ClarityCT/` based on your operating system of choice.
 
 ### ❓ Answers to questions nobody asked <a name = "faq"></a>
 * `Why?`  
